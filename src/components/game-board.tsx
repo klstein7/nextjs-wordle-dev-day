@@ -1,5 +1,3 @@
-"use client";
-
 import { GuessInput } from "./guess-input";
 import { GuessList } from "./guess-list";
 
