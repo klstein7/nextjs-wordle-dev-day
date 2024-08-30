@@ -92,7 +92,7 @@ git checkout <checkpoint-branch-name>
 2. Progress through each checkpoint, implementing the features described.
 3. After completing each section, you can compare your work with the corresponding checkpoint branch.
 4. If you get stuck, you can use the checkpoint branches as a reference or starting point.
-5. By the time you reach the `checkpoint-06-styling-polish` branch, you'll have a fully functional Wordle clone.
+5. By the time you reach the `checkpoint-07-styling-polish` branch, you'll have a fully functional Wordle clone.
 
 Remember, these checkpoints are here to help you, but the real learning comes from working through the implementation yourself!
 
