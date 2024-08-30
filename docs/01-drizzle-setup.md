@@ -1,6 +1,6 @@
-# Checkpoint 01: Drizzle Setup
+# Section 01: Drizzle Setup
 
-In this checkpoint, we'll set up Drizzle ORM, which is similar to how you might use JPA in Spring Boot. We'll define our database schema for the Wordle clone, which is analogous to creating entity classes in Java.
+In this section, we'll set up Drizzle ORM, which is similar to how you might use JPA in Spring Boot. We'll define our database schema for the Wordle clone, which is analogous to creating entity classes in Java.
 
 ## Understanding the Schema
 
@@ -93,6 +93,6 @@ yarn db:push
 
 ## Next Steps
 
-With our database schema in place, we're ready to move on to implementing the game board UI in the next checkpoint. This schema will allow us to store and retrieve game data, similar to how you'd use repositories in Spring Boot.
+With our database schema in place, we're ready to move on to implementing the game board UI in the next section. This schema will allow us to store and retrieve game data, similar to how you'd use repositories in Spring Boot.
 
 In the frontend, instead of Angular, we'll be using React with Next.js, which provides a component-based architecture similar to Angular, but with a different syntax and lifecycle management.
