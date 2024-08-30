@@ -3,9 +3,15 @@
 import { REGEXP_ONLY_CHARS } from "input-otp";
 import { useState } from "react";
 
+import { api } from "~/server/api";
+
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
-export const GuessInput = () => {
+type GuessInputProps = {
+  gameId: number;
+};
+
+export const GuessInput = ({ gameId }: GuessInputProps) => {
   const [guess, setGuess] = useState<string>("");
 
   return (
@@ -16,7 +22,7 @@ export const GuessInput = () => {
       onChange={(value) => setGuess(value)}
       onKeyDown={async (e) => {
         if (e.key === "Enter") {
-          console.log(guess);
+          await api.guesses.create(guess.toUpperCase(), gameId);
           setGuess("");
         }
       }}
