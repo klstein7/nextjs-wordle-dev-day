@@ -70,12 +70,13 @@ wordle-clone/
 The tutorial is divided into the following key stages, each represented by a checkpoint branch:
 
 1. `main` - Initial setup
-2. `checkpoint-01-game-board` - Implementing the game board UI
-3. `checkpoint-02-game-logic` - Adding core game logic and state management
-4. `checkpoint-03-keyboard` - Creating the on-screen keyboard
-5. `checkpoint-04-word-validation` - Implementing word validation and feedback
-6. `checkpoint-05-game-over` - Adding game over conditions and restart functionality
-7. `checkpoint-06-styling-polish` - Final styling and UI polish
+2. `checkpoint-01-drizzle-setup` - Drizzle setup
+3. `checkpoint-02-game-board` - Implementing the game board UI
+4. `checkpoint-03-game-logic` - Adding core game logic and state management
+5. `checkpoint-04-keyboard` - Creating the on-screen keyboard
+6. `checkpoint-05-word-validation` - Implementing word validation and feedback
+7. `checkpoint-06-game-over` - Adding game over conditions and restart functionality
+8. `checkpoint-07-styling-polish` - Final styling and UI polish
 
 These checkpoints allow you to verify your progress or jump to a specific point in the tutorial if needed.
 
