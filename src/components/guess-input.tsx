@@ -1,8 +1,8 @@
 "use client";
 
 import { REGEXP_ONLY_CHARS } from "input-otp";
-import { useState } from "react";
 
+import { useGuess } from "~/lib/hooks/use-guess";
 import { api } from "~/server/api";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
@@ -12,7 +12,7 @@ type GuessInputProps = {
 };
 
 export const GuessInput = ({ gameId }: GuessInputProps) => {
-  const [guess, setGuess] = useState<string>("");
+  const { guess, setGuess } = useGuess();
 
   return (
     <InputOTP

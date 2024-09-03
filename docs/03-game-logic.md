@@ -565,23 +565,12 @@ Great job! You've now implemented the core game logic for your Wordle clone. Thi
 3. Storing and retrieving game state
 4. Updating the UI based on game state
 
-Here's a summary of what we've accomplished:
+In the next section (Section 04: Keyboard), we'll focus on:
 
-1. We created utility functions to handle random word selection.
-2. We implemented server-side logic with services for games and guesses, similar to how you might structure a Spring Boot application.
-3. We set up an API layer to interface between our server-side logic and our React components.
-4. We updated our React components to use the new game logic, managing state and user interactions.
+1. Creating the on-screen keyboard component
+2. Integrating the keyboard with the game logic
+3. Updating the keyboard UI based on guessed letters
 
-Some key differences you might have noticed if you're coming from a Spring Boot/Angular background:
-
-- Instead of using dependency injection, we're importing our services and API functions directly.
-- React's component model is similar to Angular's, but with some differences in how props are passed and state is managed.
-- Next.js provides both server-side and client-side rendering capabilities, which we've utilized in different components.
-
-In the next section, we'll focus on improving the user experience by:
-
-1. Adding visual feedback for correct and incorrect guesses
-2. Implementing game over conditions
-3. Adding a feature to start a new game after completion
+This will further enhance the user experience and bring us closer to a fully functional Wordle clone. Remember, you can always refer to the `checkpoint-04-keyboard` branch if you need guidance or want to compare your implementation.
 
 Happy coding!

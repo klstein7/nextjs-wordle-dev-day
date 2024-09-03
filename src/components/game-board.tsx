@@ -10,7 +10,7 @@ type GameBoardProps = {
 
 export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex grow flex-col items-center gap-3">
       <GuessList guesses={guesses} />
       <GuessInput gameId={gameId} />
     </div>
