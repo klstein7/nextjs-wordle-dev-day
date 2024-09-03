@@ -22,7 +22,7 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
       onChange={(value) => setGuess(value)}
       onKeyDown={async (e) => {
         if (e.key === "Enter") {
-          await api.guesses.create(guess.toUpperCase(), gameId);
+          await api.guesses.create(guess, gameId);
           setGuess("");
         }
       }}

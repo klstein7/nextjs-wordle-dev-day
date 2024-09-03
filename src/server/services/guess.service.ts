@@ -1,9 +1,8 @@
-import { asc, count, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "../db";
 import { games, guesses } from "../db/schema";
-import { gameService } from "./game.service";
 
 const checkGuess = async (guess: string, gameId: number) => {
   const game = await db.query.games.findFirst({
@@ -19,12 +18,10 @@ const checkGuess = async (guess: string, gameId: number) => {
   const result = new Array(5).fill("X");
   const charCount = new Map();
 
-  // Count occurrences of each character in actualWord
   for (const char of actualWord) {
     charCount.set(char, (charCount.get(char) || 0) + 1);
   }
 
-  // First pass: mark correct positions
   for (let i = 0; i < 5; i++) {
     if (upperGuess[i] === actualWord[i]) {
       result[i] = "C";
@@ -32,7 +29,6 @@ const checkGuess = async (guess: string, gameId: number) => {
     }
   }
 
-  // Second pass: mark misplaced letters
   for (let i = 0; i < 5; i++) {
     if (result[i] !== "C" && charCount.get(upperGuess[i]) > 0) {
       result[i] = "~";
@@ -50,23 +46,13 @@ const create = async (guess: string, gameId: number) => {
     .insert(guesses)
     .values({
       gameId,
-      guess,
+      guess: guess.toUpperCase(),
       result,
     })
     .returning();
 
   if (!createdGuess) {
     throw new Error("Failed to create guess");
-  }
-
-  const count = await countByGameId(gameId);
-
-  if (count === 5 && createdGuess.result.includes("X")) {
-    await gameService.update(gameId, "lost");
-  }
-
-  if (createdGuess.result === "CCCCC") {
-    await gameService.update(gameId, "won");
   }
 
   revalidatePath(`/game/${gameId}`);
@@ -79,19 +65,6 @@ const findByGameId = async (gameId: number) => {
     where: eq(guesses.gameId, gameId),
     orderBy: [asc(guesses.createdAt)],
   });
-};
-
-const countByGameId = async (gameId: number) => {
-  const [gameCount] = await db
-    .select({ count: count() })
-    .from(guesses)
-    .where(eq(guesses.gameId, gameId));
-
-  if (!gameCount) {
-    throw new Error("Error counting guesses");
-  }
-
-  return gameCount.count;
 };
 
 export const guessService = {
