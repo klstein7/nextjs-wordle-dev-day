@@ -83,7 +83,6 @@ export function getRandomWord() {
   return word;
 }
 
-// This function is similar to a validation method in a Spring Boot service
 export function isValidWord(word: string) {
   return words.includes(word.toLowerCase());
 }
@@ -114,7 +113,7 @@ import { api } from "~/server/api";
 import { isValidWord } from "../utils";
 import { useGuess } from "./use-guess";
 
-// This schema is similar to creating a DTO (Data Transfer Object) in Spring Boot
+// This schema is similar to creating a DTO (Data Transfer Object) in Spring Boot with validation annotations
 const CreateGuessSchema = z.object({
   guess: z
     .string()
@@ -133,7 +132,6 @@ export const useCreateGuess = () => {
   const { setGuess } = useGuess();
 
   return async (guess: string, gameId: number) => {
-    // This validation is similar to using a validator in Spring Boot
     const result = CreateGuessSchema.safeParse({ guess, gameId });
     if (!result.success) {
       result.error.errors.forEach((error) => {
