@@ -4,8 +4,8 @@ import "react-simple-keyboard/build/css/index.css";
 
 import Keyboard from "react-simple-keyboard";
 
+import { useCreateGuess } from "~/lib/hooks/use-create-guess";
 import { useGuess } from "~/lib/hooks/use-guess";
-import { api } from "~/server/api";
 
 type GuessKeyboardProps = {
   gameId: number;
@@ -13,6 +13,8 @@ type GuessKeyboardProps = {
 
 export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
   const { guess, setGuess } = useGuess();
+
+  const createGuess = useCreateGuess();
 
   return (
     <Keyboard
@@ -39,8 +41,7 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
         }
 
         if (input === "{enter}") {
-          await api.guesses.create(guess, gameId);
-          setGuess("");
+          await createGuess(guess, gameId);
           return;
         }
 

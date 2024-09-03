@@ -15,3 +15,7 @@ export function getRandomWord() {
   }
   return word;
 }
+
+export function isValidWord(word: string) {
+  return words.includes(word.toLowerCase());
+}

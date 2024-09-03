@@ -2,8 +2,8 @@
 
 import { REGEXP_ONLY_CHARS } from "input-otp";
 
+import { useCreateGuess } from "~/lib/hooks/use-create-guess";
 import { useGuess } from "~/lib/hooks/use-guess";
-import { api } from "~/server/api";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
@@ -14,6 +14,8 @@ type GuessInputProps = {
 export const GuessInput = ({ gameId }: GuessInputProps) => {
   const { guess, setGuess } = useGuess();
 
+  const createGuess = useCreateGuess();
+
   return (
     <InputOTP
       maxLength={5}
@@ -22,8 +24,7 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
       onChange={(value) => setGuess(value)}
       onKeyDown={async (e) => {
         if (e.key === "Enter") {
-          await api.guesses.create(guess, gameId);
-          setGuess("");
+          await createGuess(guess, gameId);
         }
       }}
     >
