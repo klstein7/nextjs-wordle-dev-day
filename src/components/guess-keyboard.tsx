@@ -40,6 +40,7 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
 
         if (input === "{enter}") {
           await api.guesses.create(guess, gameId);
+          setGuess("");
           return;
         }
 

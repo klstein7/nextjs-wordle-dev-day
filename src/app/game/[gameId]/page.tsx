@@ -12,7 +12,7 @@ export default async function GamePage({
 
   return (
     <GuessProvider>
-      <div className="flex h-full flex-col items-center justify-center">
+      <div className="flex h-full flex-col items-center gap-6">
         <div className="flex flex-1 items-center justify-center">
           <GameBoard gameId={gameId} guesses={guesses} />
         </div>
