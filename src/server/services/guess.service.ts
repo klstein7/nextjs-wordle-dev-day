@@ -1,8 +1,9 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "../db";
 import { games, guesses } from "../db/schema";
+import { gameService } from "./game.service";
 
 const checkGuess = async (guess: string, gameId: number) => {
   const game = await db.query.games.findFirst({
@@ -55,6 +56,16 @@ const create = async (guess: string, gameId: number) => {
     throw new Error("Failed to create guess");
   }
 
+  const count = await countByGameId(gameId);
+
+  if (count === 6 && createdGuess.result.includes("X")) {
+    await gameService.update(gameId, "lost");
+  }
+
+  if (createdGuess.result === "CCCCC") {
+    await gameService.update(gameId, "won");
+  }
+
   revalidatePath(`/game/${gameId}`);
 
   return createdGuess;
@@ -65,6 +76,19 @@ const findByGameId = async (gameId: number) => {
     where: eq(guesses.gameId, gameId),
     orderBy: [asc(guesses.createdAt)],
   });
+};
+
+const countByGameId = async (gameId: number) => {
+  const [gameCount] = await db
+    .select({ count: count() })
+    .from(guesses)
+    .where(eq(guesses.gameId, gameId));
+
+  if (!gameCount) {
+    throw new Error("Error counting guesses");
+  }
+
+  return gameCount.count;
 };
 
 export const guessService = {
