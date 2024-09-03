@@ -1,3 +1,540 @@
+diff --git a/diff.txt b/diff.txt
+index facdcd4..0a0c41f 100644
+--- a/diff.txt
++++ b/diff.txt
+@@ -1,151 +1,418 @@
+-diff --git a/docs/02-game-board.md b/docs/02-game-board.md
++diff --git a/docs/03-game-logic.md b/docs/03-game-logic.md
+ new file mode 100644
+ index 0000000..e69de29
+ diff --git a/src/app/game/[gameId]/page.tsx b/src/app/game/[gameId]/page.tsx
+-new file mode 100644
+-index 0000000..b3a0945
+---- /dev/null
++index b3a0945..8c63a61 100644
++--- a/src/app/game/[gameId]/page.tsx
+ +++ b/src/app/game/[gameId]/page.tsx
+-@@ -0,0 +1,9 @@
+-+import { GameBoard } from "~/components/game-board";
++@@ -1,9 +1,16 @@
++ import { GameBoard } from "~/components/game-board";
+++import { api } from "~/server/api";
+ +
+-+export default function GamePage() {
+-+  return (
+-+    <div className="flex h-full items-center justify-center">
+-+      <GameBoard />
+-+    </div>
+-+  );
+-+}
+-diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+-index fae9363..c3dc2a3 100644
+---- a/src/app/layout.tsx
+-+++ b/src/app/layout.tsx
+-@@ -13,8 +13,8 @@ export default function RootLayout({
+-   children,
+- }: Readonly<{ children: React.ReactNode }>) {
+++export default async function GamePage({
+++  params: { gameId },
+++}: {
+++  params: { gameId: number };
+++}) {
+++  const guesses = await api.guesses.findByGameId(gameId);
++ 
++-export default function GamePage() {
+    return (
+--    <html lang="en" className={`${GeistSans.variable}`}>
+--      <body>{children}</body>
+-+    <html lang="en" className={`${GeistSans.variable} dark`}>
+-+      <body className="h-screen">{children}</body>
+-     </html>
++     <div className="flex h-full items-center justify-center">
++-      <GameBoard />
+++      <GameBoard gameId={gameId} guesses={guesses} />
++     </div>
+    );
+  }
+-diff --git a/src/components/game-board.tsx b/src/components/game-board.tsx
+-new file mode 100644
+-index 0000000..6b58989
+---- /dev/null
+-+++ b/src/components/game-board.tsx
+-@@ -0,0 +1,14 @@
++diff --git a/src/app/page.tsx b/src/app/page.tsx
++index 6f35279..4d2e298 100644
++--- a/src/app/page.tsx
+++++ b/src/app/page.tsx
++@@ -1,3 +1,24 @@
+ +"use client";
+ +
+-+import { GuessInput } from "./guess-input";
+-+import { GuessList } from "./guess-list";
+++import { useRouter } from "next/navigation";
+++
+++import { Button } from "~/components/ui/button";
+++import { api } from "~/server/api";
+++
++ export default function HomePage() {
++-  return <main>Home Page</main>;
+++  const router = useRouter();
+ +
+-+export const GameBoard = () => {
+-+  const guesses = ["HELLO", "WORLD"];
+ +  return (
+-+    <div className="flex flex-col gap-3">
+-+      <GuessList guesses={guesses} />
+-+      <GuessInput />
+-+    </div>
+++    <main className="flex h-full items-center justify-center">
+++      <Button
+++        onClick={async () => {
+++          const game = await api.games.create();
+++
+++          router.push(`/game/${game.id}`);
+++        }}
+++      >
+++        New game
+++      </Button>
+++    </main>
+ +  );
++ }
++diff --git a/src/components/game-board.tsx b/src/components/game-board.tsx
++index 6c5d432..99b1420 100644
++--- a/src/components/game-board.tsx
+++++ b/src/components/game-board.tsx
++@@ -1,12 +1,18 @@
+++import { type api } from "~/server/api";
+++
++ import { GuessInput } from "./guess-input";
++ import { GuessList } from "./guess-list";
++ 
++-export const GameBoard = () => {
++-  const guesses = ["HELLO", "WORLD"];
+++type GameBoardProps = {
+++  gameId: number;
+++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+ +};
+++
+++export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
++   return (
++     <div className="flex flex-col gap-3">
++       <GuessList guesses={guesses} />
++-      <GuessInput />
+++      <GuessInput gameId={gameId} />
++     </div>
++   );
++ };
+ diff --git a/src/components/guess-input.tsx b/src/components/guess-input.tsx
++index 4330429..30788b6 100644
++--- a/src/components/guess-input.tsx
+++++ b/src/components/guess-input.tsx
++@@ -3,9 +3,15 @@
++ import { REGEXP_ONLY_CHARS } from "input-otp";
++ import { useState } from "react";
++ 
+++import { api } from "~/server/api";
+++
++ import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++ 
++-export const GuessInput = () => {
+++type GuessInputProps = {
+++  gameId: number;
+++};
+++
+++export const GuessInput = ({ gameId }: GuessInputProps) => {
++   const [guess, setGuess] = useState<string>("");
++ 
++   return (
++@@ -16,7 +22,7 @@ export const GuessInput = () => {
++       onChange={(value) => setGuess(value)}
++       onKeyDown={async (e) => {
++         if (e.key === "Enter") {
++-          console.log(guess);
+++          await api.guesses.create(guess.toUpperCase(), gameId);
++           setGuess("");
++         }
++       }}
++diff --git a/src/components/guess-item.tsx b/src/components/guess-item.tsx
++index 5b32418..0778cb3 100644
++--- a/src/components/guess-item.tsx
+++++ b/src/components/guess-item.tsx
++@@ -1,25 +1,26 @@
++ "use client";
++ 
++ import { cn } from "~/lib/utils";
+++import { type api } from "~/server/api";
++ 
++ import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++ 
++ type GuessItemProps = {
++-  guess: string;
+++  guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
++ };
++ 
++-function GuessItemSlot({ index }: { index: number }) {
+++const GuessItemSlot = ({ index }: { index: number }) => {
++   return (
++     <InputOTPSlot
++       index={index}
++       className={cn("h-12 w-12 text-2xl uppercase")}
++     />
++   );
++-}
+++};
++ 
++-export function GuessItem({ guess }: GuessItemProps) {
+++export const GuessItem = ({ guess }: GuessItemProps) => {
++   return (
++-    <InputOTP readOnly maxLength={5} value={guess}>
+++    <InputOTP readOnly maxLength={5} value={guess.guess}>
++       <InputOTPGroup>
++         {[0, 1, 2, 3, 4].map((index) => (
++           <GuessItemSlot key={index} index={index} />
++@@ -27,4 +28,4 @@ export function GuessItem({ guess }: GuessItemProps) {
++       </InputOTPGroup>
++     </InputOTP>
++   );
++-}
+++};
++diff --git a/src/components/guess-list.tsx b/src/components/guess-list.tsx
++index b5c12e6..dd64b54 100644
++--- a/src/components/guess-list.tsx
+++++ b/src/components/guess-list.tsx
++@@ -1,16 +1,18 @@
++ "use client";
++ 
+++import { type api } from "~/server/api";
+++
++ import { GuessItem } from "./guess-item";
++ 
++ type GuessListProps = {
++-  guesses: string[];
+++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++ };
++ 
++ export const GuessList = ({ guesses }: GuessListProps) => {
++   return (
++     <div className="flex flex-col gap-3">
++       {guesses.map((guess) => (
++-        <GuessItem key={guess} guess={guess} />
+++        <GuessItem key={guess.id} guess={guess} />
++       ))}
++     </div>
++   );
++diff --git a/src/lib/utils.ts b/src/lib/utils.ts
++index d084cca..9e18f94 100644
++--- a/src/lib/utils.ts
+++++ b/src/lib/utils.ts
++@@ -1,6 +1,17 @@
++-import { type ClassValue, clsx } from "clsx"
++-import { twMerge } from "tailwind-merge"
+++import { type ClassValue, clsx } from "clsx";
+++import { twMerge } from "tailwind-merge";
+++
+++import { words } from "./words";
++ 
++ export function cn(...inputs: ClassValue[]) {
++-  return twMerge(clsx(inputs))
+++  return twMerge(clsx(inputs));
+++}
+++
+++export function getRandomWord() {
+++  const randomIndex = Math.floor(Math.random() * words.length);
+++  const word = words[randomIndex];
+++  if (!word) {
+++    throw new Error("Error retrieving random word");
+++  }
+++  return word;
++ }
++diff --git a/src/server/api.ts b/src/server/api.ts
++index e69de29..2065fc8 100644
++--- a/src/server/api.ts
+++++ b/src/server/api.ts
++@@ -0,0 +1,7 @@
+++import * as games from "./controllers/game.controller";
+++import * as guesses from "./controllers/guess.controller";
+++
+++export const api = {
+++  games,
+++  guesses,
+++};
++diff --git a/src/server/controllers/game.controller.ts b/src/server/controllers/game.controller.ts
+ new file mode 100644
+-index 0000000..4330429
++index 0000000..93db68c
+ --- /dev/null
+-+++ b/src/components/guess-input.tsx
+-@@ -0,0 +1,33 @@
+-+"use client";
+++++ b/src/server/controllers/game.controller.ts
++@@ -0,0 +1,11 @@
+++"use server";
+ +
+-+import { REGEXP_ONLY_CHARS } from "input-otp";
+-+import { useState } from "react";
+++import { gameService } from "../services/game.service";
+ +
+-+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
+++export const create = async () => {
+++  return gameService.create();
+++};
+ +
+-+export const GuessInput = () => {
+-+  const [guess, setGuess] = useState<string>("");
+++export const getById = async (id: number) => {
+++  return gameService.getById(id);
+++};
++diff --git a/src/server/controllers/guess.controller.ts b/src/server/controllers/guess.controller.ts
++new file mode 100644
++index 0000000..a383ace
++--- /dev/null
+++++ b/src/server/controllers/guess.controller.ts
++@@ -0,0 +1,11 @@
+++"use server";
+ +
+-+  return (
+-+    <InputOTP
+-+      maxLength={5}
+-+      pattern={REGEXP_ONLY_CHARS}
+-+      value={guess}
+-+      onChange={(value) => setGuess(value)}
+-+      onKeyDown={async (e) => {
+-+        if (e.key === "Enter") {
+-+          console.log(guess);
+-+          setGuess("");
+-+        }
+-+      }}
+-+    >
+-+      <InputOTPGroup>
+-+        <InputOTPSlot index={0} className="h-12 w-12 text-2xl uppercase" />
+-+        <InputOTPSlot index={1} className="h-12 w-12 text-2xl uppercase" />
+-+        <InputOTPSlot index={2} className="h-12 w-12 text-2xl uppercase" />
+-+        <InputOTPSlot index={3} className="h-12 w-12 text-2xl uppercase" />
+-+        <InputOTPSlot index={4} className="h-12 w-12 text-2xl uppercase" />
+-+      </InputOTPGroup>
+-+    </InputOTP>
+-+  );
+++import { guessService } from "../services/guess.service";
+++
+++export const create = async (guess: string, gameId: number) => {
+++  return guessService.create(guess, gameId);
+ +};
+-diff --git a/src/components/guess-item.tsx b/src/components/guess-item.tsx
+++
+++export const findByGameId = async (gameId: number) => {
+++  return guessService.findByGameId(gameId);
+++};
++diff --git a/src/server/services/game.service.ts b/src/server/services/game.service.ts
+ new file mode 100644
+-index 0000000..5b32418
++index 0000000..98fea8b
+ --- /dev/null
+-+++ b/src/components/guess-item.tsx
+-@@ -0,0 +1,30 @@
+-+"use client";
+++++ b/src/server/services/game.service.ts
++@@ -0,0 +1,56 @@
+++import { eq } from "drizzle-orm";
+ +
+-+import { cn } from "~/lib/utils";
+++import { getRandomWord } from "~/lib/utils";
+ +
+-+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
+++import { db } from "../db";
+++import { games } from "../db/schema";
+ +
+-+type GuessItemProps = {
+-+  guess: string;
+++export const getById = async (id: number) => {
+++  const game = await db.query.games.findFirst({
+++    where: eq(games.id, id),
+++  });
+++
+++  if (!game) {
+++    throw new Error("Game not found");
+++  }
+++
+++  return game;
+ +};
+ +
+-+function GuessItemSlot({ index }: { index: number }) {
+-+  return (
+-+    <InputOTPSlot
+-+      index={index}
+-+      className={cn("h-12 w-12 text-2xl uppercase")}
+-+    />
+-+  );
+-+}
+++const create = async () => {
+++  const randomWord = getRandomWord();
+ +
+-+export function GuessItem({ guess }: GuessItemProps) {
+-+  return (
+-+    <InputOTP readOnly maxLength={5} value={guess}>
+-+      <InputOTPGroup>
+-+        {[0, 1, 2, 3, 4].map((index) => (
+-+          <GuessItemSlot key={index} index={index} />
+-+        ))}
+-+      </InputOTPGroup>
+-+    </InputOTP>
+-+  );
+-+}
+-diff --git a/src/components/guess-list.tsx b/src/components/guess-list.tsx
+++  const [word] = await db
+++    .insert(games)
+++    .values({ word: randomWord.toUpperCase(), status: "in_progress" })
+++    .returning();
+++
+++  if (!word) {
+++    throw new Error("Failed to create game");
+++  }
+++
+++  return word;
+++};
+++
+++export const update = async (
+++  id: number,
+++  status: (typeof games.status.enumValues)[number],
+++) => {
+++  const [game] = await db
+++    .update(games)
+++    .set({ status })
+++    .where(eq(games.id, id))
+++    .returning();
+++
+++  if (!game) {
+++    throw new Error("Game not found");
+++  }
+++
+++  return game;
+++};
+++
+++export const gameService = {
+++  create,
+++  getById,
+++  update,
+++};
++diff --git a/src/server/services/guess.service.ts b/src/server/services/guess.service.ts
+ new file mode 100644
+-index 0000000..b5c12e6
++index 0000000..0d7d367
+ --- /dev/null
+-+++ b/src/components/guess-list.tsx
+-@@ -0,0 +1,17 @@
+-+"use client";
+++++ b/src/server/services/guess.service.ts
++@@ -0,0 +1,100 @@
+++import { asc, count, eq } from "drizzle-orm";
+++import { revalidatePath } from "next/cache";
+++
+++import { db } from "../db";
+++import { games, guesses } from "../db/schema";
+++import { gameService } from "./game.service";
+++
+++const checkGuess = async (guess: string, gameId: number) => {
+++  const game = await db.query.games.findFirst({
+++    where: eq(games.id, gameId),
+++  });
+++
+++  if (!game) {
+++    throw new Error("Game not found");
+++  }
+++
+++  const actualWord = game.word.toUpperCase();
+++  const upperGuess = guess.toUpperCase();
+++  const result = new Array(5).fill("X");
+++  const charCount = new Map();
+++
+++  // Count occurrences of each character in actualWord
+++  for (const char of actualWord) {
+++    charCount.set(char, (charCount.get(char) || 0) + 1);
+++  }
+ +
+-+import { GuessItem } from "./guess-item";
+++  // First pass: mark correct positions
+++  for (let i = 0; i < 5; i++) {
+++    if (upperGuess[i] === actualWord[i]) {
+++      result[i] = "C";
+++      charCount.set(upperGuess[i], charCount.get(upperGuess[i]) - 1);
+++    }
+++  }
+ +
+-+type GuessListProps = {
+-+  guesses: string[];
+++  // Second pass: mark misplaced letters
+++  for (let i = 0; i < 5; i++) {
+++    if (result[i] !== "C" && charCount.get(upperGuess[i]) > 0) {
+++      result[i] = "~";
+++      charCount.set(upperGuess[i], charCount.get(upperGuess[i]) - 1);
+++    }
+++  }
+++
+++  return result.join("");
+ +};
+ +
+-+export const GuessList = ({ guesses }: GuessListProps) => {
+-+  return (
+-+    <div className="flex flex-col gap-3">
+-+      {guesses.map((guess) => (
+-+        <GuessItem key={guess} guess={guess} />
+-+      ))}
+-+    </div>
+-+  );
+++const create = async (guess: string, gameId: number) => {
+++  const result = await checkGuess(guess, gameId);
+++
+++  const [createdGuess] = await db
+++    .insert(guesses)
+++    .values({
+++      gameId,
+++      guess,
+++      result,
+++    })
+++    .returning();
+++
+++  if (!createdGuess) {
+++    throw new Error("Failed to create guess");
+++  }
+++
+++  const count = await countByGameId(gameId);
+++
+++  if (count === 5 && createdGuess.result.includes("X")) {
+++    await gameService.update(gameId, "lost");
+++  }
+++
+++  if (createdGuess.result === "CCCCC") {
+++    await gameService.update(gameId, "won");
+++  }
+++
+++  revalidatePath(`/game/${gameId}`);
+++
+++  return createdGuess;
+++};
+++
+++const findByGameId = async (gameId: number) => {
+++  return db.query.guesses.findMany({
+++    where: eq(guesses.gameId, gameId),
+++    orderBy: [asc(guesses.createdAt)],
+++  });
+++};
+++
+++const countByGameId = async (gameId: number) => {
+++  const [gameCount] = await db
+++    .select({ count: count() })
+++    .from(guesses)
+++    .where(eq(guesses.gameId, gameId));
+++
+++  if (!gameCount) {
+++    throw new Error("Error counting guesses");
+++  }
+++
+++  return gameCount.count;
+++};
+++
+++export const guessService = {
+++  create,
+++  findByGameId,
+ +};
 diff --git a/docs/03-game-logic.md b/docs/03-game-logic.md
 new file mode 100644
 index 0000000..e69de29
@@ -81,7 +618,7 @@ index 6c5d432..99b1420 100644
    );
  };
 diff --git a/src/components/guess-input.tsx b/src/components/guess-input.tsx
-index 4330429..30788b6 100644
+index 4330429..9f9d25c 100644
 --- a/src/components/guess-input.tsx
 +++ b/src/components/guess-input.tsx
 @@ -3,9 +3,15 @@
@@ -106,7 +643,7 @@ index 4330429..30788b6 100644
        onKeyDown={async (e) => {
          if (e.key === "Enter") {
 -          console.log(guess);
-+          await api.guesses.create(guess.toUpperCase(), gameId);
++          await api.guesses.create(guess, gameId);
            setGuess("");
          }
        }}
@@ -312,16 +849,15 @@ index 0000000..98fea8b
 +};
 diff --git a/src/server/services/guess.service.ts b/src/server/services/guess.service.ts
 new file mode 100644
-index 0000000..0d7d367
+index 0000000..4516514
 --- /dev/null
 +++ b/src/server/services/guess.service.ts
-@@ -0,0 +1,100 @@
-+import { asc, count, eq } from "drizzle-orm";
+@@ -0,0 +1,73 @@
++import { asc, eq } from "drizzle-orm";
 +import { revalidatePath } from "next/cache";
 +
 +import { db } from "../db";
 +import { games, guesses } from "../db/schema";
-+import { gameService } from "./game.service";
 +
 +const checkGuess = async (guess: string, gameId: number) => {
 +  const game = await db.query.games.findFirst({
@@ -337,12 +873,10 @@ index 0000000..0d7d367
 +  const result = new Array(5).fill("X");
 +  const charCount = new Map();
 +
-+  // Count occurrences of each character in actualWord
 +  for (const char of actualWord) {
 +    charCount.set(char, (charCount.get(char) || 0) + 1);
 +  }
 +
-+  // First pass: mark correct positions
 +  for (let i = 0; i < 5; i++) {
 +    if (upperGuess[i] === actualWord[i]) {
 +      result[i] = "C";
@@ -350,7 +884,6 @@ index 0000000..0d7d367
 +    }
 +  }
 +
-+  // Second pass: mark misplaced letters
 +  for (let i = 0; i < 5; i++) {
 +    if (result[i] !== "C" && charCount.get(upperGuess[i]) > 0) {
 +      result[i] = "~";
@@ -368,23 +901,13 @@ index 0000000..0d7d367
 +    .insert(guesses)
 +    .values({
 +      gameId,
-+      guess,
++      guess: guess.toUpperCase(),
 +      result,
 +    })
 +    .returning();
 +
 +  if (!createdGuess) {
 +    throw new Error("Failed to create guess");
-+  }
-+
-+  const count = await countByGameId(gameId);
-+
-+  if (count === 5 && createdGuess.result.includes("X")) {
-+    await gameService.update(gameId, "lost");
-+  }
-+
-+  if (createdGuess.result === "CCCCC") {
-+    await gameService.update(gameId, "won");
 +  }
 +
 +  revalidatePath(`/game/${gameId}`);
@@ -397,19 +920,6 @@ index 0000000..0d7d367
 +    where: eq(guesses.gameId, gameId),
 +    orderBy: [asc(guesses.createdAt)],
 +  });
-+};
-+
-+const countByGameId = async (gameId: number) => {
-+  const [gameCount] = await db
-+    .select({ count: count() })
-+    .from(guesses)
-+    .where(eq(guesses.gameId, gameId));
-+
-+  if (!gameCount) {
-+    throw new Error("Error counting guesses");
-+  }
-+
-+  return gameCount.count;
 +};
 +
 +export const guessService = {
