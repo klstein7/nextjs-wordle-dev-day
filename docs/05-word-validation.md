@@ -338,6 +338,42 @@ export const GuessItem = ({ guess }: GuessItemProps) => {
 
 This update adds color-coding to the guess results, making it easier for users to understand the outcome of their guesses.
 
+## Checking Your Progress
+
+After implementing word validation and error handling, you can verify your progress by running the application and checking the following:
+
+1. **Start the development server**:
+   Run `yarn dev` to start the development server.
+
+2. **Navigate to a game**:
+
+   - Open your browser and go to `http://localhost:3000`.
+   - Start a new game or continue an existing one.
+
+3. **Prepare for toast notifications**:
+
+   - The Toaster container is invisible by default and will only appear when a notification is triggered.
+   - Keep an eye on the bottom of the screen where toast notifications will appear.
+
+4. **Verify input constraints**:
+
+   - Try typing letters into the input field. You should only be able to enter uppercase letters.
+   - Attempt to enter more than 5 letters. The input should stop accepting letters after the 5th character.
+   - Try entering numbers or special characters. These should not appear in the input field.
+
+5. **Verify word validation**:
+
+   - Enter a 5-letter word that's not in the word list (e.g., "XYXYX").
+     - When you press Enter or click the submit button, a toast error message should appear saying "Guess must be a valid word".
+   - Enter a valid 5-letter word (e.g., "HELLO").
+     - When you submit, it should be accepted without any error toast, and appear on the game board.
+
+6. **Check guess visualization**:
+   - After submitting a valid guess, verify that the letters are color-coded correctly:
+     - Green for correct letters in the correct position
+     - Yellow for correct letters in the wrong position
+     - Red (or gray) for incorrect letters
+
 ## Conclusion
 
 Great job! You've now implemented word validation and improved the user feedback in your Wordle clone. This enhancement includes:
