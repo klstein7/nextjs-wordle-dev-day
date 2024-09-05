@@ -47,7 +47,7 @@ function GuessItemSlot({ index, result }: { index: number; result: string }) {
           "bg-red-500 text-red-50": result === "X",
           "bg-green-500 text-green-50": result === "C",
           "bg-yellow-500 text-yellow-50": result === "~",
-        },
+        }
       )}
     />
   );
@@ -56,7 +56,9 @@ function GuessItemSlot({ index, result }: { index: number; result: string }) {
 export const GuessItem = ({ guess }: GuessItemProps) => {
   return (
     <InputOTP readOnly maxLength={5} value={guess.guess}>
-      <InputOTPGroup className="gap-2"> {/* Add gap between guess slots */}
+      <InputOTPGroup className="gap-2">
+        {" "}
+        {/* Add gap between guess slots */}
         {[0, 1, 2, 3, 4].map((index) => (
           <GuessItemSlot
             key={index}
@@ -107,7 +109,9 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
         }
       }}
     >
-      <InputOTPGroup className="gap-2"> {/* Add gap between input slots */}
+      <InputOTPGroup className="gap-2">
+        {" "}
+        {/* Add gap between input slots */}
         {[0, 1, 2, 3, 4].map((index) => (
           <GuessItemSlot key={index} index={index} />
         ))}
@@ -299,6 +303,42 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
 ```
 
 These changes enhance the keyboard's appearance and make it more consistent with the overall design.
+
+## Checking Your Progress
+
+After implementing these styling and polish improvements, you can verify your progress by running the application and checking the following:
+
+1. **Start the development server**:
+   Run `yarn dev` to start the development server.
+
+2. **Navigate to a game**:
+
+   - Open your browser and go to `http://localhost:3000`.
+   - Start a new game.
+
+3. **Check the game board appearance**:
+
+   - The game board should have larger, more vibrant guess slots.
+   - There should be a small gap between each letter in the guesses.
+   - The guess input should match the styling of the guesses above it.
+
+4. **Test the on-screen keyboard**:
+
+   - The keyboard should have a refined appearance with consistent button heights.
+   - The "Enter" and backspace keys should be properly labeled.
+   - Pressing keys should update the guess input.
+
+5. **Play through a game**:
+
+   - Make guesses and observe the color-coding (green, yellow, red) of the letters.
+   - Verify that the guess input clears after each submission.
+
+6. **Check the game over dialog**:
+   - Win the game (or lose after 6 guesses).
+   - A dialog should appear with an engaging message.
+   - If you won, check for the confetti animation.
+   - The dialog should display all your guesses.
+   - There should be a "Play again!" button.
 
 ## Conclusion
 
