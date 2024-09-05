@@ -1,6 +1,8 @@
 # Wordle Clone Tutorial
 
-Welcome to the Wordle Clone Tutorial! This project guides you through building a Wordle clone using Next.js, Drizzle ORM, and shadcn/ui in just one day.
+Welcome to the Wordle Clone Tutorial! This project guides you through building a Wordle clone using Next.js, Drizzle ORM, and shadcn/ui.
+
+![alt text](docs/img/1.png)
 
 ## Project Structure
 
