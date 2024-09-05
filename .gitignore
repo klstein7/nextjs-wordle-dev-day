@@ -47,3 +47,6 @@ yarn-error.log*
 
 # Repopack
 repopack-output.txt
+
+# Commit to all
+commit-to-all.sh
