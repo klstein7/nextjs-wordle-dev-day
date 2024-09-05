@@ -122,7 +122,7 @@ export const GuessInput = () => {
         }
       }}
     >
-     {/*
+      {/*
         We're using InputOTP here for several reasons:
         1. It provides a fixed-length input, perfect for Wordle's 5-letter format
         2. It offers individual character slots, mimicking Wordle's grid layout
@@ -267,6 +267,24 @@ export default function RootLayout({
 ```
 
 This layout wraps all our pages and applies some global styles. It's somewhat analogous to the main app component in Angular.
+
+## Checking Your Progress
+
+As you work through this chapter, it's important to regularly check your progress to ensure you're on the right track. Here are some steps you can follow:
+
+1. **Run the development server**:
+   After implementing each component, run `yarn dev` to start the development server and view your changes in the browser at `http://localhost:3000/game/1`.
+
+2. **Visual inspection**:
+   The game board should now be visible with the following elements:
+
+   - A centered game board
+   - A list of previous guesses (initially showing "HELLO" and "WORLD")
+   - An input field for new guesses
+
+3. **Functional testing**:
+   - Try entering a 5-letter word in the input field. Each letter should appear in its own box.
+   - Press Enter after entering a word. The console should log your guess, and the input field should clear.
 
 ## Conclusion
 

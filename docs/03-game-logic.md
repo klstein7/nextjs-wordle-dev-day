@@ -1,6 +1,6 @@
 # Section 03: Game Logic Implementation
 
-Welcome to the game logic implementation section of our Wordle clone! In this part, we'll add the core game mechanics, state management, and server-side logic to make our game functional. If you're coming from a Spring Boot/Angular background, you'll find some familiar concepts here, implemented in a Next.js/React environment.
+Welcome to the game logic implementation section of our Wordle clone! In this part, we'll add the core game mechanics, state management, and server-side logic to make our game functional.
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ Once you've completed these steps, you'll be ready to implement the game logic.
 
 ## Step 1: Update Utility Functions
 
-First, let's add the `getRandomWord` function to our utility file. This function will be used to select a random word for each new game, similar to how you might use a utility service in Spring Boot.
+First, let's add the `getRandomWord` function to our utility file. This function will be used to select a random word for each new game.
 
 ### Exercise 1:
 
@@ -32,34 +32,25 @@ Update `src/lib/utils.ts`:
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { words } from "./words"; // Similar to importing a constant or enum in Angular
+import { words } from "./words"; // Import the words array
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// This function acts like a utility method in a Spring Boot service
 export function getRandomWord() {
-  // Generate a random index
   const randomIndex = Math.floor(Math.random() * words.length);
-
-  // Get the word at the random index
   const word = words[randomIndex];
-
-  // Error handling, similar to throwing exceptions in Java
   if (!word) {
     throw new Error("Error retrieving random word");
   }
-
   return word;
 }
 ```
 
-Make sure you have a `words.ts` file in the same directory with an array of words to choose from.
-
 ## Step 2: Implement Server-Side Logic
 
-Now, let's add the necessary server-side logic to handle game creation, guesses, and game state. This is similar to creating service classes in Spring Boot.
+Now, let's add the necessary server-side logic to handle game creation, guesses, and game state.
 
 ### Exercise 2:
 
@@ -79,14 +70,12 @@ import { getRandomWord } from "~/lib/utils";
 import { db } from "../db";
 import { games } from "../db/schema";
 
-// This service is similar to a @Service class in Spring Boot
 export const getById = async (id: number) => {
-  // Using Drizzle ORM, similar to using JPA in Spring Boot
+  // Find a game by its ID
   const game = await db.query.games.findFirst({
     where: eq(games.id, id),
   });
 
-  // Error handling, similar to throwing a NotFoundException in Spring Boot
   if (!game) {
     throw new Error("Game not found");
   }
@@ -99,7 +88,6 @@ const create = async () => {
   const randomWord = getRandomWord();
 
   // Insert a new game into the database
-  // This is similar to using a repository in Spring Boot to create an entity
   const [word] = await db
     .insert(games)
     .values({ word: randomWord.toUpperCase(), status: "in_progress" })
@@ -114,10 +102,9 @@ const create = async () => {
 
 export const update = async (
   id: number,
-  status: (typeof games.status.enumValues)[number],
+  status: (typeof games.status.enumValues)[number]
 ) => {
   // Update the game status
-  // This is similar to using a repository method to update an entity in Spring Boot
   const [game] = await db
     .update(games)
     .set({ status })
@@ -131,7 +118,6 @@ export const update = async (
   return game;
 };
 
-// Exporting as an object, similar to how you might export a service class in Angular
 export const gameService = {
   create,
   getById,
@@ -148,7 +134,6 @@ import { revalidatePath } from "next/cache";
 import { db } from "../db";
 import { games, guesses } from "../db/schema";
 
-// This function is similar to a private method in a Spring Boot service
 const checkGuess = async (guess: string, gameId: number) => {
   // Retrieve the game from the database
   const game = await db.query.games.findFirst({
@@ -165,7 +150,6 @@ const checkGuess = async (guess: string, gameId: number) => {
   const charCount = new Map();
 
   // Count character occurrences in the actual word
-  // This is similar to using Java streams in Spring Boot
   for (const char of actualWord) {
     charCount.set(char, (charCount.get(char) || 0) + 1);
   }
@@ -194,7 +178,6 @@ const create = async (guess: string, gameId: number) => {
   const result = await checkGuess(guess, gameId);
 
   // Insert the new guess into the database
-  // This is similar to using a repository method to create an entity in Spring Boot
   const [createdGuess] = await db
     .insert(guesses)
     .values({
@@ -208,7 +191,7 @@ const create = async (guess: string, gameId: number) => {
     throw new Error("Failed to create guess");
   }
 
-  // This is similar to triggering a view update in Angular
+  // Trigger a revalidation of the game page
   revalidatePath(`/game/${gameId}`);
 
   return createdGuess;
@@ -216,14 +199,12 @@ const create = async (guess: string, gameId: number) => {
 
 const findByGameId = async (gameId: number) => {
   // Retrieve all guesses for a specific game
-  // This is similar to a findAll method in a Spring Boot repository
   return db.query.guesses.findMany({
     where: eq(guesses.gameId, gameId),
     orderBy: [asc(guesses.createdAt)],
   });
 };
 
-// Exporting as an object, similar to how you might export a service class in Angular
 export const guessService = {
   create,
   findByGameId,
@@ -232,7 +213,7 @@ export const guessService = {
 
 ## Step 3: Create Server API
 
-Now that we have our services, let's create an API layer to use them in our components. This is similar to creating controllers in Spring Boot.
+Now that we have our services, let's create an API layer to use them in our components.
 
 ### Exercise 3:
 
@@ -248,7 +229,6 @@ Create `src/server/controllers/game.controller.ts`:
 
 import { gameService } from "../services/game.service";
 
-// These functions are similar to controller methods in Spring Boot
 export const create = async () => {
   // Create a new game
   return gameService.create();
@@ -267,7 +247,6 @@ Create `src/server/controllers/guess.controller.ts`:
 
 import { guessService } from "../services/guess.service";
 
-// These functions are similar to controller methods in Spring Boot
 export const create = async (guess: string, gameId: number) => {
   // Create a new guess
   return guessService.create(guess, gameId);
@@ -285,7 +264,7 @@ Create `src/server/api.ts`:
 import * as games from "./controllers/game.controller";
 import * as guesses from "./controllers/guess.controller";
 
-// This api object is similar to how you might organize your API in Angular services
+// Export the API controllers
 export const api = {
   games,
   guesses,
@@ -313,9 +292,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { api } from "~/server/api";
 
-// This component is similar to a component in Angular
 export default function HomePage() {
-  // useRouter is similar to Angular's Router service
   const router = useRouter();
 
   return (
@@ -323,10 +300,8 @@ export default function HomePage() {
       <Button
         onClick={async () => {
           // Create a new game
-          // This is similar to calling an API service in Angular
           const game = await api.games.create();
           // Navigate to the game page
-          // This is similar to navigating in Angular
           router.push(`/game/${game.id}`);
         }}
       >
@@ -354,14 +329,12 @@ Update `src/app/game/[gameId]/page.tsx`:
 import { GameBoard } from "~/components/game-board";
 import { api } from "~/server/api";
 
-// This is similar to a component in Angular that fetches data and passes it to child components
 export default async function GamePage({
   params: { gameId },
 }: {
   params: { gameId: number };
 }) {
   // Fetch guesses for the current game
-  // This is similar to using a service to fetch data in Angular
   const guesses = await api.guesses.findByGameId(gameId);
 
   return (
@@ -391,13 +364,11 @@ import { type api } from "~/server/api";
 import { GuessInput } from "./guess-input";
 import { GuessList } from "./guess-list";
 
-// This type definition is similar to defining an interface for component props in Angular
 type GameBoardProps = {
   gameId: number;
   guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
 };
 
-// This component is similar to a presentational component in Angular
 export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
   return (
     <div className="flex flex-col gap-3">
@@ -431,14 +402,11 @@ import { api } from "~/server/api";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
-// This type definition is similar to defining an interface for component props in Angular
 type GuessInputProps = {
   gameId: number;
 };
 
-// This component is similar to a form component in Angular
 export const GuessInput = ({ gameId }: GuessInputProps) => {
-  // This state is similar to using component state in Angular
   const [guess, setGuess] = useState<string>("");
 
   return (
@@ -450,7 +418,6 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
       onKeyDown={async (e) => {
         if (e.key === "Enter") {
           // Submit the guess when Enter is pressed
-          // This is similar to calling an API service in Angular
           await api.guesses.create(guess, gameId);
           // Clear the input after submitting
           setGuess("");
@@ -491,12 +458,10 @@ import { type api } from "~/server/api";
 
 import { GuessItem } from "./guess-item";
 
-// This type definition is similar to defining an interface for component props in Angular
 type GuessListProps = {
   guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
 };
 
-// This component is similar to a list component in Angular
 export const GuessList = ({ guesses }: GuessListProps) => {
   return (
     <div className="flex flex-col gap-3">
@@ -518,22 +483,15 @@ import { type api } from "~/server/api";
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
-// This type definition is similar to defining an interface for component props in Angular
 type GuessItemProps = {
   guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
 };
 
-// This component is similar to a presentational component in Angular
-const GuessItemSlot = ({ index, result }: { index: number; result: string }) => {
+const GuessItemSlot = ({ index }: { index: number }) => {
   return (
     <InputOTPSlot
       index={index}
-      className={cn(
-        "h-12 w-12 text-2xl uppercase",
-        result === "C" && "bg-green-500 text-white",
-        result === "~" && "bg-yellow-500 text-white",
-        result === "X" && "bg-gray-500 text-white"
-      )}
+      className={cn("h-12 w-12 text-2xl uppercase")}
     />
   );
 };
@@ -543,7 +501,7 @@ export const GuessItem = ({ guess }: GuessItemProps) => {
     <InputOTP readOnly maxLength={5} value={guess.guess}>
       <InputOTPGroup>
         {[0, 1, 2, 3, 4].map((index) => (
-          <GuessItemSlot key={index} index={index} result={guess.result[index]} />
+          <GuessItemSlot key={index} index={index} />
         ))}
       </InputOTPGroup>
     </InputOTP>
@@ -551,10 +509,54 @@ export const GuessItem = ({ guess }: GuessItemProps) => {
 };
 ```
 
-In this component:
+## Checking Your Progress
 
-- We define a `GuessItemSlot` component that renders each letter of the guess with appropriate styling based on the result.
-- The `GuessItem` component uses the `InputOTP` component to display the guess, mapping over each letter and applying the appropriate styling.
+After implementing the game logic, you can verify your progress by running the application and checking the following:
+
+1. **Start the development server**:
+   Run `yarn dev` to start the development server.
+
+2. **Create a new game**:
+
+   - Open your browser and navigate to `http://localhost:3000`.
+   - You should see a "New game" button on the home page.
+   - Click the button. You should be redirected to a game page (e.g., `http://localhost:3000/game/1`).
+
+3. **Check the game board**:
+
+   - On the game page, you should see an empty game board with an input field for guesses.
+
+4. **Make guesses**:
+
+   - Enter a 5-letter word in the input field and press Enter.
+   - Your guess should appear on the game board above the input field.
+   - You should be able to make multiple guesses, with each new guess appearing above the previous ones.
+
+5. **Verify data persistence**:
+
+   - After making a few guesses, refresh the game page.
+   - Your previous guesses should still be visible on the game board.
+   - This confirms that your guesses are being stored in the database.
+
+6. **Start a new game**:
+
+   - Navigate back to the home page and click "New game" again.
+   - You should be taken to a new game page with a fresh, empty game board.
+
+7. **Check for errors**:
+   - Throughout this process, check your browser's console (F12 > Console tab).
+   - There should be no error messages related to your game logic.
+
+If you can complete all these steps without issues, congratulations! You've successfully implemented the core game logic for your Wordle clone. If you encounter any problems, review the code snippets provided in this chapter and make sure all components, services, and API routes are correctly implemented.
+
+Remember, the key functionalities you've added in this section include:
+
+- Creating new games
+- Submitting and storing guesses
+- Retrieving and displaying game state
+- Persisting game data between page refreshes
+
+In the next section, we'll build upon this foundation to create an on-screen keyboard, further enhancing the user experience of our Wordle clone. Keep up the great work!
 
 ## Conclusion
 
@@ -565,12 +567,4 @@ Great job! You've now implemented the core game logic for your Wordle clone. Thi
 3. Storing and retrieving game state
 4. Updating the UI based on game state
 
-In the next section (Section 04: Keyboard), we'll focus on:
-
-1. Creating the on-screen keyboard component
-2. Integrating the keyboard with the game logic
-3. Updating the keyboard UI based on guessed letters
-
-This will further enhance the user experience and bring us closer to a fully functional Wordle clone. Remember, you can always refer to the `checkpoint-04-keyboard` branch if you need guidance or want to compare your implementation.
-
-Happy coding!
+In the next section (Section 04: Keyboard), we'll focus on creating the on-screen keyboard component and integrating it with the game logic.

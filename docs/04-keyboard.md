@@ -339,6 +339,39 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
 
 This update replaces the local state with the shared guess state from our `GuessContext`.
 
+## Checking Your Progress
+
+As you implement the on-screen keyboard and related features, it's important to regularly check your progress. Here are some steps to verify that you've correctly implemented the functionality:
+
+1. **Run the development server**:
+   After implementing the keyboard component and related changes, run `yarn dev` to start the development server.
+
+2. **Create a new game**:
+
+   - Navigate to the home page (`http://localhost:3000`).
+   - Click the "New game" button to start a new game.
+
+3. **Verify the keyboard presence**:
+
+   - On the game page, you should see an on-screen keyboard below the game board.
+   - The keyboard should have a layout similar to a standard QWERTY keyboard.
+
+4. **Test keyboard functionality**:
+
+   - Click on letter keys on the on-screen keyboard. The letters should appear in the guess input field.
+   - Click the "Delete" key (usually represented by a backspace icon). It should remove the last entered letter.
+   - Click the "Enter" key after entering a 5-letter word. The guess should be submitted and appear on the game board.
+
+5. **Test guess synchronization**:
+
+   - Enter some letters using your physical keyboard. The on-screen keyboard input should update accordingly.
+   - Enter some letters using the on-screen keyboard. The input field should update to reflect these letters.
+
+6. **Verify guess submission**:
+   - Submit a guess using the on-screen keyboard's "Enter" key.
+   - Submit another guess using your physical keyboard's Enter key.
+   - Both methods should work and update the game board correctly.
+
 ## Conclusion
 
 Great job! You've now implemented an on-screen keyboard for your Wordle clone. This enhancement includes:
