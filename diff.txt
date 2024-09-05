@@ -1,0 +1,663 @@
+diff --git a/diff.txt b/diff.txt
+index 4a38d7e..e69de29 100644
+--- a/diff.txt
++++ b/diff.txt
+@@ -1,214 +0,0 @@
+-diff --git a/docs/06-game-over.md b/docs/06-game-over.md
+-new file mode 100644
+-index 0000000..e69de29
+-diff --git a/src/app/game/[gameId]/page.tsx b/src/app/game/[gameId]/page.tsx
+-index f594326..ddf5238 100644
+---- a/src/app/game/[gameId]/page.tsx
+-+++ b/src/app/game/[gameId]/page.tsx
+-@@ -8,17 +8,20 @@ export default async function GamePage({
+- }: {
+-   params: { gameId: number };
+- }) {
+-+  const game = await api.games.getById(gameId);
+-   const guesses = await api.guesses.findByGameId(gameId);
+- 
+-   return (
+-     <GuessProvider>
+-       <div className="flex h-full flex-col items-center gap-6">
+-         <div className="flex flex-1 items-center justify-center">
+--          <GameBoard gameId={gameId} guesses={guesses} />
+--        </div>
+--        <div className="flex w-full max-w-3xl items-center">
+--          <GuessKeyboard gameId={gameId} />
+-+          <GameBoard gameId={gameId} status={game.status} guesses={guesses} />
+-         </div>
+-+        {game.status === "in_progress" && (
+-+          <div className="flex w-full max-w-3xl items-center">
+-+            <GuessKeyboard gameId={gameId} />
+-+          </div>
+-+        )}
+-       </div>
+-     </GuessProvider>
+-   );
+-diff --git a/src/app/page.tsx b/src/app/page.tsx
+-index 4d2e298..0311d97 100644
+---- a/src/app/page.tsx
+-+++ b/src/app/page.tsx
+-@@ -1,20 +1,16 @@
+- "use client";
+- 
+--import { useRouter } from "next/navigation";
+--
+- import { Button } from "~/components/ui/button";
+--import { api } from "~/server/api";
+-+import { useCreateGame } from "~/lib/hooks/use-create-game";
+- 
+- export default function HomePage() {
+--  const router = useRouter();
+-+  const createGame = useCreateGame();
+- 
+-   return (
+-     <main className="flex h-full items-center justify-center">
+-       <Button
+-         onClick={async () => {
+--          const game = await api.games.create();
+--
+--          router.push(`/game/${game.id}`);
+-+          await createGame();
+-         }}
+-       >
+-         New game
+-diff --git a/src/components/game-board.tsx b/src/components/game-board.tsx
+-index 61d89d6..aa5141b 100644
+---- a/src/components/game-board.tsx
+-+++ b/src/components/game-board.tsx
+-@@ -1,18 +1,22 @@
+- import { type api } from "~/server/api";
+-+import { type games } from "~/server/db/schema";
+- 
+-+import { GameResults } from "./game-results";
+- import { GuessInput } from "./guess-input";
+- import { GuessList } from "./guess-list";
+- 
+- type GameBoardProps = {
+-   gameId: number;
+-+  status: (typeof games.status.enumValues)[number];
+-   guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+- };
+- 
+--export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
+-+export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
+-   return (
+--    <div className="flex grow flex-col items-center gap-3">
+-+    <div className="flex grow flex-col items-center gap-6">
+-       <GuessList guesses={guesses} />
+--      <GuessInput gameId={gameId} />
+-+      {status === "in_progress" && <GuessInput gameId={gameId} />}
+-+      <GameResults status={status} />
+-     </div>
+-   );
+- };
+-diff --git a/src/components/game-results.tsx b/src/components/game-results.tsx
+-new file mode 100644
+-index 0000000..a79e051
+---- /dev/null
+-+++ b/src/components/game-results.tsx
+-@@ -0,0 +1,43 @@
+-+"use client";
+-+
+-+import { useCreateGame } from "~/lib/hooks/use-create-game";
+-+import { type games } from "~/server/db/schema";
+-+
+-+import { Button } from "./ui/button";
+-+
+-+type GameResultsProps = {
+-+  status: (typeof games.status.enumValues)[number];
+-+};
+-+
+-+const PlayAgainButton = () => {
+-+  const createGame = useCreateGame();
+-+
+-+  return (
+-+    <Button size="lg" onClick={createGame}>
+-+      Play again!
+-+    </Button>
+-+  );
+-+};
+-+
+-+export const GameResults = ({ status }: GameResultsProps) => {
+-+  switch (status) {
+-+    case "in_progress":
+-+      return null;
+-+    case "won":
+-+      return (
+-+        <div className="flex flex-col gap-6">
+-+          <div className="text-3xl font-bold text-green-400">
+-+            Bam! You won! 🎉
+-+          </div>
+-+          <PlayAgainButton />
+-+        </div>
+-+      );
+-+    case "lost":
+-+      return (
+-+        <div className="flex flex-col gap-6">
+-+          <div className="text-3xl font-bold text-red-400">You lost! 😭</div>
+-+          <PlayAgainButton />
+-+        </div>
+-+      );
+-+  }
+-+};
+-diff --git a/src/lib/hooks/use-create-game.ts b/src/lib/hooks/use-create-game.ts
+-new file mode 100644
+-index 0000000..44195a8
+---- /dev/null
+-+++ b/src/lib/hooks/use-create-game.ts
+-@@ -0,0 +1,17 @@
+-+import { useRouter } from "next/navigation";
+-+
+-+import { api } from "~/server/api";
+-+
+-+export const useCreateGame = (withRedirect = true) => {
+-+  const router = useRouter();
+-+
+-+  return async () => {
+-+    const game = await api.games.create();
+-+
+-+    if (withRedirect) {
+-+      router.push(`/game/${game.id}`);
+-+    }
+-+
+-+    return game;
+-+  };
+-+};
+-diff --git a/src/server/services/guess.service.ts b/src/server/services/guess.service.ts
+-index 4516514..1046541 100644
+---- a/src/server/services/guess.service.ts
+-+++ b/src/server/services/guess.service.ts
+-@@ -1,8 +1,9 @@
+--import { asc, eq } from "drizzle-orm";
+-+import { asc, count, eq } from "drizzle-orm";
+- import { revalidatePath } from "next/cache";
+- 
+- import { db } from "../db";
+- import { games, guesses } from "../db/schema";
+-+import { gameService } from "./game.service";
+- 
+- const checkGuess = async (guess: string, gameId: number) => {
+-   const game = await db.query.games.findFirst({
+-@@ -55,6 +56,16 @@ const create = async (guess: string, gameId: number) => {
+-     throw new Error("Failed to create guess");
+-   }
+- 
+-+  const count = await countByGameId(gameId);
+-+
+-+  if (count === 6 && createdGuess.result.includes("X")) {
+-+    await gameService.update(gameId, "lost");
+-+  }
+-+
+-+  if (createdGuess.result === "CCCCC") {
+-+    await gameService.update(gameId, "won");
+-+  }
+-+
+-   revalidatePath(`/game/${gameId}`);
+- 
+-   return createdGuess;
+-@@ -67,6 +78,19 @@ const findByGameId = async (gameId: number) => {
+-   });
+- };
+- 
+-+const countByGameId = async (gameId: number) => {
+-+  const [gameCount] = await db
+-+    .select({ count: count() })
+-+    .from(guesses)
+-+    .where(eq(guesses.gameId, gameId));
+-+
+-+  if (!gameCount) {
+-+    throw new Error("Error counting guesses");
+-+  }
+-+
+-+  return gameCount.count;
+-+};
+-+
+- export const guessService = {
+-   create,
+-   findByGameId,
+diff --git a/docs/07-styling-polish.md b/docs/07-styling-polish.md
+new file mode 100644
+index 0000000..e69de29
+diff --git a/package.json b/package.json
+index 5f8c590..cf74de2 100644
+--- a/package.json
++++ b/package.json
+@@ -54,9 +54,10 @@
+     "geist": "^1.3.0",
+     "input-otp": "^1.2.4",
+     "lucide-react": "^0.436.0",
+-    "next": "^14.2.4",
++    "next": "14.2.7",
+     "next-themes": "^0.3.0",
+     "react": "^18.3.1",
++    "react-confetti": "^6.1.0",
+     "react-day-picker": "8.10.1",
+     "react-dom": "^18.3.1",
+     "react-hook-form": "^7.53.0",
+diff --git a/src/app/game/[gameId]/page.tsx b/src/app/game/[gameId]/page.tsx
+index ddf5238..709f0d0 100644
+--- a/src/app/game/[gameId]/page.tsx
++++ b/src/app/game/[gameId]/page.tsx
+@@ -18,7 +18,7 @@ export default async function GamePage({
+           <GameBoard gameId={gameId} status={game.status} guesses={guesses} />
+         </div>
+         {game.status === "in_progress" && (
+-          <div className="flex w-full max-w-3xl items-center">
++          <div className="h flex w-full max-w-3xl items-center">
+             <GuessKeyboard gameId={gameId} />
+           </div>
+         )}
+diff --git a/src/components/game-board.tsx b/src/components/game-board.tsx
+index aa5141b..d1a59c9 100644
+--- a/src/components/game-board.tsx
++++ b/src/components/game-board.tsx
+@@ -1,7 +1,7 @@
+ import { type api } from "~/server/api";
+ import { type games } from "~/server/db/schema";
+ 
+-import { GameResults } from "./game-results";
++import { GameResultsDialog } from "./game-results-dialog";
+ import { GuessInput } from "./guess-input";
+ import { GuessList } from "./guess-list";
+ 
+@@ -14,9 +14,11 @@ type GameBoardProps = {
+ export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
+   return (
+     <div className="flex grow flex-col items-center gap-6">
+-      <GuessList guesses={guesses} />
+-      {status === "in_progress" && <GuessInput gameId={gameId} />}
+-      <GameResults status={status} />
++      <div className="flex flex-col gap-2">
++        <GuessList guesses={guesses} />
++        {status === "in_progress" && <GuessInput gameId={gameId} />}
++      </div>
++      <GameResultsDialog status={status} guesses={guesses} />
+     </div>
+   );
+ };
+diff --git a/src/components/game-results-dialog.tsx b/src/components/game-results-dialog.tsx
+new file mode 100644
+index 0000000..31bc8d5
+--- /dev/null
++++ b/src/components/game-results-dialog.tsx
+@@ -0,0 +1,75 @@
++"use client";
++
++import { HeartCrack, Trophy } from "lucide-react";
++import { useMemo } from "react";
++import Confetti from "react-confetti";
++
++import { useCreateGame } from "~/lib/hooks/use-create-game";
++import { type api } from "~/server/api";
++import { type games } from "~/server/db/schema";
++
++import { GuessItem } from "./guess-item";
++import { Button } from "./ui/button";
++import { Dialog, DialogContent } from "./ui/dialog";
++
++type GameResultsDialogProps = {
++  status: (typeof games.status.enumValues)[number];
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++export const GameResultsDialog = ({
++  status,
++  guesses,
++}: GameResultsDialogProps) => {
++  const createGame = useCreateGame();
++
++  if (status === "in_progress") return null;
++
++  return (
++    <Dialog open={true}>
++      <DialogContent
++        className="flex flex-col items-center gap-6 rounded-2xl p-12 md:max-w-fit"
++        withClose={false}
++      >
++        {status === "won" ? (
++          <>
++            <div className="flex flex-col items-center gap-6">
++              <div className="text-center">
++                <div className="text-7xl font-bold">you are</div>
++                <div className="text-7xl font-bold text-green-500">
++                  awesome!
++                </div>
++              </div>
++              {guesses.map((guess) => (
++                <GuessItem key={guess.id} guess={guess} />
++              ))}
++            </div>
++            <Confetti
++              className="h-full w-full"
++              numberOfPieces={200}
++              gravity={0.05}
++            />
++          </>
++        ) : (
++          <div className="flex flex-col items-center gap-6">
++            <div className="text-center">
++              <div className="text-7xl font-bold">better luck</div>
++              <div className="text-7xl font-bold text-red-500">next time!</div>
++            </div>
++            {guesses.map((guess) => (
++              <GuessItem key={guess.id} guess={guess} />
++            ))}
++          </div>
++        )}
++        <Button
++          variant="outline"
++          className="h-14 w-full rounded-xl text-xl font-semibold"
++          size="lg"
++          onClick={() => createGame()}
++        >
++          Play again!
++        </Button>
++      </DialogContent>
++    </Dialog>
++  );
++};
+diff --git a/src/components/guess-input.tsx b/src/components/guess-input.tsx
+index a1973f4..19f4d8b 100644
+--- a/src/components/guess-input.tsx
++++ b/src/components/guess-input.tsx
+@@ -11,6 +11,15 @@ type GuessInputProps = {
+   gameId: number;
+ };
+ 
++function GuessItemSlot({ index }: { index: number }) {
++  return (
++    <InputOTPSlot
++      index={index}
++      className="h-16 w-16 border text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none"
++    />
++  );
++}
++
+ export const GuessInput = ({ gameId }: GuessInputProps) => {
+   const { guess, setGuess } = useGuess();
+ 
+@@ -28,12 +37,10 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
+         }
+       }}
+     >
+-      <InputOTPGroup>
+-        <InputOTPSlot index={0} className="h-12 w-12 text-2xl uppercase" />
+-        <InputOTPSlot index={1} className="h-12 w-12 text-2xl uppercase" />
+-        <InputOTPSlot index={2} className="h-12 w-12 text-2xl uppercase" />
+-        <InputOTPSlot index={3} className="h-12 w-12 text-2xl uppercase" />
+-        <InputOTPSlot index={4} className="h-12 w-12 text-2xl uppercase" />
++      <InputOTPGroup className="gap-2">
++        {[0, 1, 2, 3, 4].map((index) => (
++          <GuessItemSlot key={index} index={index} />
++        ))}
+       </InputOTPGroup>
+     </InputOTP>
+   );
+diff --git a/src/components/guess-item.tsx b/src/components/guess-item.tsx
+index 0ede1b7..a9345a2 100644
+--- a/src/components/guess-item.tsx
++++ b/src/components/guess-item.tsx
+@@ -13,11 +13,14 @@ function GuessItemSlot({ index, result }: { index: number; result: string }) {
+   return (
+     <InputOTPSlot
+       index={index}
+-      className={cn("h-12 w-12 text-2xl uppercase", {
+-        "bg-red-500 text-red-50": result === "X",
+-        "bg-green-500 text-green-50": result === "C",
+-        "bg-yellow-500 text-yellow-50": result === "~",
+-      })}
++      className={cn(
++        "h-16 w-16 border-none text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none",
++        {
++          "bg-red-500 text-red-50": result === "X",
++          "bg-green-500 text-green-50": result === "C",
++          "bg-yellow-500 text-yellow-50": result === "~",
++        },
++      )}
+     />
+   );
+ }
+@@ -25,7 +28,7 @@ function GuessItemSlot({ index, result }: { index: number; result: string }) {
+ export const GuessItem = ({ guess }: GuessItemProps) => {
+   return (
+     <InputOTP readOnly maxLength={5} value={guess.guess}>
+-      <InputOTPGroup>
++      <InputOTPGroup className="gap-2">
+         {[0, 1, 2, 3, 4].map((index) => (
+           <GuessItemSlot
+             key={index}
+diff --git a/src/components/guess-keyboard.tsx b/src/components/guess-keyboard.tsx
+index 0ea4f97..70b2a6a 100644
+--- a/src/components/guess-keyboard.tsx
++++ b/src/components/guess-keyboard.tsx
+@@ -22,7 +22,7 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
+       buttonTheme={[
+         {
+           class:
+-            "!bg-background !text-foreground !border-none !shadow-none hover:!bg-secondary/50 active:!bg-white/25",
++            "!bg-background !text-foreground !border-none !shadow-none hover:!bg-secondary/50 active:!bg-white/25 !h-16",
+           buttons:
+             "Q W E R T Y U I O P A S D F G H J K L Z X C V B N M {delete} {enter}",
+         },
+diff --git a/src/components/guess-list.tsx b/src/components/guess-list.tsx
+index dd64b54..abe3203 100644
+--- a/src/components/guess-list.tsx
++++ b/src/components/guess-list.tsx
+@@ -10,7 +10,7 @@ type GuessListProps = {
+ 
+ export const GuessList = ({ guesses }: GuessListProps) => {
+   return (
+-    <div className="flex flex-col gap-3">
++    <div className="flex flex-col gap-2">
+       {guesses.map((guess) => (
+         <GuessItem key={guess.id} guess={guess} />
+       ))}
+diff --git a/src/components/ui/dialog.tsx b/src/components/ui/dialog.tsx
+index 0af5243..bff208c 100644
+--- a/src/components/ui/dialog.tsx
++++ b/src/components/ui/dialog.tsx
+@@ -1,18 +1,18 @@
+-"use client"
++"use client";
+ 
+-import * as React from "react"
+-import * as DialogPrimitive from "@radix-ui/react-dialog"
+-import { Cross2Icon } from "@radix-ui/react-icons"
++import * as DialogPrimitive from "@radix-ui/react-dialog";
++import { Cross2Icon } from "@radix-ui/react-icons";
++import * as React from "react";
+ 
+-import { cn } from "~/lib/utils"
++import { cn } from "~/lib/utils";
+ 
+-const Dialog = DialogPrimitive.Root
++const Dialog = DialogPrimitive.Root;
+ 
+-const DialogTrigger = DialogPrimitive.Trigger
++const DialogTrigger = DialogPrimitive.Trigger;
+ 
+-const DialogPortal = DialogPrimitive.Portal
++const DialogPortal = DialogPrimitive.Portal;
+ 
+-const DialogClose = DialogPrimitive.Close
++const DialogClose = DialogPrimitive.Close;
+ 
+ const DialogOverlay = React.forwardRef<
+   React.ElementRef<typeof DialogPrimitive.Overlay>,
+@@ -21,37 +21,41 @@ const DialogOverlay = React.forwardRef<
+   <DialogPrimitive.Overlay
+     ref={ref}
+     className={cn(
+-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+-      className
++      "fixed inset-0 z-50 bg-black/80 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
++      className,
+     )}
+     {...props}
+   />
+-))
+-DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
++));
++DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+ 
+ const DialogContent = React.forwardRef<
+   React.ElementRef<typeof DialogPrimitive.Content>,
+-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+->(({ className, children, ...props }, ref) => (
++  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
++    withClose?: boolean;
++  }
++>(({ className, children, withClose = true, ...props }, ref) => (
+   <DialogPortal>
+     <DialogOverlay />
+     <DialogPrimitive.Content
+       ref={ref}
+       className={cn(
+         "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+-        className
++        className,
+       )}
+       {...props}
+     >
+       {children}
+-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+-        <Cross2Icon className="h-4 w-4" />
+-        <span className="sr-only">Close</span>
+-      </DialogPrimitive.Close>
++      {withClose && (
++        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
++          <Cross2Icon className="h-4 w-4" />
++          <span className="sr-only">Close</span>
++        </DialogPrimitive.Close>
++      )}
+     </DialogPrimitive.Content>
+   </DialogPortal>
+-))
+-DialogContent.displayName = DialogPrimitive.Content.displayName
++));
++DialogContent.displayName = DialogPrimitive.Content.displayName;
+ 
+ const DialogHeader = ({
+   className,
+@@ -60,12 +64,12 @@ const DialogHeader = ({
+   <div
+     className={cn(
+       "flex flex-col space-y-1.5 text-center sm:text-left",
+-      className
++      className,
+     )}
+     {...props}
+   />
+-)
+-DialogHeader.displayName = "DialogHeader"
++);
++DialogHeader.displayName = "DialogHeader";
+ 
+ const DialogFooter = ({
+   className,
+@@ -74,12 +78,12 @@ const DialogFooter = ({
+   <div
+     className={cn(
+       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+-      className
++      className,
+     )}
+     {...props}
+   />
+-)
+-DialogFooter.displayName = "DialogFooter"
++);
++DialogFooter.displayName = "DialogFooter";
+ 
+ const DialogTitle = React.forwardRef<
+   React.ElementRef<typeof DialogPrimitive.Title>,
+@@ -89,12 +93,12 @@ const DialogTitle = React.forwardRef<
+     ref={ref}
+     className={cn(
+       "text-lg font-semibold leading-none tracking-tight",
+-      className
++      className,
+     )}
+     {...props}
+   />
+-))
+-DialogTitle.displayName = DialogPrimitive.Title.displayName
++));
++DialogTitle.displayName = DialogPrimitive.Title.displayName;
+ 
+ const DialogDescription = React.forwardRef<
+   React.ElementRef<typeof DialogPrimitive.Description>,
+@@ -105,18 +109,18 @@ const DialogDescription = React.forwardRef<
+     className={cn("text-sm text-muted-foreground", className)}
+     {...props}
+   />
+-))
+-DialogDescription.displayName = DialogPrimitive.Description.displayName
++));
++DialogDescription.displayName = DialogPrimitive.Description.displayName;
+ 
+ export {
+   Dialog,
+-  DialogPortal,
+-  DialogOverlay,
+-  DialogTrigger,
+   DialogClose,
+   DialogContent,
+-  DialogHeader,
++  DialogDescription,
+   DialogFooter,
++  DialogHeader,
++  DialogOverlay,
++  DialogPortal,
+   DialogTitle,
+-  DialogDescription,
+-}
++  DialogTrigger,
++};
+diff --git a/src/styles/globals.css b/src/styles/globals.css
+index bc0ea3d..f450d1e 100644
+--- a/src/styles/globals.css
++++ b/src/styles/globals.css
+@@ -66,4 +66,4 @@
+   body {
+     @apply bg-background text-foreground;
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/tailwind.config.ts b/tailwind.config.ts
+index 84287e8..41668a3 100644
+--- a/tailwind.config.ts
++++ b/tailwind.config.ts
+@@ -1,13 +1,13 @@
+-import type { Config } from "tailwindcss"
++import type { Config } from "tailwindcss";
+ 
+ const config = {
+   darkMode: ["class"],
+   content: [
+-    './pages/**/*.{ts,tsx}',
+-    './components/**/*.{ts,tsx}',
+-    './app/**/*.{ts,tsx}',
+-    './src/**/*.{ts,tsx}',
+-	],
++    "./pages/**/*.{ts,tsx}",
++    "./components/**/*.{ts,tsx}",
++    "./app/**/*.{ts,tsx}",
++    "./src/**/*.{ts,tsx}",
++  ],
+   prefix: "",
+   theme: {
+     container: {
+@@ -75,6 +75,6 @@ const config = {
+     },
+   },
+   plugins: [require("tailwindcss-animate")],
+-} satisfies Config
++} satisfies Config;
+ 
+-export default config
+\ No newline at end of file
++export default config;
