@@ -15,6 +15,7 @@ wordle-clone/
 │   ├── lib/                 # Utility functions and shared code
 │   ├── server/              # Server-side code
 │   └── styles/              # CSS files
+├── docs/                    # Tutorial documents and additional resources
 ├── public/                  # Static files
 ├── .env.example             # Example environment variables
 ├── drizzle.config.ts        # Drizzle ORM configuration
@@ -83,6 +84,12 @@ wordle-clone/
 
 7. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
+## Tutorials and Documentation
+
+In the `docs` folder of this project, you'll find detailed tutorials and additional resources to guide you through the development process. These documents provide step-by-step instructions, explanations of key concepts, and tips for each stage of building the Wordle clone.
+
+Be sure to refer to these tutorials as you progress through the project. They're designed to complement the code in each checkpoint and provide a deeper understanding of the technologies and techniques used.
+
 ## Tutorial Checkpoints
 
 The tutorial is divided into the following key stages, each represented by a checkpoint branch:
@@ -111,13 +118,3 @@ git checkout <checkpoint-branch-name>
 3. After completing each section, you can compare your work with the corresponding checkpoint branch.
 4. If you get stuck, you can use the checkpoint branches as a reference or starting point.
 5. By the time you reach the `checkpoint-07-styling-polish` branch, you'll have a fully functional Wordle clone.
-
-Remember, these checkpoints are here to help you, but the real learning comes from working through the implementation yourself!
-
-## Contributing
-
-If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
