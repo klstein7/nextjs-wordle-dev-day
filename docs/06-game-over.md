@@ -16,11 +16,13 @@ Once you've completed these steps, you'll be ready to implement the game over lo
 
 ## Step 1: Update the Game Page
 
-First, let's update our game page to fetch the game status and conditionally render the keyboard.
-
 ### Exercise 1:
 
-Before looking at the solution, think about how you would implement this in Angular. How would you fetch the game status and conditionally render components?
+Before looking at the solution, try to update the game page yourself. Consider:
+
+1. How would you fetch both the game status and guesses?
+2. How would you conditionally render the keyboard based on the game status?
+3. What props would you need to pass to the `GameBoard` component?
 
 Update `src/app/game/[gameId]/page.tsx`:
 
@@ -30,6 +32,8 @@ import { GuessKeyboard } from "~/components/guess-keyboard";
 import { GuessProvider } from "~/lib/store/guess-provider";
 import { api } from "~/server/api";
 
+// This is a server component it does not have "use client" at the top
+// This means we can fetch data directly from the server inside this component
 export default async function GamePage({
   params: { gameId },
 }: {
@@ -43,8 +47,10 @@ export default async function GamePage({
     <GuessProvider>
       <div className="flex h-full flex-col items-center gap-6">
         <div className="flex flex-1 items-center justify-center">
+          {/* Pass game status to GameBoard */}
           <GameBoard gameId={gameId} status={game.status} guesses={guesses} />
         </div>
+        {/* Conditionally render keyboard only if game is in progress */}
         {game.status === "in_progress" && (
           <div className="flex w-full max-w-3xl items-center">
             <GuessKeyboard gameId={gameId} />
@@ -56,18 +62,15 @@ export default async function GamePage({
 }
 ```
 
-Here, we're fetching the game status and conditionally rendering the keyboard only if the game is in progress. This is similar to using `*ngIf` in Angular templates.
-
 ## Step 2: Update the GameBoard Component
-
-Now, let's update our `GameBoard` component to handle different game states.
 
 ### Exercise 2:
 
-Before implementing the changes, consider:
+Before implementing the changes, try to update the `GameBoard` component yourself. Consider:
 
-1. How will you display different content based on the game status?
-2. How does this compare to using `ngSwitch` in Angular?
+1. How will you handle different game statuses?
+2. When should the `GuessInput` be displayed?
+3. How will you incorporate the new `GameResults` component?
 
 Update `src/components/game-board.tsx`:
 
@@ -88,26 +91,26 @@ type GameBoardProps = {
 export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
   return (
     <div className="flex grow flex-col items-center gap-6">
+      {/* Always show the list of guesses */}
       <GuessList guesses={guesses} />
+      {/* Only show GuessInput if the game is still in progress */}
       {status === "in_progress" && <GuessInput gameId={gameId} />}
+      {/* Show game results (will be null if game is in progress) */}
       <GameResults status={status} />
     </div>
   );
 };
 ```
 
-This component now conditionally renders the `GuessInput` and includes a new `GameResults` component based on the game status.
-
 ## Step 3: Create the GameResults Component
-
-Let's create a new component to display the game results and a "Play Again" button.
 
 ### Exercise 3:
 
-Before implementing the component, think about:
+Before implementing the component, try to create the `GameResults` component yourself. Consider:
 
-1. What different states does this component need to handle?
-2. How will you trigger a new game?
+1. What different game statuses do you need to handle?
+2. How will you design the UI for win and lose scenarios?
+3. How will you implement the "Play Again" functionality?
 
 Create a new file `src/components/game-results.tsx`:
 
@@ -123,6 +126,7 @@ type GameResultsProps = {
   status: (typeof games.status.enumValues)[number];
 };
 
+// Separate component for the "Play Again" button
 const PlayAgainButton = () => {
   const createGame = useCreateGame();
 
@@ -134,9 +138,10 @@ const PlayAgainButton = () => {
 };
 
 export const GameResults = ({ status }: GameResultsProps) => {
+  // Use a switch statement to handle different game statuses
   switch (status) {
     case "in_progress":
-      return null;
+      return null; // Don't show anything if the game is still in progress
     case "won":
       return (
         <div className="flex flex-col gap-6">
@@ -157,18 +162,15 @@ export const GameResults = ({ status }: GameResultsProps) => {
 };
 ```
 
-This component uses a switch statement to render different content based on the game status, similar to using `ngSwitch` in Angular. The `PlayAgainButton` uses a custom hook to create a new game.
-
 ## Step 4: Create a Custom Hook for Game Creation
-
-Let's create a custom hook to handle game creation and navigation.
 
 ### Exercise 4:
 
-Before implementing the hook, consider:
+Before implementing the hook, try to create the `useCreateGame` hook yourself. Consider:
 
-1. How will you handle navigation after creating a game?
-2. How does this compare to using a service and router in Angular?
+1. How will you handle game creation?
+2. How will you manage navigation after creating a game?
+3. How can you make the hook flexible for different use cases?
 
 Create a new file `src/lib/hooks/use-create-game.ts`:
 
@@ -181,9 +183,11 @@ export const useCreateGame = (withRedirect = true) => {
   const router = useRouter();
 
   return async () => {
+    // Create a new game using the API
     const game = await api.games.create();
 
     if (withRedirect) {
+      // Redirect to the new game page if withRedirect is true
       router.push(`/game/${game.id}`);
     }
 
@@ -192,15 +196,14 @@ export const useCreateGame = (withRedirect = true) => {
 };
 ```
 
-This hook encapsulates the logic for creating a new game and optionally navigating to it. It's similar to combining a service method and navigation in Angular.
-
 ## Step 5: Update the Home Page
-
-Now, let's update our home page to use the new `useCreateGame` hook.
 
 ### Exercise 5:
 
-Before updating the component, think about how this simplifies the home page compared to the previous implementation.
+Before updating the component, try to modify the home page yourself. Consider:
+
+1. How will you use the new `useCreateGame` hook?
+2. How does this simplify the home page compared to the previous implementation?
 
 Update `src/app/page.tsx`:
 
@@ -211,6 +214,7 @@ import { Button } from "~/components/ui/button";
 import { useCreateGame } from "~/lib/hooks/use-create-game";
 
 export default function HomePage() {
+  // Use the custom hook to create a new game
   const createGame = useCreateGame();
 
   return (
@@ -218,6 +222,7 @@ export default function HomePage() {
       <Button
         onClick={async () => {
           await createGame();
+          // No need to handle navigation here, it's done in the hook
         }}
       >
         New game
@@ -227,18 +232,15 @@ export default function HomePage() {
 }
 ```
 
-This update simplifies the home page by using the `useCreateGame` hook, which encapsulates the game creation and navigation logic.
-
 ## Step 6: Update the Guess Service
-
-Finally, let's update our guess service to handle game completion logic.
 
 ### Exercise 6:
 
-Before updating the service, consider:
+Before updating the service, try to modify the guess service yourself. Consider:
 
 1. How will you determine if a game is won or lost?
-2. How does this compare to updating entity status in a Spring Boot service?
+2. At what point should you update the game status?
+3. How will you ensure the UI is updated after a game status change?
 
 Update `src/server/services/guess.service.ts`:
 
@@ -272,13 +274,16 @@ const create = async (guess: string, gameId: number) => {
 
   // Check for game over conditions
   if (count === 6 && createdGuess.result.includes("X")) {
+    // If it's the 6th guess and not all correct, the game is lost
     await gameService.update(gameId, "lost");
   }
 
   if (createdGuess.result === "CCCCC") {
+    // If all letters are correct, the game is won
     await gameService.update(gameId, "won");
   }
 
+  // Trigger a revalidation of the game page to reflect the new state
   revalidatePath(`/game/${gameId}`);
 
   return createdGuess;
@@ -287,6 +292,7 @@ const create = async (guess: string, gameId: number) => {
 // ... (rest of the code remains the same)
 
 const countByGameId = async (gameId: number) => {
+  // Count the number of guesses for a specific game
   const [gameCount] = await db
     .select({ count: count() })
     .from(guesses)
@@ -305,7 +311,39 @@ export const guessService = {
 };
 ```
 
-This update adds logic to check for game over conditions after each guess. It's similar to updating an entity's status in a Spring Boot service.
+## Checking Your Progress
+
+After implementing the game over logic and new game creation, you can verify your progress by running the application and checking the following:
+
+1. **Start the development server**:
+   Run `yarn dev` to start the development server.
+
+2. **Start a new game**:
+
+   - Open your browser and go to `http://localhost:3000`.
+   - Click the "New game" button on the home page.
+   - You should be redirected to a new game page (e.g., `http://localhost:3000/game/1`).
+
+3. **Play through a game**:
+
+   - Make guesses until you either win or lose the game.
+   - If you win (guess the correct word):
+     - The keyboard should disappear.
+     - You should see a victory message ("Bam! You won! 🎉").
+     - A "Play again!" button should appear.
+   - If you lose (make 6 incorrect guesses):
+     - The keyboard should disappear.
+     - You should see a losing message ("You lost! 😭").
+     - A "Play again!" button should appear.
+
+4. **Check game status persistence**:
+
+   - After winning or losing a game, refresh the page.
+   - The game over state (won or lost) should still be displayed, not a new game.
+
+5. **Start a new game from game over state**:
+   - Click the "Play again!" button.
+   - You should be redirected to a new game page with a fresh board and keyboard.
 
 ## Conclusion
 
