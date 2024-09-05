@@ -13,11 +13,14 @@ function GuessItemSlot({ index, result }: { index: number; result: string }) {
   return (
     <InputOTPSlot
       index={index}
-      className={cn("h-12 w-12 text-2xl uppercase", {
-        "bg-red-500 text-red-50": result === "X",
-        "bg-green-500 text-green-50": result === "C",
-        "bg-yellow-500 text-yellow-50": result === "~",
-      })}
+      className={cn(
+        "h-16 w-16 border-none text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none",
+        {
+          "bg-red-500 text-red-50": result === "X",
+          "bg-green-500 text-green-50": result === "C",
+          "bg-yellow-500 text-yellow-50": result === "~",
+        },
+      )}
     />
   );
 }
@@ -25,7 +28,7 @@ function GuessItemSlot({ index, result }: { index: number; result: string }) {
 export const GuessItem = ({ guess }: GuessItemProps) => {
   return (
     <InputOTP readOnly maxLength={5} value={guess.guess}>
-      <InputOTPGroup>
+      <InputOTPGroup className="gap-2">
         {[0, 1, 2, 3, 4].map((index) => (
           <GuessItemSlot
             key={index}

@@ -18,7 +18,7 @@ export default async function GamePage({
           <GameBoard gameId={gameId} status={game.status} guesses={guesses} />
         </div>
         {game.status === "in_progress" && (
-          <div className="flex w-full max-w-3xl items-center">
+          <div className="h flex w-full max-w-3xl items-center">
             <GuessKeyboard gameId={gameId} />
           </div>
         )}

@@ -10,7 +10,7 @@ type GuessListProps = {
 
 export const GuessList = ({ guesses }: GuessListProps) => {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {guesses.map((guess) => (
         <GuessItem key={guess.id} guess={guess} />
       ))}
