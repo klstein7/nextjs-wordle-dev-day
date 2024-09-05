@@ -39,33 +39,49 @@ wordle-clone/
 1. Clone this repository:
 
    ```
-   git clone https://github.com/your-username/wordle-clone-tutorial.git
+   git clone https://github.com/farmcreditca/nextjs-wordle-dev-day.git
    ```
 
-2. Install dependencies:
+2. Open the project in Visual Studio Code:
 
    ```
-   cd wordle-clone-tutorial
+   code nextjs-wordle-dev-day
+   ```
+
+   If you don't have VS Code installed, you can download it from [https://code.visualstudio.com/](https://code.visualstudio.com/)
+
+3. Install the SQLite Viewer extension:
+
+   - Open the Extensions view in VS Code (Ctrl+Shift+X or Cmd+Shift+X on macOS)
+   - Search for "SQLite Viewer"
+   - Install the extension by Florian Klampfer
+
+   This extension will allow you to view your SQLite database directly in VS Code.
+
+4. Install dependencies:
+
+   ```
+   cd nextjs-wordle-dev-day
    yarn install
    ```
 
-3. Set up your environment variables:
+5. Set up your environment variables:
 
-   - Copy `.env.example` to `.env.local`
+   - Copy `.env.example` to `.env`
 
    ```
-   cp .env.example .env.local
+   cp .env.example .env
    ```
 
    - The database credentials are pre-configured in the .env.example file, so you don't need to change anything for this tutorial.
 
-4. Run the development server:
+6. Run the development server:
 
    ```
    yarn dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+7. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
 ## Tutorial Checkpoints
 
