@@ -1,45 +1,78 @@
-# Section 06: Game Over Implementation
+# 06: Game Over Implementation
 
-Welcome to the game over implementation section of our Wordle clone! In this part, we'll add logic to handle game completion, display results, and allow users to start a new game. If you're coming from a Spring Boot/Angular background, you'll find some familiar concepts here, implemented in a Next.js/React environment.
+Welcome to the sixth section of our tutorial! In this part, you'll implement game over logic in your Wordle clone. This includes handling game completion, displaying results, and allowing users to start a new game. If you're familiar with Angular/Spring Boot, you'll find parallels in how we manage state and user interactions in a Next.js/React environment.
 
-## Getting Started
+## Exercise Objectives
 
-If you're just joining us or need to catch up, check out the `checkpoint-05-word-validation` branch. This contains all the work we've done in implementing word validation.
+- **Update** the game page to handle game status.
+- **Modify** the `GameBoard` component to display game results.
+- **Create** a `GameResults` component for win/lose messages.
+- **Develop** a custom hook for creating new games.
+- **Adjust** the home page to use the new game creation hook.
+- **Enhance** the guess service to handle game completion logic.
 
-To get up to speed:
+---
 
-1. Switch to the `checkpoint-05-word-validation` branch
-2. Run `yarn install` to ensure all dependencies are installed
-3. Run `yarn dev` to start the development server
+## Prerequisites
 
-Once you've completed these steps, you'll be ready to implement the game over logic.
+Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-05-word-validation` branch.
 
-## Step 1: Update the Game Page
+**To get up to speed:**
 
-### Exercise 1:
+1. **Switch to the branch:**
 
-Before looking at the solution, try to update the game page yourself. Consider:
+   ```bash
+   git checkout checkpoint-05-word-validation
+   ```
 
-1. How would you fetch both the game status and guesses?
-2. How would you conditionally render the keyboard based on the game status?
-3. What props would you need to pass to the `GameBoard` component?
+2. **Install dependencies:**
 
-Update `src/app/game/[gameId]/page.tsx`:
+   ```bash
+   yarn install
+   ```
+
+3. **Start the development server:**
+
+   ```bash
+   yarn dev
+   ```
+
+Once you've completed these steps, you're ready to implement the game over logic.
+
+---
+
+## Tasks and Hints
+
+### 1. Update the Game Page
+
+**Task:** Modify the game page to fetch both the game status and guesses, and conditionally render the keyboard based on the game status.
+
+**Why:** To determine when the game is over and to display or hide certain components accordingly, similar to conditionally displaying elements in Angular templates.
+
+**Instructions:**
+
+- **Fetch** both the game and guesses data.
+- **Pass** the game status to the `GameBoard` component.
+- **Conditionally render** the keyboard based on the game's status.
+
+**Example:**
 
 ```typescript
+// src/app/game/[gameId]/page.tsx
+
 import { GameBoard } from "~/components/game-board";
 import { GuessKeyboard } from "~/components/guess-keyboard";
 import { GuessProvider } from "~/lib/store/guess-provider";
 import { api } from "~/server/api";
 
-// This is a server component it does not have "use client" at the top
-// This means we can fetch data directly from the server inside this component
+// This is a server component; it does not have "use client" at the top
+// We can fetch data directly from the server inside this component
 export default async function GamePage({
   params: { gameId },
 }: {
   params: { gameId: number };
 }) {
-  // Fetch both game and guesses data
+  // Fetch both game and guesses data from the server
   const game = await api.games.getById(gameId);
   const guesses = await api.guesses.findByGameId(gameId);
 
@@ -50,7 +83,7 @@ export default async function GamePage({
           {/* Pass game status to GameBoard */}
           <GameBoard gameId={gameId} status={game.status} guesses={guesses} />
         </div>
-        {/* Conditionally render keyboard only if game is in progress */}
+        {/* Conditionally render the keyboard only if the game is in progress */}
         {game.status === "in_progress" && (
           <div className="flex w-full max-w-3xl items-center">
             <GuessKeyboard gameId={gameId} />
@@ -62,19 +95,34 @@ export default async function GamePage({
 }
 ```
 
-## Step 2: Update the GameBoard Component
+**Comments:**
 
-### Exercise 2:
+- **Data Fetching:**
+  - Fetches the game details (`game`) and the list of guesses (`guesses`) using the `api`.
+- **Passing Props:**
+  - Passes `status` to the `GameBoard` component to inform it about the game's current state.
+- **Conditional Rendering:**
+  - Uses `{game.status === "in_progress" && ...}` to render the `GuessKeyboard` only when the game is not over.
 
-Before implementing the changes, try to update the `GameBoard` component yourself. Consider:
+---
 
-1. How will you handle different game statuses?
-2. When should the `GuessInput` be displayed?
-3. How will you incorporate the new `GameResults` component?
+### 2. Update the `GameBoard` Component
 
-Update `src/components/game-board.tsx`:
+**Task:** Modify the `GameBoard` component to handle different game statuses and incorporate the new `GameResults` component.
+
+**Why:** To display the appropriate content based on whether the game is in progress, won, or lost, similar to using `*ngIf` in Angular templates.
+
+**Instructions:**
+
+- **Adjust** the component to accept the `status` prop.
+- **Display** the `GuessInput` only if the game is in progress.
+- **Include** the `GameResults` component to show game outcomes.
+
+**Example:**
 
 ```typescript
+// src/components/game-board.tsx
+
 import { type api } from "~/server/api";
 import { type games } from "~/server/db/schema";
 
@@ -95,26 +143,40 @@ export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
       <GuessList guesses={guesses} />
       {/* Only show GuessInput if the game is still in progress */}
       {status === "in_progress" && <GuessInput gameId={gameId} />}
-      {/* Show game results (will be null if game is in progress) */}
+      {/* Show game results when the game is over */}
       <GameResults status={status} />
     </div>
   );
 };
 ```
 
-## Step 3: Create the GameResults Component
+**Comments:**
 
-### Exercise 3:
+- **Props Update:**
+  - Accepts `status` as a prop to determine the game's current state.
+- **Conditional Rendering:**
+  - Renders `GuessInput` only if `status` is `"in_progress"`.
+  - Includes `GameResults` component to display messages when the game is over.
 
-Before implementing the component, try to create the `GameResults` component yourself. Consider:
+---
 
-1. What different game statuses do you need to handle?
-2. How will you design the UI for win and lose scenarios?
-3. How will you implement the "Play Again" functionality?
+### 3. Create the `GameResults` Component
 
-Create a new file `src/components/game-results.tsx`:
+**Task:** Develop a `GameResults` component to display win or lose messages and provide a "Play Again" button.
+
+**Why:** To enhance user experience by giving immediate feedback upon game completion, similar to showing alerts or modals in Angular.
+
+**Instructions:**
+
+- **Create** a new file `src/components/game-results.tsx`.
+- **Handle** different game statuses (`won`, `lost`, `in_progress`).
+- **Implement** a "Play Again" button using a custom hook.
+
+**Example:**
 
 ```typescript
+// src/components/game-results.tsx
+
 "use client";
 
 import { useCreateGame } from "~/lib/hooks/use-create-game";
@@ -162,19 +224,35 @@ export const GameResults = ({ status }: GameResultsProps) => {
 };
 ```
 
-## Step 4: Create a Custom Hook for Game Creation
+**Comments:**
 
-### Exercise 4:
+- **"use client":**
+  - Indicates that this component is client-side because it uses hooks.
+- **PlayAgainButton Component:**
+  - Uses `useCreateGame` hook to start a new game when clicked.
+- **GameResults Component:**
+  - Uses a `switch` statement to render different content based on `status`.
+  - Displays appropriate messages and the `PlayAgainButton` when the game is over.
 
-Before implementing the hook, try to create the `useCreateGame` hook yourself. Consider:
+---
 
-1. How will you handle game creation?
-2. How will you manage navigation after creating a game?
-3. How can you make the hook flexible for different use cases?
+### 4. Create a Custom Hook for Game Creation
 
-Create a new file `src/lib/hooks/use-create-game.ts`:
+**Task:** Develop a `useCreateGame` hook that handles creating a new game and navigating to it.
+
+**Why:** To encapsulate the game creation logic, making it reusable and keeping components clean, similar to services in Angular.
+
+**Instructions:**
+
+- **Create** a new file `src/lib/hooks/use-create-game.ts`.
+- **Use** Next.js's `useRouter` for navigation.
+- **Implement** the game creation logic using the API.
+
+**Example:**
 
 ```typescript
+// src/lib/hooks/use-create-game.ts
+
 import { useRouter } from "next/navigation";
 
 import { api } from "~/server/api";
@@ -196,18 +274,34 @@ export const useCreateGame = (withRedirect = true) => {
 };
 ```
 
-## Step 5: Update the Home Page
+**Comments:**
 
-### Exercise 5:
+- **Parameters:**
+  - `withRedirect`: Determines whether to navigate to the new game after creation.
+- **Functionality:**
+  - Creates a new game by calling `api.games.create()`.
+  - Uses `router.push` to navigate to the new game's page.
+- **Reusability:**
+  - Can be used in multiple components where game creation is needed.
 
-Before updating the component, try to modify the home page yourself. Consider:
+---
 
-1. How will you use the new `useCreateGame` hook?
-2. How does this simplify the home page compared to the previous implementation?
+### 5. Update the Home Page
 
-Update `src/app/page.tsx`:
+**Task:** Modify the home page to use the `useCreateGame` hook, simplifying the code.
+
+**Why:** To utilize the custom hook for cleaner code and centralized logic, similar to using services in Angular components.
+
+**Instructions:**
+
+- **Update** `src/app/page.tsx`.
+- **Replace** existing game creation logic with the `useCreateGame` hook.
+
+**Example:**
 
 ```typescript
+// src/app/page.tsx
+
 "use client";
 
 import { Button } from "~/components/ui/button";
@@ -222,7 +316,7 @@ export default function HomePage() {
       <Button
         onClick={async () => {
           await createGame();
-          // No need to handle navigation here, it's done in the hook
+          // No need to handle navigation here; it's done in the hook
         }}
       >
         New game
@@ -232,19 +326,35 @@ export default function HomePage() {
 }
 ```
 
-## Step 6: Update the Guess Service
+**Comments:**
 
-### Exercise 6:
+- **Imports:**
+  - Imports `useCreateGame` to handle game creation.
+- **Event Handling:**
+  - On button click, calls `createGame()` without worrying about navigation logic.
+- **Simplification:**
+  - Reduces the code in the component by offloading logic to the custom hook.
 
-Before updating the service, try to modify the guess service yourself. Consider:
+---
 
-1. How will you determine if a game is won or lost?
-2. At what point should you update the game status?
-3. How will you ensure the UI is updated after a game status change?
+### 6. Update the Guess Service
 
-Update `src/server/services/guess.service.ts`:
+**Task:** Enhance the guess service to determine when the game is won or lost and update the game status accordingly.
+
+**Why:** To implement server-side logic for game completion, similar to business logic in a Spring Boot application.
+
+**Instructions:**
+
+- **Update** `src/server/services/guess.service.ts`.
+- **Check** for win or loss conditions after each guess.
+- **Update** the game's status in the database.
+- **Trigger** revalidation of the game page to reflect changes.
+
+**Example:**
 
 ```typescript
+// src/server/services/guess.service.ts
+
 import { asc, count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -311,56 +421,72 @@ export const guessService = {
 };
 ```
 
+**Comments:**
+
+- **Game Over Logic:**
+  - Checks if the player has made 6 guesses and hasn't guessed the word correctly to determine a loss.
+  - Checks if the guess result is `"CCCCC"` (all letters correct) to determine a win.
+- **Updating Game Status:**
+  - Calls `gameService.update` to update the game's status in the database.
+- **Revalidation:**
+  - Uses `revalidatePath` to refresh the game page so that the client sees the updated game status.
+- **Helper Function `countByGameId`:**
+  - Counts the number of guesses made in the game to check against the maximum allowed guesses.
+
+---
+
 ## Checking Your Progress
 
-After implementing the game over logic and new game creation, you can verify your progress by running the application and checking the following:
+Now that you've implemented the game over logic and new game creation, it's time to test your application.
 
-1. **Start the development server**:
-   Run `yarn dev` to start the development server.
+**Instructions:**
 
-2. **Start a new game**:
+1. **Start the Development Server:**
 
-   - Open your browser and go to `http://localhost:3000`.
+   ```bash
+   yarn dev
+   ```
+
+2. **Start a New Game:**
+
+   - Navigate to `http://localhost:3000`.
    - Click the "New game" button on the home page.
    - You should be redirected to a new game page (e.g., `http://localhost:3000/game/1`).
 
-3. **Play through a game**:
+3. **Play Through a Game:**
 
-   - Make guesses until you either win or lose the game.
-   - If you win (guess the correct word):
-     - The keyboard should disappear.
-     - You should see a victory message ("Bam! You won! 🎉").
+   - **Win Scenario:**
+     - Guess the correct word within six attempts.
+     - The keyboard should disappear upon winning.
+     - A victory message ("Bam! You won! 🎉") should be displayed.
      - A "Play again!" button should appear.
-   - If you lose (make 6 incorrect guesses):
-     - The keyboard should disappear.
-     - You should see a losing message ("You lost! 😭").
+   - **Lose Scenario:**
+     - Make six incorrect guesses.
+     - The keyboard should disappear upon losing.
+     - A losing message ("You lost! 😭") should be displayed.
      - A "Play again!" button should appear.
 
-4. **Check game status persistence**:
+4. **Check Game Status Persistence:**
 
-   - After winning or losing a game, refresh the page.
-   - The game over state (won or lost) should still be displayed, not a new game.
+   - Refresh the page after winning or losing.
+   - The game over state should persist, showing the same message and not resetting the game.
 
-5. **Start a new game from game over state**:
+5. **Start a New Game from Game Over State:**
+
    - Click the "Play again!" button.
    - You should be redirected to a new game page with a fresh board and keyboard.
 
-## Conclusion
+If everything works as expected, congratulations! You've successfully implemented game over logic in your Wordle clone.
 
-Great job! You've now implemented game over logic for your Wordle clone. This enhancement includes:
+---
 
-1. Updating the game page to fetch and use the game status
-2. Creating a `GameResults` component to display win/lose messages
-3. Implementing a custom hook for creating new games
-4. Updating the guess service to handle game completion logic
+## Next Steps
 
-Key differences from Angular/Spring Boot you may have noticed:
+In the next section, we'll focus on adding final touches to our game, such as:
 
-- Instead of using `*ngIf` and `ngSwitch`, we use JavaScript conditionals and switch statements directly in our JSX.
-- Custom hooks in React serve a similar purpose to services in Angular, encapsulating reusable logic.
-- The `useRouter` hook in Next.js is similar to Angular's Router service for handling navigation.
-- Server-side logic in Next.js (like our `guessService`) is more integrated with the frontend compared to a separate Spring Boot backend.
+- **UI Enhancements:**
 
-In the next section, we'll focus on adding some final polish to our game, such as animations and improved styling.
+  - Adding animations for guess submissions.
+  - Improving the overall styling and responsiveness.
 
-Happy coding!
+---
