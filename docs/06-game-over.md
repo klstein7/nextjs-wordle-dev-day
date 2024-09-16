@@ -456,11 +456,13 @@ Now that you've implemented the game over logic and new game creation, it's time
 3. **Play Through a Game:**
 
    - **Win Scenario:**
+     ![Game Won Screenshot](img/10.png)
      - Guess the correct word within six attempts.
      - The keyboard should disappear upon winning.
      - A victory message ("Bam! You won! 🎉") should be displayed.
      - A "Play again!" button should appear.
    - **Lose Scenario:**
+     ![Game Over Screenshot](img/9.png)
      - Make six incorrect guesses.
      - The keyboard should disappear upon losing.
      - A losing message ("You lost! 😭") should be displayed.
