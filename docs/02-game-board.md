@@ -621,7 +621,7 @@ _Comments:_
 
 Now that you've implemented all the components, it's time to check your work.
 
-![Keyboard Screenshot](img/4.png)
+![Game Board Screenshot](img/4.png)
 
 **Instructions:**
 
