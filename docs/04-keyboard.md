@@ -432,6 +432,8 @@ Now that you've implemented the on-screen keyboard and related components, it's 
 
 3. **Verify the Keyboard Presence:**
 
+   ![Keyboard](img/7.png)
+
    - On the game page, you should see the on-screen keyboard below the game board.
    - The keyboard should display the correct layout.
 

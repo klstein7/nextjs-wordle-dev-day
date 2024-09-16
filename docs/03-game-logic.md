@@ -1111,12 +1111,16 @@ Now that you've implemented the game logic, it's time to verify that everything 
 
 2. **Create a New Game:**
 
+   ![New Game Screenshot](img/5.png)
+
    - Navigate to `http://localhost:3000` in your web browser.
    - You should see a "New Game" button on the home page.
    - Click the button to create a new game.
    - You should be redirected to a game page with a unique game ID (e.g., `http://localhost:3000/game/1`).
 
 3. **Interact with the Game Board:**
+
+   ![Game Board Screenshot](img/6.png)
 
    - On the game page, you should see an empty game board and an input field for entering guesses.
    - Enter a 5-letter word and press **Enter**.
