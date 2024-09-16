@@ -4,9 +4,9 @@ Welcome to the **Wordle Clone Tutorial**! This project guides you through buildi
 
 ![Game Screenshot](docs/img/1.png)
 
-![Game Over Screenshot](docs/img/2.png)
+![Game Won Screenshot](docs/img/2.png)
 
-![Keyboard Screenshot](docs/img/3.png)
+![Game Over Screenshot](docs/img/3.png)
 
 ## Project Structure
 

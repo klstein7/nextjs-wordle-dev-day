@@ -484,6 +484,8 @@ Now that you've implemented word validation and enhanced user feedback, it's tim
 
 3. **Test Input Constraints:**
 
+   ![Word Validation](img/8.png)
+
    - **Enter Invalid Characters:**
      - Try entering numbers or special characters.
      - The input should reject these characters.
