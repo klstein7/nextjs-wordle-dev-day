@@ -1,12 +1,12 @@
 # Wordle Clone Tutorial
 
-Welcome to the Wordle Clone Tutorial! This project guides you through building a Wordle clone using Next.js, Drizzle ORM, and shadcn/ui.
+Welcome to the **Wordle Clone Tutorial**! This project guides you through building a fully functional Wordle clone using **Next.js**, **Drizzle ORM**, **shadcn/ui**, and other modern web technologies. By the end of this tutorial, you'll have a deeper understanding of building interactive web applications with a robust backend and a polished frontend.
 
-![alt text](docs/img/1.png)
+![Game Screenshot](docs/img/1.png)
 
-![alt text](docs/img/2.png)
+![Game Won Screenshot](docs/img/2.png)
 
-![alt text](docs/img/3.png)
+![Game Over Screenshot](docs/img/3.png)
 
 ## Project Structure
 
@@ -14,11 +14,28 @@ Welcome to the Wordle Clone Tutorial! This project guides you through building a
 wordle-clone/
 │
 ├── src/
-│   ├── app/                 # Next.js app directory
+│   ├── app/                 # Next.js app directory (routes and pages)
+│   │   ├── game/            # Game-related pages
+│   │   │   └── [gameId]/    # Dynamic routes for individual games
+│   │   └── page.tsx         # Home page component
 │   ├── components/          # React components
+│   │   ├── game-board.tsx       # Main game board component
+│   │   ├── guess-input.tsx      # Input component for guesses
+│   │   ├── guess-keyboard.tsx   # On-screen keyboard component
+│   │   ├── game-results-dialog.tsx # Game over dialog component
+│   │   └── ui/                  # UI components from shadcn/ui
 │   ├── lib/                 # Utility functions and shared code
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── store/               # Context and providers
+│   │   ├── utils.ts             # Utility functions
+│   │   └── words.ts             # Word list for the game
 │   ├── server/              # Server-side code
-│   └── styles/              # CSS files
+│   │   ├── api.ts               # API functions for server actions
+│   │   ├── db/                  # Database schema and configuration
+│   │   └── services/            # Server-side logic (game and guess services)
+│   ├── styles/              # CSS files
+│   │   └── globals.css          # Global styles
+│   └── pages/               # (If using pages directory)
 ├── docs/                    # Tutorial documents and additional resources
 ├── public/                  # Static files
 ├── .env.example             # Example environment variables
@@ -26,99 +43,241 @@ wordle-clone/
 ├── next.config.js           # Next.js configuration
 ├── package.json
 ├── README.md
-├── tailwind.config.ts       # Tailwind CSS configuration
+├── tailwind.config.js       # Tailwind CSS configuration
 └── yarn.lock                # Yarn lock file
 ```
 
 ## Technologies Used
 
-- Next.js 14+
-- Drizzle ORM
-- shadcn/ui
-- TypeScript
-- Tailwind CSS
-- Yarn (package manager)
+- **Next.js 14+**: A React framework for building server-rendered applications.
+- **Drizzle ORM**: A TypeScript ORM for interacting with the database.
+- **shadcn/ui**: A set of accessible and customizable UI components built with Radix UI and Tailwind CSS.
+- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript.
+- **Tailwind CSS**: A utility-first CSS framework for rapidly building custom designs.
+- **SQLite**: A lightweight, file-based relational database.
+- **Yarn**: A fast, reliable, and secure dependency management tool.
 
 ## Getting Started
 
-1. Clone this repository:
+We **highly recommend** using **Visual Studio Code (VS Code)** for this tutorial, as it provides excellent support for the technologies used and simplifies the development process. However, if you prefer **IntelliJ IDEA**, we've included instructions for that as well.
 
-   ```
-   git clone https://github.com/farmcreditca/nextjs-wordle-dev-day.git
-   ```
+### Prerequisites
 
-2. Open the project in Visual Studio Code:
+- **Node.js** (version 14 or higher)
+- **Yarn** package manager
 
-   ```
-   code nextjs-wordle-dev-day
-   ```
+### 1. Clone this repository
 
-   If you don't have VS Code installed, you can download it from [https://code.visualstudio.com/](https://code.visualstudio.com/)
+Open your terminal and run:
 
-3. Install the SQLite Viewer extension:
+```bash
+git clone https://github.com/farmcreditca/nextjs-wordle-dev-day.git
+```
 
-   - Open the Extensions view in VS Code (Ctrl+Shift+X or Cmd+Shift+X on macOS)
-   - Search for "SQLite Viewer"
-   - Install the extension by Florian Klampfer
+### 2. Open the project in your code editor
 
-   This extension will allow you to view your SQLite database directly in VS Code.
+#### Recommended: Visual Studio Code
 
-4. Install dependencies:
+Open the project in **Visual Studio Code**:
 
-   ```
-   cd nextjs-wordle-dev-day
-   yarn install
-   ```
+```bash
+cd nextjs-wordle-dev-day
+code .
+```
 
-5. Set up your environment variables:
+If you don't have VS Code installed, you can download it from [https://code.visualstudio.com/](https://code.visualstudio.com/).
 
-   - Copy `.env.example` to `.env`
+#### Alternatively: IntelliJ IDEA
 
-   ```
-   cp .env.example .env
-   ```
+If you prefer to use **IntelliJ IDEA**, follow these steps:
 
-   - The database credentials are pre-configured in the .env.example file, so you don't need to change anything for this tutorial.
+1. **Open IntelliJ IDEA**.
+2. Click on **"Open"** from the welcome screen or go to **File > Open...** if you already have a project open.
+3. Navigate to the cloned `nextjs-wordle-dev-day` directory and click **"Open"**.
+4. IntelliJ IDEA may prompt you to import project settings. Choose **"Open as a new project"**.
+5. Ensure that the IDE recognizes the project as a **Node.js** project. If prompted to install dependencies or configure Node.js settings, follow the on-screen instructions.
 
-6. Run the development server:
+**Note**: While IntelliJ IDEA supports TypeScript and JavaScript development, some extensions and configurations may not be as straightforward as in VS Code. We recommend using VS Code for the best experience with this tutorial.
 
-   ```
-   yarn dev
-   ```
+### 3. Install the SQLite Viewer extension (Optional but recommended)
 
-7. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+#### For Visual Studio Code:
+
+- Open the Extensions view in VS Code (`Ctrl+Shift+X` or `Cmd+Shift+X` on macOS).
+- Search for **"SQLite Viewer"**.
+- Install the extension by **Florian Klampfer**.
+
+This extension allows you to view your SQLite database directly in VS Code.
+
+#### For IntelliJ IDEA:
+
+- IntelliJ IDEA does not have a built-in SQLite viewer, but you can use the **Database** tool window to connect to the SQLite database.
+- Go to **View > Tool Windows > Database**.
+- Click the **"+"** icon to add a new data source.
+- Select **"SQLite"** from the list.
+- In the **Database files** field, navigate to your project's database file (e.g., `./sqlite.db`).
+- Click **"OK"** to connect.
+
+### 4. Install dependencies
+
+In your terminal, navigate to the project directory (if not already there) and run:
+
+```bash
+cd nextjs-wordle-dev-day
+yarn install
+```
+
+### 5. Set up your environment variables
+
+Copy the example `.env` file to create your own `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+The database credentials are pre-configured in the `.env.example` file, so you don't need to change anything for this tutorial.
+
+### 6. Run the database migrations
+
+Ensure that your database schema is up to date by running:
+
+```bash
+yarn drizzle:push
+```
+
+### 7. Run the development server
+
+Start the development server by running:
+
+```bash
+yarn dev
+```
+
+### 8. Open the application
+
+Navigate to [http://localhost:3000](http://localhost:3000) in your browser to see the Wordle clone in action.
 
 ## Tutorials and Documentation
 
-In the `docs` folder of this project, you'll find detailed tutorials and additional resources to guide you through the development process. These documents provide step-by-step instructions, explanations of key concepts, and tips for each stage of building the Wordle clone.
+In the `docs` folder of this project, you'll find detailed tutorials and additional resources guiding you through the development process. Each document corresponds to a specific section of the tutorial, providing step-by-step instructions, explanations of key concepts, and tips for building the Wordle clone.
 
-Be sure to refer to these tutorials as you progress through the project. They're designed to complement the code in each checkpoint and provide a deeper understanding of the technologies and techniques used.
+### Tutorial Sections:
+
+1. **Section 01: Drizzle Setup**
+
+   - Setting up Drizzle ORM for database interactions.
+   - Configuring the database schema.
+
+2. **Section 02: Game Board Implementation**
+
+   - Building the main game board UI.
+   - Creating components for displaying guesses.
+
+3. **Section 03: Game Logic**
+
+   - Implementing core game logic and state management.
+   - Handling guess submissions and game state.
+
+4. **Section 04: Keyboard Implementation**
+
+   - Creating an on-screen keyboard for user input.
+   - Managing shared state between the keyboard and input field.
+
+5. **Section 05: Word Validation**
+
+   - Implementing word validation to ensure valid guesses.
+   - Providing user feedback through toast notifications.
+
+6. **Section 06: Game Over Implementation**
+
+   - Adding game over conditions and restart functionality.
+   - Displaying game results and handling new game creation.
+
+7. **Section 07: Styling and Polish**
+   - Enhancing the UI with improved styling and animations.
+   - Adding visual effects for a more engaging experience.
+
+Each section builds upon the previous ones, so it's recommended to follow them in order. The tutorials are designed to complement the code in each checkpoint and provide a deeper understanding of the technologies and techniques used.
 
 ## Tutorial Checkpoints
 
-The tutorial is divided into the following key stages, each represented by a checkpoint branch:
+The tutorial is divided into key stages, each represented by a checkpoint branch in the Git repository. These checkpoints allow you to verify your progress or jump to a specific point in the tutorial if needed.
 
-1. `main` - Initial setup
-2. `checkpoint-01-drizzle-setup` - Drizzle setup
-3. `checkpoint-02-game-board` - Implementing the game board UI
-4. `checkpoint-03-game-logic` - Adding core game logic and state management
-5. `checkpoint-04-keyboard` - Creating the on-screen keyboard
-6. `checkpoint-05-word-validation` - Implementing word validation and feedback
-7. `checkpoint-06-game-over` - Adding game over conditions and restart functionality
-8. `checkpoint-07-styling-polish` - Final styling and UI polish
+### Checkpoints:
 
-These checkpoints allow you to verify your progress or jump to a specific point in the tutorial if needed.
+1. **`main`** - Initial project setup.
+2. **`checkpoint-01-drizzle-setup`** - Setting up Drizzle ORM and the database schema.
+3. **`checkpoint-02-game-board`** - Implementing the game board UI and guess components.
+4. **`checkpoint-03-game-logic`** - Adding core game logic and state management.
+5. **`checkpoint-04-keyboard`** - Creating the on-screen keyboard and shared state.
+6. **`checkpoint-05-word-validation`** - Implementing word validation and error handling.
+7. **`checkpoint-06-game-over`** - Adding game over conditions and restart options.
+8. **`checkpoint-07-styling-polish`** - Final styling enhancements and UI polish.
 
 To switch to a checkpoint branch, use:
 
-```
+```bash
 git checkout <checkpoint-branch-name>
 ```
 
-## Tutorial Steps
+For example:
 
-1. Start with the `main` branch for initial setup.
-2. Progress through each checkpoint, implementing the features described.
-3. After completing each section, you can compare your work with the corresponding checkpoint branch.
-4. If you get stuck, you can use the checkpoint branches as a reference or starting point.
-5. By the time you reach the `checkpoint-07-styling-polish` branch, you'll have a fully functional Wordle clone.
+```bash
+git checkout checkpoint-03-game-logic
+```
+
+## Additional Features Implemented
+
+Throughout the tutorial, the following features and improvements are made:
+
+- **On-Screen Keyboard**: A custom on-screen keyboard is implemented using `react-simple-keyboard`, allowing users to input guesses interactively.
+
+- **Shared State Management**: A context (`GuessContext`) and custom hooks (`useGuess`) are created to manage shared state between components, similar to services in Angular.
+
+- **Word Validation**: Validation logic is added to ensure that only valid words can be submitted as guesses. Errors are displayed using toast notifications from `sonner`.
+
+- **Game Over Logic**: The game can detect win or loss conditions, updating the game status accordingly and displaying appropriate messages.
+
+- **Game Results Dialog**: An engaging game over dialog is created using `react-confetti` to celebrate wins and encourage the player after losses.
+
+- **Styling Enhancements**: The UI is refined with improved styling, larger and more vibrant guess slots, and consistent design across components.
+
+- **Custom Hooks**: Hooks like `useCreateGame` and `useCreateGuess` are developed to encapsulate logic, making components cleaner and more maintainable.
+
+## Running the Application
+
+To run the application and see all the features in action:
+
+1. **Start the development server**:
+
+   ```bash
+   yarn dev
+   ```
+
+2. **Open the application**:
+
+   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
+
+3. **Start a new game**:
+
+   - Click the **"New game"** button on the home page.
+   - You'll be redirected to a new game page (e.g., `http://localhost:3000/game/1`).
+
+4. **Play the game**:
+
+   - Use the on-screen keyboard or your physical keyboard to input guesses.
+   - Submit valid 5-letter words to try and guess the correct word.
+   - The game board will provide feedback with color-coded letters.
+
+5. **Experience game over scenarios**:
+
+   - **Win the game** by guessing the correct word:
+     - A celebratory dialog with confetti will appear.
+     - A **"Play again!"** button allows you to start a new game.
+   - **Lose the game** after 6 incorrect guesses:
+     - An encouraging dialog will appear with a **"Play again!"** button.
+
+6. **Enjoy the polished UI**:
+
+   - Notice the enhanced styling and responsive design.
+   - Interact with the refined on-screen keyboard and game components.
