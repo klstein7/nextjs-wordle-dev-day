@@ -506,6 +506,7 @@ Now that you've implemented these styling and polish improvements, it's time to 
 3. **Check the Game Board Appearance:**
 
    - **Game Board:**
+     ![Game Screenshot](img/1.png)
      - The guess slots should be larger (`h-16 w-16`) with bigger letters (`text-3xl`).
      - There should be a gap between each letter due to `gap-2`.
      - The color-coding for guesses should be more vibrant.
@@ -536,36 +537,17 @@ Now that you've implemented these styling and polish improvements, it's time to 
 7. **Check the Game Over Dialog:**
 
    - **Winning:**
+     ![Game Won Screenshot](img/2.png)
      - Win the game to see the confetti animation.
      - The dialog should display a congratulatory message in large, bold text.
    - **Losing:**
+     ![Game Over Screenshot](img/3.png)
      - Lose the game to see the encouraging message.
    - **Common Elements:**
      - The dialog should display all your guesses.
      - A "Play again!" button should be present and functional.
 
-8. **Monitor for Errors:**
-
-   - Check the browser console and terminal for any error messages.
-   - Ensure all components are interacting correctly.
-
 If everything works as expected, congratulations! You've successfully polished your Wordle clone.
-
----
-
-## Conclusion
-
-Great job! In this final section, you've:
-
-- **Enhanced** the game board for better visibility and user engagement.
-- **Improved** the guess input to match the game board's styling.
-- **Created** an engaging game over dialog with animations using `react-confetti`.
-- **Refined** the on-screen keyboard for a more polished look.
-- **Consistently styled** components for a cohesive user experience.
-
-These improvements significantly enhance the user experience, making your Wordle clone more visually appealing and enjoyable to play.
-
----
 
 ## Next Steps
 
