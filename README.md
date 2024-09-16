@@ -4,6 +4,10 @@ Welcome to the Wordle Clone Tutorial! This project guides you through building a
 
 ![alt text](docs/img/1.png)
 
+![alt text](docs/img/2.png)
+
+![alt text](docs/img/3.png)
+
 ## Project Structure
 
 ```
