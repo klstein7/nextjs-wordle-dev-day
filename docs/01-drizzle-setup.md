@@ -1,60 +1,14 @@
 # 01: Drizzle Setup
 
-Welcome to the first section of our tutorial! In this exercise, you'll set up Drizzle ORM to define your database schema for the Wordle clone. This process is similar to creating entity classes in Java using JPA in Spring Boot.
+Welcome to the first section of our tutorial! We're going to set up Drizzle ORM to define the database schema for our Wordle clone. If you're familiar with Java and Spring Boot, this process is similar to creating entity classes using JPA. Don't worry if you're not though - we'll walk through it step by step.
 
-## Exercise Objectives
+Let's start by importing the necessary modules from Drizzle ORM and creating a table creator function. This function will prefix our table names, which is a neat way to organize our database tables. It's kind of like using @Table(name = "custom_name") in JPA, if you're familiar with that.
 
-- **Set up** Drizzle ORM in your project.
-- **Define** the `games` and `guesses` tables in `src/server/db/schema.ts`.
-- **Establish** relationships between tables using Drizzle's relation functions.
-- **Prepare** your schema for use in the database.
-
----
-
-## Tasks and Hints
-
-### 1. Set Up Imports and Create a Table Creator Function
-
-**Task:** In `src/server/db/schema.ts`, import the necessary modules from Drizzle ORM and create a table creator function to prefix your table names.
-
-**Hints:**
-
-- **Imports:**
-
-  - Import `relations` and `sql` from `"drizzle-orm"`.
-  - Import column types like `int` and `text` from `"drizzle-orm/sqlite-core"`.
-
-- **Table Creator:**
-  - Use `sqliteTableCreator` to create a function that prefixes your table names.
-  - This is similar to specifying a custom table name in JPA using `@Table(name = "custom_name")`.
-
-**Example:**
+Add the following code to your src/server/db/schema.ts file:
 
 ```typescript
 // src/server/db/schema.ts
 
-// Import necessary functions and types
-import { relations, sql } from "drizzle-orm";
-import { int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
-
-// Create a table creator function that adds a prefix to table names
-export const createTable = sqliteTableCreator((name) => `your_prefix_${name}`);
-```
-
-_Replace `"your_prefix_"` with your desired table name prefix.\_
-
-**Helpful Links:**
-
-- [Drizzle ORM Documentation - SQLite Table Creator](https://orm.drizzle.team/docs/sqlite-core#sqlitetablecreator)
-- [Drizzle ORM Documentation - Column Types](https://orm.drizzle.team/docs/sqlite-core#column-types)
-- [Understanding Table Naming Conventions](https://www.sqlshack.com/sql-table-naming-conventions/)
-
-**Solution Code:**
-
-<details>
-<summary>Click to reveal solution</summary>
-
-```typescript
 import { relations, sql } from "drizzle-orm";
 import { int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
 
@@ -63,67 +17,47 @@ export const createTable = sqliteTableCreator(
 );
 ```
 
-</details>
+Here, we're importing some key functions and types from Drizzle ORM. The `relations` and `sql` imports will come in handy later when we're setting up relationships between our tables. The `int`, `sqliteTableCreator`, and `text` imports are for defining our table structures.
 
----
+The `createTable` function we've defined will add the prefix "nextjs-wordle-dev-day\_" to all our table names. This is a good practice to avoid naming conflicts, especially if you're working on multiple projects using the same database.
 
-### 2. Define the `games` Table
+Now, let's move on to defining our first table: the games table. This is where we'll store information about each Wordle game. In Spring Boot terms, think of this as creating an entity class with fields and annotations.
 
-**Task:** In `src/server/db/schema.ts`, define the `games` table with appropriate fields and constraints.
+## Exercise 1: Defining the games Table
 
-**Hints:**
+Your task is to create the 'games' table using the `createTable` function we just defined. You'll need to include fields for id (as an auto-incrementing primary key), word, status, and timestamp fields for when the game was created and last updated.
 
-- **Fields to Include:**
-
-  - `id`: Auto-incrementing primary key.
-  - `word`: Non-null text field with a length of 5.
-  - `status`: Non-null text field that only allows specific values (e.g., "in_progress", "won", "lost").
-  - `createdAt` and `updatedAt`: Timestamp fields that automatically handle creation and update times.
-
-- **Drizzle ORM Functions:**
-
-  - Use `int` and `text` to define column types.
-  - Use methods like `.primaryKey({ autoIncrement: true })`, `.notNull()`, and `.default()` to set constraints and defaults.
-  - For `status`, consider how to restrict values to a specific set, similar to an enum.
-
-- **Analogous JPA Annotations:**
-  - `@Id` and `@GeneratedValue` for the primary key.
-  - `@Column(nullable = false, length = 5)` for text fields.
-  - `@Enumerated(EnumType.STRING)` for the `status` field.
-  - `@CreationTimestamp` and `@UpdateTimestamp` for timestamp fields.
-
-**Example:**
+Here's the starting code:
 
 ```typescript
-// src/server/db/schema.ts
-
-// Define the 'games' table structure
 export const games = createTable("game", {
-  // Define the 'id' field as an auto-incrementing primary key
-  id: /* ... */,
-
-  // Define the 'word' field as a non-null text field with length 5
-  word: /* ... */,
-
-  // Define the 'status' field with specific allowed values
-  status: /* ... */,
-
-  // Define 'createdAt' and 'updatedAt' fields for timestamps
-  createdAt: /* ... */,
-  updatedAt: /* ... */,
+  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  // TODO: Add word field (text, length 5, not null)
+  // TODO: Add status field (text, enum with values "in_progress", "won", "lost", not null)
+  // TODO: Add createdAt field (int, mode: "timestamp", default to current timestamp, not null)
+  // TODO: Add updatedAt field (int, mode: "timestamp", default to current timestamp, auto-update, not null)
 });
 ```
 
-**Helpful Links:**
+Your tasks:
 
-- [Drizzle ORM Documentation - Column Definitions](https://orm.drizzle.team/docs/sqlite-core#column-types)
-- [Defining Enums in Drizzle ORM](https://orm.drizzle.team/docs/enums)
-- [Drizzle ORM Documentation - Default Values and Constraints](https://orm.drizzle.team/docs/default-values)
+1. Add the `word` field as a non-null text field with a length of 5.
+2. Add the `status` field as a non-null text field with an enum constraint.
+3. Add the `createdAt` field as a non-null int with a default value of the current timestamp.
+4. Add the `updatedAt` field as a non-null int with a default value of the current timestamp and auto-update functionality.
 
-**Solution Code:**
+Remember, for the timestamp fields, you can use `sql`(unixepoch())` as the default value.
+
+Helpful resources:
+
+- [Drizzle ORM Column Types](https://orm.drizzle.team/docs/column-types/sqlite)
+
+When you're ready, check your solution against one possible implementation below.
+
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see a possible solution 👈</summary>
 
 ```typescript
 export const games = createTable("game", {
@@ -140,67 +74,58 @@ export const games = createTable("game", {
 });
 ```
 
+Note: This is one correct implementation, but there might be slight variations that are equally valid.
+
 </details>
 
 ---
 
-### 3. Define the `guesses` Table
+Great job! The `id` field is our primary key, set to auto-increment. We've made `word` a non-null text field with a length of 5, perfect for Wordle words. The `status` field is a non-null text field with an enum constraint, allowing only "in_progress", "won", or "lost" as valid values. The `createdAt` and `updatedAt` fields are set up to automatically handle creation and update times using the Unix epoch.
 
-**Task:** In `src/server/db/schema.ts`, define the `guesses` table and set up a foreign key relationship with the `games` table.
+Now that we have our games table, let's create a table for storing guesses. This table will have a relationship with the games table, as each guess belongs to a specific game.
 
-**Hints:**
+## Exercise 2: Defining the guesses Table
 
-- **Fields to Include:**
+Your next task is to create the 'guesses' table. This table should include fields for id (as an auto-incrementing primary key), gameId (as a foreign key referencing games.id), guess, result, and the same timestamp fields we used in the games table.
 
-  - `id`: Auto-incrementing primary key.
-  - `gameId`: Foreign key referencing the `id` field in the `games` table.
-  - `guess` and `result`: Non-null text fields with a length of 5.
-  - `createdAt` and `updatedAt`: Timestamp fields similar to those in the `games` table.
-
-- **Establishing Relationships:**
-  - Use `.references(() => games.id)` to set up the foreign key constraint on `gameId`.
-  - This is analogous to using `@ManyToOne` and `@JoinColumn` in JPA.
-
-**Example:**
-
-```typescript
-// src/server/db/schema.ts
-
-// Define the 'guesses' table structure
-export const guesses = createTable("guess", {
-  // Define the 'id' field as an auto-incrementing primary key
-  id: /* ... */,
-
-  // Define the 'gameId' field as a foreign key referencing 'games.id'
-  gameId: /* ... */,
-
-  // Define the 'guess' and 'result' fields
-  guess: /* ... */,
-  result: /* ... */,
-
-  // Define 'createdAt' and 'updatedAt' fields for timestamps
-  createdAt: /* ... */,
-  updatedAt: /* ... */,
-});
-```
-
-**Helpful Links:**
-
-- [Drizzle ORM Documentation - Foreign Keys](https://orm.drizzle.team/docs/foreign-keys)
-- [Understanding Relationships in SQL](https://www.w3schools.com/sql/sql_foreignkey.asp)
-- [Drizzle ORM Documentation - Column Definitions](https://orm.drizzle.team/docs/sqlite-core#column-types)
-
-**Solution Code:**
-
-<details>
-<summary>Click to reveal solution</summary>
+Here's your starting point:
 
 ```typescript
 export const guesses = createTable("guess", {
   id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  gameId: int("game_id", { mode: "number" })
-    .references(() => games.id)
-    .notNull(),
+  // TODO: Add gameId field (int, references games.id)
+  // TODO: Add guess field (text, length 5, not null)
+  // TODO: Add result field (text, length 5, not null)
+  // TODO: Add createdAt field (int, mode: "timestamp", default to current timestamp, not null)
+  // TODO: Add updatedAt field (int, mode: "timestamp", default to current timestamp, auto-update, not null)
+});
+```
+
+Your tasks:
+
+1. Add the `gameId` field as an int that references the `id` field in the `games` table.
+2. Add the `guess` field as a non-null text field with a length of 5.
+3. Add the `result` field as a non-null text field with a length of 5.
+4. Add the `createdAt` field as a non-null int with a default value of the current timestamp.
+5. Add the `updatedAt` field as a non-null int with a default value of the current timestamp and auto-update functionality.
+
+Remember to use the `references()` function to establish the foreign key relationship for the `gameId` field.
+
+Helpful resource:
+
+- [Drizzle Foreign Keys](https://orm.drizzle.team/docs/indexes-constraints#foreign-key)
+
+When you're done, check your solution against one possible implementation.
+
+---
+
+<details>
+<summary>👉 Click here to see a possible solution 👈</summary>
+
+```typescript
+export const guesses = createTable("guess", {
+  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  gameId: int("game_id", { mode: "number" }).references(() => games.id),
   guess: text("guess", { length: 5 }).notNull(),
   result: text("result", { length: 5 }).notNull(),
   createdAt: int("created_at", { mode: "timestamp" })
@@ -213,60 +138,47 @@ export const guesses = createTable("guess", {
 });
 ```
 
+Note: While this is a correct implementation, there might be slight variations that are equally valid.
+
 </details>
 
 ---
 
-### 4. Establish Relationships Between Tables
+Excellent work! The `gameId` field is set up as a foreign key referencing the `id` field in the `games` table. This establishes the relationship between our two tables - each guess belongs to a specific game. The `guess` and `result` fields are non-null text fields with a length of 5, perfect for storing Wordle guesses and their results. The timestamp fields are set up similarly to those in the games table.
 
-**Task:** In `src/server/db/schema.ts`, define the relationships between the `games` and `guesses` tables using Drizzle's relation functions.
+We're in the home stretch now! The last step is to explicitly define the relationships between our `games` and `guesses` tables. This is similar to setting up `@OneToMany` and `@ManyToOne` relationships in JPA.
 
-**Hints:**
+## Exercise 3: Establishing Table Relationships
 
-- **Using `relations` Function:**
+Your final challenge is to use Drizzle's `relations` function to establish these relationships. Remember, a game can have many guesses, but each guess belongs to only one game.
 
-  - For the `games` table, use `many()` to indicate that one game has many guesses.
-  - For the `guesses` table, use `one()` to indicate that each guess belongs to one game.
-
-- **Field Mappings:**
-
-  - In the `guesses` table, specify which field is the foreign key and which field it references in the `games` table.
-
-- **Analogous JPA Annotations:**
-  - `@OneToMany(mappedBy = "game")` in the `Game` entity.
-  - `@ManyToOne` and `@JoinColumn(name = "game_id")` in the `Guess` entity.
-
-**Example:**
+Here's your starting point:
 
 ```typescript
-// src/server/db/schema.ts
-
-// Establish relationships for the 'games' table
 export const gameRelations = relations(games, ({ many }) => ({
-  // A game has many guesses
-  guesses: many(/* ... */),
+  // TODO: Define the relationship to guesses (one game has many guesses)
 }));
 
-// Establish relationships for the 'guesses' table
 export const guessRelations = relations(guesses, ({ one }) => ({
-  // A guess belongs to one game
-  game: one(/* ... */, {
-    fields: [/* ... */],       // Foreign key in 'guesses' table
-    references: [/* ... */],   // Primary key in 'games' table
-  }),
+  // TODO: Define the relationship to games (one guess belongs to one game)
 }));
 ```
 
-**Helpful Links:**
+Your tasks:
 
-- [Drizzle ORM Documentation - Relations](https://orm.drizzle.team/docs/relations)
-- [Defining One-to-Many Relationships](https://www.sqlservertutorial.net/sql-server-basics/sql-server-one-to-many-relationship/)
-- [Understanding Foreign Key Constraints](https://www.geeksforgeeks.org/sql-foreign-key/)
+1. In `gameRelations`, use the `many()` function to express that a game has many guesses.
+2. In `guessRelations`, use the `one()` function to express that a guess belongs to one game. You'll need to specify which fields are used for this relationship.
 
-**Solution Code:**
+Helpful resource:
+
+- [Drizzle ORM TypeScript Relations](https://orm.drizzle.team/docs/rqb#declaring-relations)
+
+When you're finished, compare your solution to one possible implementation.
+
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see a possible solution 👈</summary>
 
 ```typescript
 export const gameRelations = relations(games, ({ many }) => ({
@@ -281,48 +193,38 @@ export const guessRelations = relations(guesses, ({ one }) => ({
 }));
 ```
 
+Note: This implementation matches the expected output exactly, but there might be slight variations that are equally valid.
+
 </details>
 
 ---
 
-## Pushing the Schema to the Database
+Fantastic job! You've successfully set up the relationships between our tables. The `gameRelations` specifies that a game has many guesses, and the `guessRelations` specifies that a guess belongs to one game. The `fields` and `references` arrays in the guess relation define exactly how these tables are linked.
 
-Now that you've defined your tables and established their relationships, it's time to push your schema to the database.
+Now that we've defined our tables and established their relationships, it's time to push our schema to the database. Here's how you do it:
 
-**Instructions:**
+1. Open your terminal and navigate to your project's root directory.
+2. Run the following command:
 
-- **Run the Database Push Command:**
+```bash
+yarn db:push
+```
 
-  - Open your terminal and navigate to your project's root directory.
-  - Execute the following command to apply your schema definitions:
+Make sure all your dependencies are installed (run `yarn install` if you haven't already) and your database configuration is correct before running this command.
 
-    ```bash
-    yarn db:push
-    ```
+Helpful resource:
 
-- **Prerequisites:**
-  - Ensure all dependencies are installed (run `yarn install` if necessary).
-  - Verify that your database configuration (e.g., connection string) is correct.
-
-**Helpful Links:**
-
-- [Drizzle ORM Documentation - Migrations](https://orm.drizzle.team/docs/migrations)
-- [Setting Up SQLite with Drizzle ORM](https://orm.drizzle.team/docs/sqlite-core)
-- [Troubleshooting Database Connections](https://www.sqlshack.com/troubleshooting-sql-server-database-connection-problems/)
-
----
+- [Drizzle ORM Push](https://orm.drizzle.team/kit-docs/commands#push)
 
 ## Summary
 
-By completing these steps, you've:
+Congratulations! You've successfully:
 
-- **Set up** Drizzle ORM in your project.
-- **Defined** the `games` and `guesses` tables with appropriate fields and constraints.
-- **Established** relationships between the tables.
-- **Prepared** your schema for use in the database.
+- Set up Drizzle ORM in your project
+- Defined the games and guesses tables with appropriate fields and constraints
+- Established relationships between the tables
+- Prepared your schema for use in the database
 
----
+You're now ready to move on to implementing the game board UI in the next section. We'll be using React with Next.js, which provides a component-based architecture similar to Angular but with different syntax and lifecycle methods.
 
-## Next Steps
-
-With your database schema in place, you're ready to move on to implementing the game board UI in the next section. This will involve using React with Next.js, providing a component-based architecture similar to Angular but with different syntax and lifecycle methods.
+If you want to dive deeper into Drizzle ORM, check out their documentation at [Drizzle ORM Docs](https://orm.drizzle.team/). Happy coding!

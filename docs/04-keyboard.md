@@ -1,19 +1,6 @@
 # 04: Keyboard Implementation
 
-Welcome to the fourth section of our tutorial! In this part, you'll enhance your Wordle clone by adding an on-screen keyboard. This keyboard will improve the user experience by providing an alternative input method and visual feedback, similar to how you might enhance an Angular application with additional UI components.
-
-## Exercise Objectives
-
-- **Install** the required dependencies for the keyboard component.
-- **Create** the `GuessKeyboard` component.
-- **Implement** a context for managing the guess state.
-- **Create** a `GuessProvider` to supply the context to components.
-- **Develop** a custom `useGuess` hook for easy access to the guess state.
-- **Update** the game page to include the keyboard and provider.
-- **Adjust** the `GameBoard` and `GuessInput` components to use the new context.
-- **Verify** the functionality by running the application.
-
----
+Welcome to the fourth section of our tutorial! In this section, you'll enhance your Wordle clone by adding an **on-screen keyboard**. This keyboard will improve the user experience by providing an alternative input method and visual feedback, similar to how you might enhance an Angular application with additional UI components.
 
 ## Prerequisites
 
@@ -43,49 +30,54 @@ Once you've completed these steps, you're ready to implement the on-screen keybo
 
 ---
 
-## Tasks and Hints
+## Implementing the On-Screen Keyboard
 
-### 1. Install Required Dependencies
+In this section, you'll add an on-screen keyboard to your game. This enhancement is akin to adding a new component in Angular and managing shared state across components. The keyboard will allow users to interact with the game without relying solely on their physical keyboard, providing a more engaging and accessible experience.
 
-**Task:** Install the `react-simple-keyboard` library to provide an on-screen keyboard component.
+### Exercise 1: Installing Required Dependencies
 
-**Why:** This library will help us create a customizable keyboard, enhancing user experience without building one from scratch.
+Your task is to install the `react-simple-keyboard` library, which provides a customizable on-screen keyboard component.
 
 **Instructions:**
 
-- Run the following command to install the dependency:
+1. Open your terminal.
+2. Run the following command to install `react-simple-keyboard`:
 
-  ```bash
-  yarn add react-simple-keyboard
-  ```
-
-**Helpful Links:**
-
-- [react-simple-keyboard Documentation](https://hodgef.com/simple-keyboard/)
-
----
-
-### 2. Create the `GuessKeyboard` Component
-
-**Task:** In `src/components/guess-keyboard.tsx`, create the `GuessKeyboard` component that renders the on-screen keyboard.
-
-**Why:** This component will allow users to input guesses using an on-screen keyboard, similar to mobile-friendly interfaces.
+```bash
+yarn add react-simple-keyboard
+```
 
 **Hints:**
 
-- **Client-Side Component:**
-  - Include `"use client";` at the top since the component handles user interactions.
-- **Imports:**
-  - Import the `Keyboard` component from `react-simple-keyboard`.
-  - Import necessary styles.
-- **Props Definition:**
-  - Define `GuessKeyboardProps` to accept `gameId`.
-- **State Management:**
-  - Use a custom hook (we'll create it later) to manage the guess state.
-- **Event Handling:**
-  - Implement the `onKeyPress` function to handle key presses.
+- After installation, you can import and use the `Keyboard` component from this library in your React components, similar to how you might import and use Angular Material components in an Angular project.
+- This approach of using third-party libraries for complex UI components is common in React, just as it is in Angular development.
 
-**Example:**
+Helpful resource:
+
+- [react-simple-keyboard Documentation](https://hodgef.com/simple-keyboard/documentation/)
+
+---
+
+### Exercise 2: Creating the GuessKeyboard Component
+
+Now, you'll create the `GuessKeyboard` component, which will render the on-screen keyboard and handle user interactions.
+
+**Instructions:**
+
+1. Create a new file at `src/components/guess-keyboard.tsx`.
+2. Import the necessary dependencies, including the `Keyboard` component from `react-simple-keyboard`.
+3. Implement the `GuessKeyboard` component with the following features:
+   - Render the `Keyboard` component with appropriate props.
+   - Handle key presses for letter input, deletion, and guess submission.
+   - Use the `useGuess` hook (which we'll create later) to manage the current guess state.
+
+**Hints:**
+
+- Remember to import the CSS for `react-simple-keyboard`, similar to how you'd import styles in an Angular component.
+- Use the `onKeyPress` prop of the `Keyboard` component to handle key presses. This is analogous to using `(click)` or `(keydown)` event bindings in Angular templates.
+- The `useGuess` hook will function similarly to how you might use a shared service in Angular to manage state across components.
+
+Here's a starting point for your `GuessKeyboard` component:
 
 ```typescript
 // src/components/guess-keyboard.tsx
@@ -93,6 +85,38 @@ Once you've completed these steps, you're ready to implement the on-screen keybo
 "use client";
 
 import "react-simple-keyboard/build/css/index.css";
+
+import Keyboard from "react-simple-keyboard";
+
+import { useGuess } from "~/lib/hooks/use-guess";
+import { api } from "~/server/api";
+
+type GuessKeyboardProps = {
+  gameId: number;
+};
+
+export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
+  const { guess, setGuess } = useGuess();
+
+  // TODO: Implement the Keyboard component with appropriate props
+  // TODO: Handle key presses in the onKeyPress callback
+};
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
+
+```typescript
+// src/components/guess-keyboard.tsx
+
+"use client";
+
+import "react-simple-keyboard/build/css/index.css";
+
 import Keyboard from "react-simple-keyboard";
 
 import { useGuess } from "~/lib/hooks/use-guess";
@@ -151,24 +175,43 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
 };
 ```
 
+</details>
+
 ---
 
-### 3. Create a Guess Context
+### Exercise 3: Creating a Guess Context
 
-**Task:** In `src/lib/store/guess-context.ts`, create a context to manage the guess state across components.
+To share the guess state between the `GuessInput` and `GuessKeyboard` components, you'll create a context using React's Context API. This approach is similar to using services in Angular to share data across components without prop drilling.
 
-**Why:** Context provides a way to pass data through the component tree without having to pass props down manually, similar to shared services in Angular.
+**Instructions:**
+
+1. Create a new file at `src/lib/store/guess-context.ts`.
+2. Define a `GuessContextType` that includes the current guess and a function to update it.
+3. Create and export a `GuessContext` using `createContext`.
 
 **Hints:**
 
-- **Context Creation:**
-  - Use `createContext` from React.
-- **Type Definition:**
-  - Define a `GuessContextType` with `guess` and `setGuess`.
-- **Default Values:**
-  - Provide default values for the context.
+- The `createContext` function in React is similar to creating an injectable service in Angular, providing a way to share state across components.
+- The context should have a default value that matches the shape of `GuessContextType`.
 
-**Example:**
+Here's a starting point for your guess context:
+
+```typescript
+// src/lib/store/guess-context.ts
+
+import { createContext } from "react";
+
+// TODO: Define GuessContextType
+
+// TODO: Create and export GuessContext
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/lib/store/guess-context.ts
@@ -188,24 +231,44 @@ export const GuessContext = createContext<GuessContextType>({
 });
 ```
 
+</details>
+
 ---
 
-### 4. Create a `GuessProvider`
+### Exercise 4: Creating a GuessProvider
 
-**Task:** In `src/lib/store/guess-provider.tsx`, create a provider component that supplies the `GuessContext` to its child components.
+Next, you'll create a provider component that supplies the `GuessContext` to its child components. This is akin to providing a service in Angular that can be injected where needed.
 
-**Why:** The provider allows any child component to access the guess state, similar to providing a service in Angular at a component level.
+**Instructions:**
+
+1. Create a new file at `src/lib/store/guess-provider.tsx`.
+2. Import the necessary dependencies, including the `GuessContext` you just created.
+3. Implement a `GuessProvider` component that manages the guess state and provides it to its children.
 
 **Hints:**
 
-- **Client-Side Component:**
-  - Include `"use client";` at the top.
-- **State Management:**
-  - Use `useState` to manage the `guess` state.
-- **Context Provider:**
-  - Wrap `children` with `GuessContext.Provider`.
+- Use the `useState` hook to manage the `guess` state. This is similar to using component state in Angular, but with React's functional component approach.
+- The provider component should wrap its children with `GuessContext.Provider`, passing the current state and update function as the context value.
 
-**Example:**
+Here's a starting point for your `GuessProvider`:
+
+```typescript
+// src/lib/store/guess-provider.tsx
+
+"use client";
+
+import { useState } from "react";
+import { GuessContext } from "./guess-context";
+
+// TODO: Implement the GuessProvider component
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/lib/store/guess-provider.tsx
@@ -226,23 +289,42 @@ export const GuessProvider = ({ children }: { children: React.ReactNode }) => {
 };
 ```
 
+</details>
+
 ---
 
-### 5. Create a `useGuess` Hook
+### Exercise 5: Creating a useGuess Hook
 
-**Task:** In `src/lib/hooks/use-guess.ts`, create a custom hook to access the `GuessContext`.
+For convenience, you'll create a custom hook to consume the `GuessContext`. This is similar to creating a custom service in Angular for state management.
 
-**Why:** Custom hooks provide a convenient way to reuse logic across components, similar to Angular services.
+**Instructions:**
+
+1. Create a new file at `src/lib/hooks/use-guess.ts`.
+2. Import the necessary dependencies, including the `GuessContext`.
+3. Implement and export a `useGuess` hook that returns the context value.
 
 **Hints:**
 
-- **Imports:**
-  - Import `useContext` from React.
-  - Import `GuessContext`.
-- **Hook Definition:**
-  - Create a function `useGuess` that returns `useContext(GuessContext)`.
+- Use the `useContext` hook to access the `GuessContext`. This is conceptually similar to injecting a service in Angular, but uses React's hooks system.
+- The custom hook pattern in React allows for reusable logic across components, similar to how you might use services in Angular for shared functionality.
 
-**Example:**
+Here's a starting point for your `useGuess` hook:
+
+```typescript
+// src/lib/hooks/use-guess.ts
+
+import { useContext } from "react";
+import { GuessContext } from "../store/guess-context";
+
+// TODO: Implement and export the useGuess hook
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/lib/hooks/use-guess.ts
@@ -255,25 +337,55 @@ export const useGuess = () => {
 };
 ```
 
+</details>
+
 ---
 
-### 6. Update the Game Page
+### Exercise 6: Updating the Game Page
 
-**Task:** In `src/app/game/[gameId]/page.tsx`, wrap the content with `GuessProvider` and include the `GuessKeyboard` component.
+Now, you'll update the game page to include the `GuessProvider` and the `GuessKeyboard` component. This ensures that the `guess` state is shared across the necessary components.
 
-**Why:** The `GuessProvider` needs to wrap components that consume the `GuessContext`, and the `GuessKeyboard` adds the on-screen keyboard to the page.
+**Instructions:**
+
+1. Open `src/app/game/[gameId]/page.tsx`.
+2. Import the `GuessProvider` and `GuessKeyboard` components.
+3. Wrap the existing content with `GuessProvider`.
+4. Add the `GuessKeyboard` component below the `GameBoard`.
 
 **Hints:**
 
-- **Imports:**
-  - Import `GuessProvider` and `GuessKeyboard`.
-- **Component Hierarchy:**
-  - Wrap the content with `<GuessProvider>`.
-  - Place `GuessKeyboard` appropriately in the layout.
-- **Styling Adjustments:**
-  - Modify the layout to accommodate the keyboard.
+- The `GuessProvider` wrapping is similar to how you might provide a service at a component level in Angular.
+- Adjust the layout to accommodate the new keyboard component, using Tailwind CSS classes for styling.
 
-**Example:**
+Here's a starting point for your updated game page:
+
+```typescript
+// src/app/game/[gameId]/page.tsx
+
+import { GameBoard } from "~/components/game-board";
+// TODO: Import GuessKeyboard and GuessProvider
+import { api } from "~/server/api";
+
+export default async function GamePage({
+  params: { gameId },
+}: {
+  params: { gameId: number };
+}) {
+  const guesses = await api.guesses.findByGameId(gameId);
+
+  return (
+    // TODO: Wrap with GuessProvider
+    // TODO: Adjust layout and add GuessKeyboard
+  );
+}
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/app/game/[gameId]/page.tsx
@@ -305,22 +417,53 @@ export default async function GamePage({
 }
 ```
 
+</details>
+
 ---
 
-### 7. Update the `GameBoard` Component
+### Exercise 7: Updating the GameBoard Component
 
-**Task:** In `src/components/game-board.tsx`, adjust the component to improve its layout within the new page structure.
+You'll adjust the `GameBoard` component to better align within the new layout and ensure it uses the shared `guess` state.
 
-**Why:** Adjustments may be needed to ensure the `GameBoard` aligns properly with the keyboard and other elements.
+**Instructions:**
+
+1. Open `src/components/game-board.tsx`.
+2. Adjust the component's layout to fit within the new page structure.
+3. Ensure the `GuessInput` component receives the `gameId` prop.
 
 **Hints:**
 
-- **Styling Adjustments:**
-  - Modify CSS classes to adjust alignment and spacing.
-- **Flex Properties:**
-  - Use `flex-grow` or other flex properties as needed.
+- Use Tailwind CSS classes to adjust the layout, similar to how you might use CSS classes in Angular templates.
+- The changes here are mostly structural to accommodate the new keyboard layout.
 
-**Example:**
+Here's a starting point for your updated `GameBoard` component:
+
+```typescript
+// src/components/game-board.tsx
+
+import { type api } from "~/server/api";
+import { GuessInput } from "./guess-input";
+import { GuessList } from "./guess-list";
+
+type GameBoardProps = {
+  gameId: number;
+  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+};
+
+export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
+  // TODO: Adjust the layout
+  return (
+    // TODO: Update component structure
+  );
+};
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/components/game-board.tsx
@@ -344,24 +487,55 @@ export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
 };
 ```
 
+</details>
+
 ---
 
-### 8. Update the `GuessInput` Component
+### Exercise 8: Updating the GuessInput Component
 
-**Task:** In `src/components/guess-input.tsx`, modify the component to use the `useGuess` hook instead of local state.
+Modify the `GuessInput` component to use the shared guess state from the context, ensuring synchronization with the on-screen keyboard.
 
-**Why:** Centralizing the guess state allows for synchronization between the input field and the on-screen keyboard.
+**Instructions:**
+
+1. Open `src/components/guess-input.tsx`.
+2. Replace the local state management with the `useGuess` hook.
+3. Update the component to use the shared `guess` state and `setGuess` function.
 
 **Hints:**
 
-- **Remove Local State:**
-  - Remove `useState` and the local `guess` state.
-- **Use Custom Hook:**
-  - Import and use `useGuess` to get `guess` and `setGuess`.
-- **Event Handling:**
-  - Update event handlers to use the new `guess` state.
+- The `useGuess` hook replaces the need for local state, similar to how you might inject a shared service in Angular.
+- Ensure the `onKeyDown` handler updates the shared state and submits guesses using the API.
 
-**Example:**
+Here's a starting point for your updated `GuessInput` component:
+
+```typescript
+// src/components/guess-input.tsx
+
+"use client";
+
+import { REGEXP_ONLY_CHARS } from "input-otp";
+
+import { useGuess } from "~/lib/hooks/use-guess";
+import { api } from "~/server/api";
+
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
+
+type GuessInputProps = {
+  gameId: number;
+};
+
+export const GuessInput = ({ gameId }: GuessInputProps) => {
+  // TODO: Replace useState with useGuess hook
+  // TODO: Update component to use shared guess state
+};
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/components/guess-input.tsx
@@ -411,11 +585,13 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
 };
 ```
 
+</details>
+
 ---
 
 ## Checking Your Progress
 
-Now that you've implemented the on-screen keyboard and related components, it's time to test your application.
+Now that you've implemented the on-screen keyboard and updated the components, it's time to test your application. Testing ensures that all components work together seamlessly and that the user experience is as intended.
 
 **Instructions:**
 
@@ -425,10 +601,10 @@ Now that you've implemented the on-screen keyboard and related components, it's 
    yarn dev
    ```
 
-2. **Create a New Game:**
+2. **Navigate to a Game:**
 
-   - Navigate to `http://localhost:3000`.
-   - Click the "New Game" button to start a new game.
+   - Open your browser and go to `http://localhost:3000`.
+   - Start a new game or continue an existing one.
 
 3. **Verify the Keyboard Presence:**
 
@@ -439,21 +615,26 @@ Now that you've implemented the on-screen keyboard and related components, it's 
 
 4. **Test Keyboard Functionality:**
 
-   - Click on letter keys; the letters should appear in the input field.
-   - Use the "{delete}" key to remove letters.
-   - Use the "{enter}" key to submit a guess.
+   - **On-Screen Keyboard:**
+     - Click on letter keys; the letters should appear in the input field above.
+     - Use the `{delete}` key to remove letters.
+     - Use the `{enter}` key to submit a guess.
+   - **Physical Keyboard:**
+     - Typing on your physical keyboard should also update the input field.
 
 5. **Check Guess Synchronization:**
 
-   - Ensure that typing with your physical keyboard also updates the on-screen input.
-   - The input field should reflect input from both physical and on-screen keyboards.
+   - Ensure that the input field reflects input from both the on-screen and physical keyboards.
+   - The `GuessInput` component should display the current guess.
 
 6. **Verify Guess Submission:**
 
    - After submitting a guess, it should appear on the game board.
-   - The guess should be stored and persist after page refresh.
+   - The guess should be stored in the database and persist after refreshing the page.
 
-If everything works as expected, congratulations! You've successfully added an on-screen keyboard to your Wordle clone.
+If everything works as expected, congratulations! You've successfully enhanced your Wordle clone with an on-screen keyboard, providing an improved user experience.
+
+This implementation demonstrates how React's component-based architecture and context API can be used to create interactive, stateful UI elements. The separation of concerns between the keyboard component, input component, and shared state management is similar to how you might structure an Angular application with components and services, but leverages React's more flexible and lightweight approach to state management.
 
 ---
 
@@ -462,9 +643,32 @@ If everything works as expected, congratulations! You've successfully added an o
 In the next section, we'll focus on adding visual feedback for guesses and implementing game-over conditions. This will involve:
 
 - **Enhancing the UI:**
-  - Providing color-coded feedback for correct and incorrect letters.
+  - Providing color-coded feedback for correct and incorrect letters, similar to the original Wordle game.
 - **Game Logic:**
   - Determining when the game is won or lost.
-  - Handling game-over scenarios.
+  - Handling game-over scenarios and displaying appropriate messages.
+
+By continuing to build on your application, you'll gain a deeper understanding of state management and component interaction in React, paralleling advanced techniques in Angular applications.
+
+---
+
+## Helpful Resources
+
+To further enhance your understanding, you might find the following resources helpful:
+
+1. **react-simple-keyboard Documentation:**
+
+   - [Official Documentation](https://hodgef.com/simple-keyboard/)
+     - Learn about customizing the keyboard layout and styling.
+
+2. **React Context API:**
+
+   - [React Context Documentation](https://react.dev/learn/passing-data-deeply-with-context)
+     - Understand how context provides a way to pass data through the component tree.
+
+3. **Using Custom Hooks:**
+
+   - [Building Your Own Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)
+     - Learn how to create reusable logic with custom hooks.
 
 ---

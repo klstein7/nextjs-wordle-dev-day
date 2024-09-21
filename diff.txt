@@ -1,0 +1,4725 @@
+diff --git a/README.md b/README.md
+index 8396bd9..f8f7a97 100644
+--- a/README.md
++++ b/README.md
+@@ -1,6 +1,12 @@
+ # Wordle Clone Tutorial
+ 
+-Welcome to the Wordle Clone Tutorial! This project guides you through building a Wordle clone using Next.js, Drizzle ORM, and shadcn/ui in just one day.
++Welcome to the **Wordle Clone Tutorial**! This project guides you through building a fully functional Wordle clone using **Next.js**, **Drizzle ORM**, **shadcn/ui**, and other modern web technologies. By the end of this tutorial, you'll have a deeper understanding of building interactive web applications with a robust backend and a polished frontend.
++
++![Game Screenshot](docs/img/1.png)
++
++![Game Won Screenshot](docs/img/2.png)
++
++![Game Over Screenshot](docs/img/3.png)
+ 
+ ## Project Structure
+ 
+@@ -8,98 +14,270 @@ Welcome to the Wordle Clone Tutorial! This project guides you through building a
+ wordle-clone/
+ │
+ ├── src/
+-│   ├── app/                 # Next.js app directory
++│   ├── app/                 # Next.js app directory (routes and pages)
++│   │   ├── game/            # Game-related pages
++│   │   │   └── [gameId]/    # Dynamic routes for individual games
++│   │   └── page.tsx         # Home page component
+ │   ├── components/          # React components
++│   │   ├── game-board.tsx       # Main game board component
++│   │   ├── guess-input.tsx      # Input component for guesses
++│   │   ├── guess-keyboard.tsx   # On-screen keyboard component
++│   │   ├── game-results-dialog.tsx # Game over dialog component
++│   │   └── ui/                  # UI components from shadcn/ui
+ │   ├── lib/                 # Utility functions and shared code
++│   │   ├── hooks/               # Custom React hooks
++│   │   ├── store/               # Context and providers
++│   │   ├── utils.ts             # Utility functions
++│   │   └── words.ts             # Word list for the game
+ │   ├── server/              # Server-side code
+-│   └── styles/              # CSS files
++│   │   ├── api.ts               # API functions for server actions
++│   │   ├── db/                  # Database schema and configuration
++│   │   └── services/            # Server-side logic (game and guess services)
++│   ├── styles/              # CSS files
++│   │   └── globals.css          # Global styles
++│   └── pages/               # (If using pages directory)
++├── docs/                    # Tutorial documents and additional resources
+ ├── public/                  # Static files
+ ├── .env.example             # Example environment variables
+ ├── drizzle.config.ts        # Drizzle ORM configuration
+ ├── next.config.js           # Next.js configuration
+ ├── package.json
+ ├── README.md
+-├── tailwind.config.ts       # Tailwind CSS configuration
++├── tailwind.config.js       # Tailwind CSS configuration
+ └── yarn.lock                # Yarn lock file
+ ```
+ 
+ ## Technologies Used
+ 
+-- Next.js 14+
+-- Drizzle ORM
+-- shadcn/ui
+-- TypeScript
+-- Tailwind CSS
+-- Yarn (package manager)
++- **Next.js 14+**: A React framework for building server-rendered applications.
++- **Drizzle ORM**: A TypeScript ORM for interacting with the database.
++- **shadcn/ui**: A set of accessible and customizable UI components built with Radix UI and Tailwind CSS.
++- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript.
++- **Tailwind CSS**: A utility-first CSS framework for rapidly building custom designs.
++- **SQLite**: A lightweight, file-based relational database.
++- **Yarn**: A fast, reliable, and secure dependency management tool.
+ 
+ ## Getting Started
+ 
+-1. Clone this repository:
++We **highly recommend** using **Visual Studio Code (VS Code)** for this tutorial, as it provides excellent support for the technologies used and simplifies the development process. However, if you prefer **IntelliJ IDEA**, we've included instructions for that as well.
+ 
+-   ```
+-   git clone https://github.com/your-username/wordle-clone-tutorial.git
+-   ```
++### Prerequisites
+ 
+-2. Install dependencies:
++- **Node.js** (version 14 or higher)
++- **Yarn** package manager
+ 
+-   ```
+-   cd wordle-clone-tutorial
+-   yarn install
+-   ```
++### 1. Clone this repository
+ 
+-3. Set up your environment variables:
++Open your terminal and run:
+ 
+-   - Copy `.env.example` to `.env.local`
++```bash
++git clone https://github.com/farmcreditca/nextjs-wordle-dev-day.git
++```
+ 
+-   ```
+-   cp .env.example .env.local
+-   ```
++### 2. Open the project in your code editor
+ 
+-   - The database credentials are pre-configured in the .env.example file, so you don't need to change anything for this tutorial.
++#### Recommended: Visual Studio Code
+ 
+-4. Run the development server:
++Open the project in **Visual Studio Code**:
+ 
+-   ```
+-   yarn dev
+-   ```
++```bash
++cd nextjs-wordle-dev-day
++code .
++```
++
++If you don't have VS Code installed, you can download it from [https://code.visualstudio.com/](https://code.visualstudio.com/).
++
++#### Alternatively: IntelliJ IDEA
++
++If you prefer to use **IntelliJ IDEA**, follow these steps:
++
++1. **Open IntelliJ IDEA**.
++2. Click on **"Open"** from the welcome screen or go to **File > Open...** if you already have a project open.
++3. Navigate to the cloned `nextjs-wordle-dev-day` directory and click **"Open"**.
++4. IntelliJ IDEA may prompt you to import project settings. Choose **"Open as a new project"**.
++5. Ensure that the IDE recognizes the project as a **Node.js** project. If prompted to install dependencies or configure Node.js settings, follow the on-screen instructions.
++
++**Note**: While IntelliJ IDEA supports TypeScript and JavaScript development, some extensions and configurations may not be as straightforward as in VS Code. We recommend using VS Code for the best experience with this tutorial.
++
++### 3. Install the SQLite Viewer extension (Optional but recommended)
++
++#### For Visual Studio Code:
++
++- Open the Extensions view in VS Code (`Ctrl+Shift+X` or `Cmd+Shift+X` on macOS).
++- Search for **"SQLite Viewer"**.
++- Install the extension by **Florian Klampfer**.
++
++This extension allows you to view your SQLite database directly in VS Code.
++
++#### For IntelliJ IDEA:
++
++- IntelliJ IDEA does not have a built-in SQLite viewer, but you can use the **Database** tool window to connect to the SQLite database.
++- Go to **View > Tool Windows > Database**.
++- Click the **"+"** icon to add a new data source.
++- Select **"SQLite"** from the list.
++- In the **Database files** field, navigate to your project's database file (e.g., `./sqlite.db`).
++- Click **"OK"** to connect.
++
++### 4. Install dependencies
++
++In your terminal, navigate to the project directory (if not already there) and run:
++
++```bash
++cd nextjs-wordle-dev-day
++yarn install
++```
++
++### 5. Set up your environment variables
++
++Copy the example `.env` file to create your own `.env` file:
++
++```bash
++cp .env.example .env
++```
++
++The database credentials are pre-configured in the `.env.example` file, so you don't need to change anything for this tutorial.
++
++### 6. Run the database migrations
++
++Ensure that your database schema is up to date by running:
++
++```bash
++yarn drizzle:push
++```
++
++### 7. Run the development server
++
++Start the development server by running:
++
++```bash
++yarn dev
++```
++
++### 8. Open the application
++
++Navigate to [http://localhost:3000](http://localhost:3000) in your browser to see the Wordle clone in action.
++
++## Tutorials and Documentation
++
++In the `docs` folder of this project, you'll find detailed tutorials and additional resources guiding you through the development process. Each document corresponds to a specific section of the tutorial, providing step-by-step instructions, explanations of key concepts, and tips for building the Wordle clone.
++
++### Tutorial Sections:
++
++1. **Section 01: Drizzle Setup**
++
++   - Setting up Drizzle ORM for database interactions.
++   - Configuring the database schema.
++
++2. **Section 02: Game Board Implementation**
++
++   - Building the main game board UI.
++   - Creating components for displaying guesses.
++
++3. **Section 03: Game Logic**
+ 
+-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
++   - Implementing core game logic and state management.
++   - Handling guess submissions and game state.
++
++4. **Section 04: Keyboard Implementation**
++
++   - Creating an on-screen keyboard for user input.
++   - Managing shared state between the keyboard and input field.
++
++5. **Section 05: Word Validation**
++
++   - Implementing word validation to ensure valid guesses.
++   - Providing user feedback through toast notifications.
++
++6. **Section 06: Game Over Implementation**
++
++   - Adding game over conditions and restart functionality.
++   - Displaying game results and handling new game creation.
++
++7. **Section 07: Styling and Polish**
++   - Enhancing the UI with improved styling and animations.
++   - Adding visual effects for a more engaging experience.
++
++Each section builds upon the previous ones, so it's recommended to follow them in order. The tutorials are designed to complement the code in each checkpoint and provide a deeper understanding of the technologies and techniques used.
+ 
+ ## Tutorial Checkpoints
+ 
+-The tutorial is divided into the following key stages, each represented by a checkpoint branch:
++The tutorial is divided into key stages, each represented by a checkpoint branch in the Git repository. These checkpoints allow you to verify your progress or jump to a specific point in the tutorial if needed.
+ 
+-1. `main` - Initial setup
+-2. `checkpoint-01-drizzle-setup` - Drizzle setup
+-3. `checkpoint-02-game-board` - Implementing the game board UI
+-4. `checkpoint-03-game-logic` - Adding core game logic and state management
+-5. `checkpoint-04-keyboard` - Creating the on-screen keyboard
+-6. `checkpoint-05-word-validation` - Implementing word validation and feedback
+-7. `checkpoint-06-game-over` - Adding game over conditions and restart functionality
+-8. `checkpoint-07-styling-polish` - Final styling and UI polish
++### Checkpoints:
+ 
+-These checkpoints allow you to verify your progress or jump to a specific point in the tutorial if needed.
++1. **`main`** - Initial project setup.
++2. **`checkpoint-01-drizzle-setup`** - Setting up Drizzle ORM and the database schema.
++3. **`checkpoint-02-game-board`** - Implementing the game board UI and guess components.
++4. **`checkpoint-03-game-logic`** - Adding core game logic and state management.
++5. **`checkpoint-04-keyboard`** - Creating the on-screen keyboard and shared state.
++6. **`checkpoint-05-word-validation`** - Implementing word validation and error handling.
++7. **`checkpoint-06-game-over`** - Adding game over conditions and restart options.
++8. **`checkpoint-07-styling-polish`** - Final styling enhancements and UI polish.
+ 
+ To switch to a checkpoint branch, use:
+ 
+-```
++```bash
+ git checkout <checkpoint-branch-name>
+ ```
+ 
+-## Tutorial Steps
++For example:
++
++```bash
++git checkout checkpoint-03-game-logic
++```
++
++## Additional Features Implemented
++
++Throughout the tutorial, the following features and improvements are made:
++
++- **On-Screen Keyboard**: A custom on-screen keyboard is implemented using `react-simple-keyboard`, allowing users to input guesses interactively.
++
++- **Shared State Management**: A context (`GuessContext`) and custom hooks (`useGuess`) are created to manage shared state between components, similar to services in Angular.
++
++- **Word Validation**: Validation logic is added to ensure that only valid words can be submitted as guesses. Errors are displayed using toast notifications from `sonner`.
++
++- **Game Over Logic**: The game can detect win or loss conditions, updating the game status accordingly and displaying appropriate messages.
++
++- **Game Results Dialog**: An engaging game over dialog is created using `react-confetti` to celebrate wins and encourage the player after losses.
++
++- **Styling Enhancements**: The UI is refined with improved styling, larger and more vibrant guess slots, and consistent design across components.
++
++- **Custom Hooks**: Hooks like `useCreateGame` and `useCreateGuess` are developed to encapsulate logic, making components cleaner and more maintainable.
++
++## Running the Application
++
++To run the application and see all the features in action:
++
++1. **Start the development server**:
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Open the application**:
++
++   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
++
++3. **Start a new game**:
++
++   - Click the **"New game"** button on the home page.
++   - You'll be redirected to a new game page (e.g., `http://localhost:3000/game/1`).
+ 
+-1. Start with the `main` branch for initial setup.
+-2. Progress through each checkpoint, implementing the features described.
+-3. After completing each section, you can compare your work with the corresponding checkpoint branch.
+-4. If you get stuck, you can use the checkpoint branches as a reference or starting point.
+-5. By the time you reach the `checkpoint-06-styling-polish` branch, you'll have a fully functional Wordle clone.
++4. **Play the game**:
+ 
+-Remember, these checkpoints are here to help you, but the real learning comes from working through the implementation yourself!
++   - Use the on-screen keyboard or your physical keyboard to input guesses.
++   - Submit valid 5-letter words to try and guess the correct word.
++   - The game board will provide feedback with color-coded letters.
+ 
+-## Contributing
++5. **Experience game over scenarios**:
+ 
+-If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
++   - **Win the game** by guessing the correct word:
++     - A celebratory dialog with confetti will appear.
++     - A **"Play again!"** button allows you to start a new game.
++   - **Lose the game** after 6 incorrect guesses:
++     - An encouraging dialog will appear with a **"Play again!"** button.
+ 
+-## License
++6. **Enjoy the polished UI**:
+ 
+-This project is open source and available under the [MIT License](LICENSE).
++   - Notice the enhanced styling and responsive design.
++   - Interact with the refined on-screen keyboard and game components.
+diff --git a/docs/01-drizzle-setup.md b/docs/01-drizzle-setup.md
+index e69de29..317c1bf 100644
+--- a/docs/01-drizzle-setup.md
++++ b/docs/01-drizzle-setup.md
+@@ -0,0 +1,328 @@
++# 01: Drizzle Setup
++
++Welcome to the first section of our tutorial! In this exercise, you'll set up Drizzle ORM to define your database schema for the Wordle clone. This process is similar to creating entity classes in Java using JPA in Spring Boot.
++
++## Exercise Objectives
++
++- **Set up** Drizzle ORM in your project.
++- **Define** the `games` and `guesses` tables in `src/server/db/schema.ts`.
++- **Establish** relationships between tables using Drizzle's relation functions.
++- **Prepare** your schema for use in the database.
++
++---
++
++## Tasks and Hints
++
++### 1. Set Up Imports and Create a Table Creator Function
++
++**Task:** In `src/server/db/schema.ts`, import the necessary modules from Drizzle ORM and create a table creator function to prefix your table names.
++
++**Hints:**
++
++- **Imports:**
++
++  - Import `relations` and `sql` from `"drizzle-orm"`.
++  - Import column types like `int` and `text` from `"drizzle-orm/sqlite-core"`.
++
++- **Table Creator:**
++  - Use `sqliteTableCreator` to create a function that prefixes your table names.
++  - This is similar to specifying a custom table name in JPA using `@Table(name = "custom_name")`.
++
++**Example:**
++
++```typescript
++// src/server/db/schema.ts
++
++// Import necessary functions and types
++import { relations, sql } from "drizzle-orm";
++import { int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
++
++// Create a table creator function that adds a prefix to table names
++export const createTable = sqliteTableCreator((name) => `your_prefix_${name}`);
++```
++
++_Replace `"your_prefix_"` with your desired table name prefix.\_
++
++**Helpful Links:**
++
++- [Drizzle ORM Documentation - SQLite Table Creator](https://orm.drizzle.team/docs/sqlite-core#sqlitetablecreator)
++- [Drizzle ORM Documentation - Column Types](https://orm.drizzle.team/docs/sqlite-core#column-types)
++- [Understanding Table Naming Conventions](https://www.sqlshack.com/sql-table-naming-conventions/)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++import { relations, sql } from "drizzle-orm";
++import { int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
++
++export const createTable = sqliteTableCreator(
++  (name) => `nextjs-wordle-dev-day_${name}`,
++);
++```
++
++</details>
++
++---
++
++### 2. Define the `games` Table
++
++**Task:** In `src/server/db/schema.ts`, define the `games` table with appropriate fields and constraints.
++
++**Hints:**
++
++- **Fields to Include:**
++
++  - `id`: Auto-incrementing primary key.
++  - `word`: Non-null text field with a length of 5.
++  - `status`: Non-null text field that only allows specific values (e.g., "in_progress", "won", "lost").
++  - `createdAt` and `updatedAt`: Timestamp fields that automatically handle creation and update times.
++
++- **Drizzle ORM Functions:**
++
++  - Use `int` and `text` to define column types.
++  - Use methods like `.primaryKey({ autoIncrement: true })`, `.notNull()`, and `.default()` to set constraints and defaults.
++  - For `status`, consider how to restrict values to a specific set, similar to an enum.
++
++- **Analogous JPA Annotations:**
++  - `@Id` and `@GeneratedValue` for the primary key.
++  - `@Column(nullable = false, length = 5)` for text fields.
++  - `@Enumerated(EnumType.STRING)` for the `status` field.
++  - `@CreationTimestamp` and `@UpdateTimestamp` for timestamp fields.
++
++**Example:**
++
++```typescript
++// src/server/db/schema.ts
++
++// Define the 'games' table structure
++export const games = createTable("game", {
++  // Define the 'id' field as an auto-incrementing primary key
++  id: /* ... */,
++
++  // Define the 'word' field as a non-null text field with length 5
++  word: /* ... */,
++
++  // Define the 'status' field with specific allowed values
++  status: /* ... */,
++
++  // Define 'createdAt' and 'updatedAt' fields for timestamps
++  createdAt: /* ... */,
++  updatedAt: /* ... */,
++});
++```
++
++**Helpful Links:**
++
++- [Drizzle ORM Documentation - Column Definitions](https://orm.drizzle.team/docs/sqlite-core#column-types)
++- [Defining Enums in Drizzle ORM](https://orm.drizzle.team/docs/enums)
++- [Drizzle ORM Documentation - Default Values and Constraints](https://orm.drizzle.team/docs/default-values)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++export const games = createTable("game", {
++  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
++  word: text("word", { length: 5 }).notNull(),
++  status: text("status", { enum: ["in_progress", "won", "lost"] }).notNull(),
++  createdAt: int("created_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .notNull(),
++  updatedAt: int("updated_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .$onUpdateFn(() => new Date())
++    .notNull(),
++});
++```
++
++</details>
++
++---
++
++### 3. Define the `guesses` Table
++
++**Task:** In `src/server/db/schema.ts`, define the `guesses` table and set up a foreign key relationship with the `games` table.
++
++**Hints:**
++
++- **Fields to Include:**
++
++  - `id`: Auto-incrementing primary key.
++  - `gameId`: Foreign key referencing the `id` field in the `games` table.
++  - `guess` and `result`: Non-null text fields with a length of 5.
++  - `createdAt` and `updatedAt`: Timestamp fields similar to those in the `games` table.
++
++- **Establishing Relationships:**
++  - Use `.references(() => games.id)` to set up the foreign key constraint on `gameId`.
++  - This is analogous to using `@ManyToOne` and `@JoinColumn` in JPA.
++
++**Example:**
++
++```typescript
++// src/server/db/schema.ts
++
++// Define the 'guesses' table structure
++export const guesses = createTable("guess", {
++  // Define the 'id' field as an auto-incrementing primary key
++  id: /* ... */,
++
++  // Define the 'gameId' field as a foreign key referencing 'games.id'
++  gameId: /* ... */,
++
++  // Define the 'guess' and 'result' fields
++  guess: /* ... */,
++  result: /* ... */,
++
++  // Define 'createdAt' and 'updatedAt' fields for timestamps
++  createdAt: /* ... */,
++  updatedAt: /* ... */,
++});
++```
++
++**Helpful Links:**
++
++- [Drizzle ORM Documentation - Foreign Keys](https://orm.drizzle.team/docs/foreign-keys)
++- [Understanding Relationships in SQL](https://www.w3schools.com/sql/sql_foreignkey.asp)
++- [Drizzle ORM Documentation - Column Definitions](https://orm.drizzle.team/docs/sqlite-core#column-types)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++export const guesses = createTable("guess", {
++  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
++  gameId: int("game_id", { mode: "number" })
++    .references(() => games.id)
++    .notNull(),
++  guess: text("guess", { length: 5 }).notNull(),
++  result: text("result", { length: 5 }).notNull(),
++  createdAt: int("created_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .notNull(),
++  updatedAt: int("updated_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .$onUpdateFn(() => new Date())
++    .notNull(),
++});
++```
++
++</details>
++
++---
++
++### 4. Establish Relationships Between Tables
++
++**Task:** In `src/server/db/schema.ts`, define the relationships between the `games` and `guesses` tables using Drizzle's relation functions.
++
++**Hints:**
++
++- **Using `relations` Function:**
++
++  - For the `games` table, use `many()` to indicate that one game has many guesses.
++  - For the `guesses` table, use `one()` to indicate that each guess belongs to one game.
++
++- **Field Mappings:**
++
++  - In the `guesses` table, specify which field is the foreign key and which field it references in the `games` table.
++
++- **Analogous JPA Annotations:**
++  - `@OneToMany(mappedBy = "game")` in the `Game` entity.
++  - `@ManyToOne` and `@JoinColumn(name = "game_id")` in the `Guess` entity.
++
++**Example:**
++
++```typescript
++// src/server/db/schema.ts
++
++// Establish relationships for the 'games' table
++export const gameRelations = relations(games, ({ many }) => ({
++  // A game has many guesses
++  guesses: many(/* ... */),
++}));
++
++// Establish relationships for the 'guesses' table
++export const guessRelations = relations(guesses, ({ one }) => ({
++  // A guess belongs to one game
++  game: one(/* ... */, {
++    fields: [/* ... */],       // Foreign key in 'guesses' table
++    references: [/* ... */],   // Primary key in 'games' table
++  }),
++}));
++```
++
++**Helpful Links:**
++
++- [Drizzle ORM Documentation - Relations](https://orm.drizzle.team/docs/relations)
++- [Defining One-to-Many Relationships](https://www.sqlservertutorial.net/sql-server-basics/sql-server-one-to-many-relationship/)
++- [Understanding Foreign Key Constraints](https://www.geeksforgeeks.org/sql-foreign-key/)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++export const gameRelations = relations(games, ({ many }) => ({
++  guesses: many(guesses),
++}));
++
++export const guessRelations = relations(guesses, ({ one }) => ({
++  game: one(games, {
++    fields: [guesses.gameId],
++    references: [games.id],
++  }),
++}));
++```
++
++</details>
++
++---
++
++## Pushing the Schema to the Database
++
++Now that you've defined your tables and established their relationships, it's time to push your schema to the database.
++
++**Instructions:**
++
++- **Run the Database Push Command:**
++
++  - Open your terminal and navigate to your project's root directory.
++  - Execute the following command to apply your schema definitions:
++
++    ```bash
++    yarn db:push
++    ```
++
++- **Prerequisites:**
++  - Ensure all dependencies are installed (run `yarn install` if necessary).
++  - Verify that your database configuration (e.g., connection string) is correct.
++
++**Helpful Links:**
++
++- [Drizzle ORM Documentation - Migrations](https://orm.drizzle.team/docs/migrations)
++- [Setting Up SQLite with Drizzle ORM](https://orm.drizzle.team/docs/sqlite-core)
++- [Troubleshooting Database Connections](https://www.sqlshack.com/troubleshooting-sql-server-database-connection-problems/)
++
++---
++
++## Summary
++
++By completing these steps, you've:
++
++- **Set up** Drizzle ORM in your project.
++- **Defined** the `games` and `guesses` tables with appropriate fields and constraints.
++- **Established** relationships between the tables.
++- **Prepared** your schema for use in the database.
++
++---
++
++## Next Steps
++
++With your database schema in place, you're ready to move on to implementing the game board UI in the next section. This will involve using React with Next.js, providing a component-based architecture similar to Angular but with different syntax and lifecycle methods.
+diff --git a/docs/02-game-board.md b/docs/02-game-board.md
+new file mode 100644
+index 0000000..4e2dff7
+--- /dev/null
++++ b/docs/02-game-board.md
+@@ -0,0 +1,671 @@
++# 02: Game Board Implementation
++
++Welcome to the second section of our tutorial! In this exercise, you'll build the game board UI using React and Next.js for our Wordle clone. This will help you understand component composition and state management in React, similar to how you'd structure components in Angular.
++
++## Exercise Objectives
++
++- **Set up** the game page in Next.js.
++- **Create** the `GameBoard` component.
++- **Implement** the `GuessInput` component.
++- **Create** the `GuessList` component.
++- **Implement** the `GuessItem` component.
++- **Update** the root layout for styling.
++- **Check** your progress by running the application.
++
++---
++
++## Prerequisites
++
++Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-01-drizzle-setup` branch.
++
++**To get up to speed:**
++
++1. **Switch to the branch:**
++
++   ```bash
++   git checkout checkpoint-01-drizzle-setup
++   ```
++
++2. **Install dependencies:**
++
++   ```bash
++   yarn install
++   ```
++
++3. **Set up your database schema:**
++
++   ```bash
++   yarn db:push
++   ```
++
++---
++
++## Tasks and Hints
++
++### 1. Set Up the Game Page
++
++**Task:** In `src/app/game/[gameId]/page.tsx`, create the game page component that will display the game board.
++
++**Why:** This page serves as the main entry point for a game instance, utilizing Next.js dynamic routing to handle different game IDs.
++
++**Hints:**
++
++- **File-Based Routing:**
++  - In Next.js, files inside the `app` directory define routes automatically.
++  - The `[gameId]` in the folder name creates a dynamic route, similar to route parameters in Angular.
++- **Import Statements:**
++  - You'll need to import the `GameBoard` component, which will be the main component on this page.
++- **Styling:**
++  - Use Tailwind CSS classes to center the content vertically and horizontally for a clean UI.
++
++**Example:**
++
++```typescript
++// src/app/game/[gameId]/page.tsx
++
++import { GameBoard } from "~/components/game-board";
++
++export default function GamePage() {
++  return (
++    <div className="flex h-full items-center justify-center">
++      {/* Render your GameBoard component here */}
++    </div>
++  );
++}
++```
++
++**Helpful Links:**
++
++- [Next.js Routing Documentation](https://nextjs.org/docs/routing/introduction)
++- [Dynamic Routes in Next.js](https://nextjs.org/docs/routing/dynamic-routes)
++- [Tailwind CSS Flexbox Utilities](https://tailwindcss.com/docs/flex)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/app/game/[gameId]/page.tsx
++
++import { GameBoard } from "~/components/game-board";
++
++// This component represents the game page for a specific game ID
++export default function GamePage() {
++  return (
++    // Center the GameBoard component both vertically and horizontally
++    <div className="flex h-full items-center justify-center">
++      {/* Render the GameBoard component */}
++      <GameBoard />
++    </div>
++  );
++}
++```
++
++_Comments:_
++
++- **Import Statement:** We import the `GameBoard` component from our components directory.
++- **Function Component:** `GamePage` is a default export function that represents our page component.
++- **Styling:** The `<div>` uses Tailwind CSS classes to create a flex container that centers its content.
++- **Rendering `GameBoard`:** Inside the `<div>`, we render the `GameBoard` component, which we'll define later.
++
++</details>
++
++---
++
++### 2. Create the `GameBoard` Component
++
++**Task:** In `src/components/game-board.tsx`, build the main `GameBoard` component that combines the guess input and the list of guesses.
++
++**Why:** The `GameBoard` component acts as the container for the game's UI elements, similar to a parent component in Angular.
++
++**Hints:**
++
++- **Component Structure:**
++  - The `GameBoard` should render both the `GuessList` and `GuessInput` components.
++- **State Management:**
++  - Initialize a state or a variable to hold previous guesses. For now, you can use a hardcoded array to simulate this.
++- **Import Statements:**
++  - Import the `GuessInput` and `GuessList` components to be used within `GameBoard`.
++
++**Example:**
++
++```typescript
++// src/components/game-board.tsx
++
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++export const GameBoard = () => {
++  // Initialize your guesses array here
++  const guesses = ["HELLO", "WORLD"];
++
++  return (
++    <div className="flex flex-col gap-3">
++      {/* Render the GuessList and GuessInput components here */}
++    </div>
++  );
++};
++```
++
++**Helpful Links:**
++
++- [React Functional Components](https://reactjs.org/docs/components-and-props.html)
++- [Composition in React](https://reactjs.org/docs/composition-vs-inheritance.html)
++- [Tailwind CSS Spacing](https://tailwindcss.com/docs/spacing)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/game-board.tsx
++
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++// Define the GameBoard component
++export const GameBoard = () => {
++  // Temporary hardcoded array of guesses for demonstration
++  const guesses = ["HELLO", "WORLD"];
++
++  return (
++    // Use flex layout to stack components vertically with spacing
++    <div className="flex flex-col gap-3">
++      {/* Render the list of previous guesses */}
++      <GuessList guesses={guesses} />
++      {/* Render the input component for new guesses */}
++      <GuessInput />
++    </div>
++  );
++};
++```
++
++_Comments:_
++
++- **Imports:** We import `GuessInput` and `GuessList` components which we'll create.
++- **Component Definition:** `GameBoard` is a functional component that represents the main game area.
++- **State (Temporary):** We define a `guesses` array with some placeholder guesses.
++- **Layout:** The `<div>` uses Tailwind CSS classes to create a vertical flex container with gaps between items.
++- **Rendering Children:** We render `GuessList` passing in the `guesses` array, and `GuessInput` below it.
++
++</details>
++
++---
++
++### 3. Implement the `GuessInput` Component
++
++**Task:** In `src/components/guess-input.tsx`, create the `GuessInput` component to handle user input for guesses.
++
++**Why:** This component captures the user's input, allowing them to submit guesses, similar to a form component in Angular.
++
++**Hints:**
++
++- **Client-Side Interactivity:**
++  - Include `"use client";` at the top to enable client-side rendering, necessary for interactive components in Next.js.
++- **State Management:**
++  - Use the `useState` hook to manage the input value of the guess.
++- **Event Handling:**
++  - Update the guess state on input change.
++  - Handle the Enter key to submit the guess and clear the input.
++- **Input Component:**
++  - Utilize the `InputOTP` component to create individual input slots for each character, mimicking the Wordle input style.
++
++**Example:**
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { useState } from "react";
++import { InputOTP } from "./ui/input-otp";
++
++export const GuessInput = () => {
++  const [guess, setGuess] = useState<string>("");
++
++  return (
++    <InputOTP
++      value={guess}
++      onChange={(value) => setGuess(value)}
++      onKeyDown={(e) => {
++        if (e.key === "Enter") {
++          // Handle guess submission
++          setGuess("");
++        }
++      }}
++    >
++      {/* Render your input slots here */}
++    </InputOTP>
++  );
++};
++```
++
++**Helpful Links:**
++
++- [React useState Hook](https://reactjs.org/docs/hooks-state.html)
++- [Handling Events in React](https://reactjs.org/docs/handling-events.html)
++- [InputOTP Component Documentation](https://www.npmjs.com/package/input-otp)
++- [Client Components in Next.js](https://nextjs.org/docs/getting-started/react-essentials#client-components)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { REGEXP_ONLY_CHARS } from "input-otp";
++import { useState } from "react";
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++// Define the GuessInput component
++export const GuessInput = () => {
++  // State to hold the current guess input by the user
++  const [guess, setGuess] = useState<string>("");
++
++  return (
++    // InputOTP component handles the OTP-style input
++    <InputOTP
++      maxLength={5} // Limit input to 5 characters
++      pattern={REGEXP_ONLY_CHARS} // Allow only alphabetic characters
++      value={guess} // Bind the input value to the state
++      onChange={(value) => setGuess(value)} // Update state on change
++      onKeyDown={async (e) => {
++        if (e.key === "Enter") {
++          // When Enter is pressed
++          console.log(guess); // Log the guess (temporary action)
++          setGuess(""); // Clear the input field
++        }
++      }}
++    >
++      {/* Group the input slots together */}
++      <InputOTPGroup>
++        {/* Create 5 input slots for each character in the guess */}
++        {[...Array(5)].map((_, index) => (
++          <InputOTPSlot
++            key={index} // Unique key for each slot
++            index={index} // Index prop required by InputOTPSlot
++            className="h-12 w-12 text-2xl uppercase" // Styling for the slot
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++_Comments:_
++
++- **"use client":** Indicates that this component should be rendered on the client-side.
++- **Imports:** We import necessary hooks and components.
++- **State Management:** `useState` hook initializes `guess` state.
++- **InputOTP Component:**
++  - **Props:**
++    - `maxLength`: Limits input to 5 characters.
++    - `pattern`: Ensures only alphabetic characters are accepted.
++    - `value`: Binds the component to the `guess` state.
++    - `onChange`: Updates the `guess` state when the input changes.
++    - `onKeyDown`: Handles key presses; on "Enter", it logs the guess and clears the input.
++- **InputOTPGroup & InputOTPSlot:**
++  - We create an array of 5 slots using `Array(5)`.
++  - Each `InputOTPSlot` represents a single character input.
++  - Styling is applied to make the slots visually appealing.
++
++</details>
++
++---
++
++### 4. Create the `GuessList` Component
++
++**Task:** In `src/components/guess-list.tsx`, develop the `GuessList` component to display a list of previous guesses.
++
++**Why:** This component displays the history of guesses, similar to iterating over data in an Angular component to render a list.
++
++**Hints:**
++
++- **Props Definition:**
++  - Define a TypeScript interface or type for the component's props to enforce type checking.
++- **Mapping Over Guesses:**
++  - Use the `map` method to render a `GuessItem` for each guess in the array.
++- **Component Composition:**
++  - Import the `GuessItem` component, which will display individual guesses.
++
++**Example:**
++
++```typescript
++// src/components/guess-list.tsx
++
++import { GuessItem } from "./guess-item";
++
++type GuessListProps = {
++  guesses: string[];
++};
++
++export const GuessList = ({ guesses }: GuessListProps) => {
++  return (
++    <div className="flex flex-col gap-3">
++      {/* Map over the guesses array and render GuessItem components */}
++    </div>
++  );
++};
++```
++
++**Helpful Links:**
++
++- [React Props](https://reactjs.org/docs/components-and-props.html)
++- [TypeScript Interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html)
++- [Rendering Lists in React](https://reactjs.org/docs/lists-and-keys.html)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/guess-list.tsx
++
++"use client";
++
++import { GuessItem } from "./guess-item";
++
++type GuessListProps = {
++  guesses: string[];
++};
++
++// Define the GuessList component
++export const GuessList = ({ guesses }: GuessListProps) => {
++  return (
++    // Use flex layout to stack guess items vertically with spacing
++    <div className="flex flex-col gap-3">
++      {/* Iterate over the guesses array */}
++      {guesses.map((guess) => (
++        // Render a GuessItem for each guess
++        <GuessItem key={guess} guess={guess} />
++      ))}
++    </div>
++  );
++};
++```
++
++_Comments:_
++
++- **"use client":** Ensures client-side rendering.
++- **Props Interface:** `GuessListProps` defines the expected props.
++- **Component Definition:** `GuessList` accepts `guesses` as props.
++- **Layout:** The `<div>` uses Tailwind CSS classes to arrange items vertically with gaps.
++- **Mapping Over Guesses:**
++  - We use `guesses.map` to iterate over each guess.
++  - For each guess, we render a `GuessItem` component.
++  - `key` prop is set to `guess` to help React identify elements.
++
++</details>
++
++---
++
++### 5. Implement the `GuessItem` Component
++
++**Task:** In `src/components/guess-item.tsx`, create the `GuessItem` component to display individual guesses.
++
++**Why:** This component displays each guess in a formatted way, similar to individual item components in an Angular list.
++
++**Hints:**
++
++- **Client-Side Directive:**
++  - Add `"use client";` at the top to enable interactivity if needed.
++- **Props Definition:**
++  - Define the `GuessItemProps` interface to type-check the `guess` prop.
++- **Display Logic:**
++  - Use the `InputOTP` component in read-only mode to display the guess as individual letters.
++- **Helper Component:**
++  - Consider creating a helper component like `GuessItemSlot` to render each letter slot, which keeps the code organized.
++
++**Example:**
++
++```typescript
++// src/components/guess-item.tsx
++
++"use client";
++
++import { InputOTP } from "./ui/input-otp";
++
++type GuessItemProps = {
++  guess: string;
++};
++
++export function GuessItem({ guess }: GuessItemProps) {
++  return (
++    <InputOTP readOnly value={guess}>
++      {/* Render the input slots for each letter in the guess */}
++    </InputOTP>
++  );
++}
++```
++
++**Helpful Links:**
++
++- [React Components and Props](https://reactjs.org/docs/components-and-props.html)
++- [Read-Only Inputs in React](https://reactjs.org/docs/forms.html#controlled-components)
++- [Understanding React Keys](https://reactjs.org/docs/lists-and-keys.html#keys)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/guess-item.tsx
++
++"use client";
++
++import { cn } from "~/lib/utils";
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++type GuessItemProps = {
++  guess: string;
++};
++
++// Helper component for individual slots
++function GuessItemSlot({ index }: { index: number }) {
++  return (
++    <InputOTPSlot
++      index={index} // Index prop required by InputOTPSlot
++      className={cn("h-12 w-12 text-2xl uppercase")} // Styling for the slot
++    />
++  );
++}
++
++// Define the GuessItem component
++export function GuessItem({ guess }: GuessItemProps) {
++  return (
++    // InputOTP in read-only mode to display the guess
++    <InputOTP readOnly maxLength={5} value={guess}>
++      <InputOTPGroup>
++        {/* Create an input slot for each character in the guess */}
++        {[0, 1, 2, 3, 4].map((index) => (
++          <GuessItemSlot key={index} index={index} />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++}
++```
++
++_Comments:_
++
++- **"use client":** Enables client-side rendering.
++- **Imports:** We import necessary components and utilities.
++- **Props Interface:** `GuessItemProps` defines the expected props.
++- **Helper Component (`GuessItemSlot`):**
++  - Created for cleaner code and reusability.
++  - Accepts an `index` prop and renders an `InputOTPSlot`.
++  - Applies styling to make slots uniform.
++- **Component Definition (`GuessItem`):**
++  - Renders `InputOTP` in `readOnly` mode to display the guess.
++  - `maxLength` ensures only 5 characters are displayed.
++  - `value` is set to the `guess` prop.
++- **InputOTPGroup & InputOTPSlot:**
++  - We map over indices 0 to 4 to create slots for each character.
++  - Each slot uses `GuessItemSlot` helper component.
++
++</details>
++
++---
++
++### 6. Update the Root Layout
++
++**Task:** In `src/app/layout.tsx`, modify the root layout to ensure proper styling and metadata.
++
++**Why:** Setting up the root layout ensures consistent styling and metadata across your application, similar to setting up the main template in Angular.
++
++**Hints:**
++
++- **Metadata:**
++  - Use the `Metadata` type to define the `title` and `description` of your app.
++- **Global Styles:**
++  - Ensure global styles are imported to apply base styles across all components.
++- **Layout Structure:**
++  - Wrap your content in `<html>` and `<body>` tags, applying necessary classes for styling.
++
++**Example:**
++
++```typescript
++// src/app/layout.tsx
++
++import type { Metadata } from "next";
++import "~/styles/globals.css";
++
++export const metadata: Metadata = {
++  title: "Your App Title",
++  description: "Your app description",
++};
++
++export default function RootLayout({
++  children,
++}: {
++  children: React.ReactNode;
++}) {
++  return (
++    <html lang="en">
++      <body>{children}</body>
++    </html>
++  );
++}
++```
++
++**Helpful Links:**
++
++- [Next.js Layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts)
++- [Metadata in Next.js](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)
++- [Tailwind CSS Dark Mode](https://tailwindcss.com/docs/dark-mode)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/app/layout.tsx
++
++import { GeistSans } from "geist/font/sans";
++import type { Metadata } from "next";
++
++import "~/styles/globals.css";
++
++// Define metadata for the application
++export const metadata: Metadata = {
++  title: "Wordle Clone", // Title displayed in the browser tab
++  description: "A Wordle clone built with Next.js and Drizzle", // Meta description
++};
++
++// RootLayout component wraps all pages
++export default function RootLayout({
++  children,
++}: Readonly<{ children: React.ReactNode }>) {
++  return (
++    // Set the language and apply custom fonts and dark mode
++    <html lang="en" className={`${GeistSans.variable} dark`}>
++      {/* Body with full height to enable centering */}
++      <body className="h-screen">
++        {/* Render the page content */}
++        {children}
++      </body>
++    </html>
++  );
++}
++```
++
++_Comments:_
++
++- **Imports:**
++  - `GeistSans`: Custom font import.
++  - `Metadata`: Type for defining metadata.
++  - Global styles are imported from `globals.css`.
++- **Metadata Definition:**
++  - Sets the title and description for SEO and browser display.
++- **RootLayout Component:**
++  - Wraps all pages, providing a consistent layout.
++  - `<html>` tag sets the language and applies classes for fonts and dark mode.
++  - `<body>` tag sets the height to full screen to help with centering content.
++  - `{children}` renders the content of the current page.
++
++</details>
++
++---
++
++## Checking Your Progress
++
++Now that you've implemented all the components, it's time to check your work.
++
++![Game Board Screenshot](img/4.png)
++
++**Instructions:**
++
++1. **Start the Development Server:**
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Open the Application:**
++
++   - Navigate to `http://localhost:3000/game/1` in your web browser.
++
++3. **Visual Inspection:**
++
++   - **Game Board Display:**
++     - The game board should be centered on the page.
++     - You should see the list of previous guesses ("HELLO" and "WORLD").
++     - An input field should be available for entering new guesses.
++
++4. **Functional Testing:**
++
++   - **Guess Input:**
++
++     - Enter a 5-letter word in the input field.
++     - Each letter should appear in its own box, reflecting the Wordle style.
++
++   - **Submitting a Guess:**
++     - Press **Enter** after typing your guess.
++     - The guess should be logged in the console (for now).
++     - The input field should clear after submission.
++
++---
++
++## Next Steps
++
++In the next section, we'll delve into implementing the core game logic and state management. This will involve:
++
++- **Managing global state:**
++
++  - We'll explore state management solutions to share data between components.
++
++- **Implementing game logic:**
++  - You'll write functions to check user guesses against the target word.
++  - Provide feedback by updating the UI based on whether letters are correct, present, or absent.
++
++---
+diff --git a/docs/03-game-logic.md b/docs/03-game-logic.md
+new file mode 100644
+index 0000000..b86027c
+--- /dev/null
++++ b/docs/03-game-logic.md
+@@ -0,0 +1,1155 @@
++# 03: Game Logic Implementation
++
++Welcome to the third section of our tutorial! In this part, you'll add the core game mechanics, state management, and server-side logic to make our Wordle clone fully functional. This involves implementing the game logic on both the server and client sides, similar to how you'd manage services and state in an Angular application.
++
++## Exercise Objectives
++
++- **Implement** utility functions for random word selection.
++- **Develop** server-side logic for game and guess management.
++- **Create** an API layer to interact with the server-side logic.
++- **Update** the home page to start new games.
++- **Modify** the game page to fetch and display game data.
++- **Enhance** components to handle real game data.
++- **Verify** the functionality by running the application.
++
++---
++
++## Prerequisites
++
++Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-02-game-board` branch.
++
++**To get up to speed:**
++
++1. **Switch to the branch:**
++
++   ```bash
++   git checkout checkpoint-02-game-board
++   ```
++
++2. **Install dependencies:**
++
++   ```bash
++   yarn install
++   ```
++
++3. **Start the development server:**
++
++   ```bash
++   yarn dev
++   ```
++
++Once you've completed these steps, you're ready to implement the game logic.
++
++---
++
++## Tasks and Hints
++
++### 1. Update Utility Functions
++
++**Task:** Implement the `getRandomWord` function in `src/lib/utils.ts` to select a random word for each new game.
++
++**Why:** The game requires a random word to be guessed. This function will provide that word when a new game is created.
++
++**Hints:**
++
++- **Importing Words:**
++  - You'll need an array of words to select from. Assume you have a `words` array in `src/lib/words.ts`.
++- **Random Selection:**
++  - Use `Math.random()` and `Math.floor()` to select a random index within the bounds of the words array.
++- **Error Handling:**
++  - Check if the selected word exists and handle potential errors gracefully.
++
++**Example:**
++
++```typescript
++// src/lib/utils.ts
++
++import { clsx } from "clsx";
++import { twMerge } from "tailwind-merge";
++
++// Import the words array
++import { words } from "./words";
++
++export function cn(...inputs: string[]) {
++  return twMerge(clsx(inputs));
++}
++
++export function getRandomWord() {
++  // TODO: Implement the function to return a random word from the words array
++}
++```
++
++**Helpful Links:**
++
++- [JavaScript Math.random()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random)
++- [Error Handling in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/lib/utils.ts
++
++import { clsx } from "clsx";
++import { twMerge } from "tailwind-merge";
++
++// Import the words array
++import { words } from "./words";
++
++// Utility function for combining class names
++export function cn(...inputs: string[]) {
++  return twMerge(clsx(inputs));
++}
++
++// Function to get a random word from the words array
++export function getRandomWord() {
++  // Generate a random index based on the length of the words array
++  const randomIndex = Math.floor(Math.random() * words.length);
++  // Get the word at the random index
++  const word = words[randomIndex];
++  // If no word is found, throw an error
++  if (!word) {
++    throw new Error("Error retrieving random word");
++  }
++  // Return the word in uppercase for consistency
++  return word.toUpperCase();
++}
++```
++
++_Comments:_
++
++- **Imports:**
++  - We import `clsx` and `twMerge` for class name utilities.
++  - Import `words` array containing possible words for the game.
++- **`cn` Function:**
++  - Combines class names using `clsx` and `twMerge`.
++- **`getRandomWord` Function:**
++  - Uses `Math.random()` and `Math.floor()` to select a random index.
++  - Retrieves the word at the random index from the `words` array.
++  - Checks if the word exists and throws an error if it doesn't.
++  - Returns the word converted to uppercase.
++
++</details>
++
++---
++
++### 2. Implement Server-Side Logic
++
++**Task:** Create server-side services to handle game creation, retrieval, and updating, as well as guess management.
++
++**Why:** The server-side logic handles the core game mechanics, including storing game state and processing guesses, similar to backend services in Angular.
++
++**Hints:**
++
++- **Game Service:**
++  - Implement functions to create a new game, get a game by ID, and update a game's status.
++- **Guess Service:**
++  - Implement functions to create a new guess and find guesses by game ID.
++- **Database Operations:**
++  - Use your ORM (e.g., Drizzle ORM) to interact with the database.
++  - Handle errors and edge cases appropriately.
++
++**Example for `game.service.ts`:**
++
++```typescript
++// src/server/services/game.service.ts
++
++import { db } from "../db";
++import { games } from "../db/schema";
++import { getRandomWord } from "~/lib/utils";
++
++export const gameService = {
++  create: async () => {
++    // TODO: Implement game creation logic
++  },
++  getById: async (id: number) => {
++    // TODO: Implement logic to retrieve a game by ID
++  },
++  update: async (id: number, status: string) => {
++    // TODO: Implement logic to update a game's status
++  },
++};
++```
++
++**Helpful Links:**
++
++- [Drizzle ORM Documentation](https://orm.drizzle.team/)
++- [Error Handling in Async Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
++
++**Solution Code for `game.service.ts`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/server/services/game.service.ts
++
++import { eq } from "drizzle-orm";
++import { getRandomWord } from "~/lib/utils";
++import { db } from "../db";
++import { games } from "../db/schema";
++
++// Function to get a game by its ID
++export const getById = async (id: number) => {
++  // Query the database for the game with the specified ID
++  const game = await db.query.games.findFirst({
++    where: eq(games.id, id),
++  });
++
++  // If the game doesn't exist, throw an error
++  if (!game) {
++    throw new Error("Game not found");
++  }
++
++  return game;
++};
++
++// Function to create a new game
++const create = async () => {
++  // Get a random word for the new game
++  const randomWord = getRandomWord();
++
++  // Insert a new game into the database with the random word
++  const [newGame] = await db
++    .insert(games)
++    .values({ word: randomWord, status: "in_progress" })
++    .returning();
++
++  // If the game wasn't created, throw an error
++  if (!newGame) {
++    throw new Error("Failed to create game");
++  }
++
++  return newGame;
++};
++
++// Function to update the status of a game
++export const update = async (
++  id: number,
++  status: (typeof games.status.enumValues)[number],
++) => {
++  // Update the game status in the database
++  const [updatedGame] = await db
++    .update(games)
++    .set({ status })
++    .where(eq(games.id, id))
++    .returning();
++
++  // If the game wasn't found, throw an error
++  if (!updatedGame) {
++    throw new Error("Game not found");
++  }
++
++  return updatedGame;
++};
++
++// Export the gameService with the methods
++export const gameService = {
++  create,
++  getById,
++  update,
++};
++```
++
++_Comments:_
++
++- **Imports:**
++  - `eq` from `drizzle-orm` for query conditions.
++  - `getRandomWord` to get a random word for new games.
++  - `db` and `games` schema for database operations.
++- **`getById` Function:**
++  - Queries the database for a game with the given ID.
++  - Throws an error if no game is found.
++- **`create` Function:**
++  - Uses `getRandomWord` to get a word.
++  - Inserts a new game into the `games` table with the random word and status `in_progress`.
++  - Returns the created game.
++- **`update` Function:**
++  - Updates the status of a game with the given ID.
++  - Throws an error if the game is not found.
++- **Exported Service:**
++  - Exports the `gameService` object containing the methods.
++
++</details>
++
++**Example for `guess.service.ts`:**
++
++```typescript
++// src/server/services/guess.service.ts
++
++import { db } from "../db";
++import { guesses } from "../db/schema";
++
++export const guessService = {
++  create: async (guess: string, gameId: number) => {
++    // TODO: Implement logic to create a new guess
++  },
++  findByGameId: async (gameId: number) => {
++    // TODO: Implement logic to retrieve guesses by game ID
++  },
++};
++```
++
++**Solution Code for `guess.service.ts`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/server/services/guess.service.ts
++
++import { asc, eq } from "drizzle-orm";
++import { revalidatePath } from "next/cache";
++
++import { db } from "../db";
++import { games, guesses } from "../db/schema";
++
++// Function to check the guess against the actual word
++const checkGuess = async (guess: string, gameId: number) => {
++  // Retrieve the game from the database
++  const game = await db.query.games.findFirst({
++    where: eq(games.id, gameId),
++  });
++
++  // If the game doesn't exist, throw an error
++  if (!game) {
++    throw new Error("Game not found");
++  }
++
++  const actualWord = game.word.toUpperCase();
++  const upperGuess = guess.toUpperCase();
++  const result = new Array(5).fill("X");
++  const charCount = new Map<string, number>();
++
++  // Count character occurrences in the actual word
++  for (const char of actualWord) {
++    charCount.set(char, (charCount.get(char) || 0) + 1);
++  }
++
++  // Check for correct letters in correct positions
++  for (let i = 0; i < 5; i++) {
++    if (upperGuess[i] === actualWord[i]) {
++      result[i] = "C"; // Correct position
++      charCount.set(upperGuess[i], charCount.get(upperGuess[i])! - 1);
++    }
++  }
++
++  // Check for correct letters in wrong positions
++  for (let i = 0; i < 5; i++) {
++    if (result[i] !== "C" && charCount.get(upperGuess[i])! > 0) {
++      result[i] = "~"; // Wrong position
++      charCount.set(upperGuess[i], charCount.get(upperGuess[i])! - 1);
++    }
++  }
++
++  return result.join("");
++};
++
++// Function to create a new guess
++const create = async (guess: string, gameId: number) => {
++  // Check the guess against the actual word
++  const result = await checkGuess(guess, gameId);
++
++  // Insert the new guess into the database
++  const [createdGuess] = await db
++    .insert(guesses)
++    .values({
++      gameId,
++      guess: guess.toUpperCase(),
++      result,
++    })
++    .returning();
++
++  // If the guess wasn't created, throw an error
++  if (!createdGuess) {
++    throw new Error("Failed to create guess");
++  }
++
++  // Revalidate the game page to update the UI
++  revalidatePath(`/game/${gameId}`);
++
++  return createdGuess;
++};
++
++// Function to retrieve guesses by game ID
++const findByGameId = async (gameId: number) => {
++  // Query the database for guesses associated with the game ID
++  return db.query.guesses.findMany({
++    where: eq(guesses.gameId, gameId),
++    orderBy: [asc(guesses.createdAt)],
++  });
++};
++
++// Export the guessService with the methods
++export const guessService = {
++  create,
++  findByGameId,
++};
++```
++
++_Comments:_
++
++- **Imports:**
++  - `asc`, `eq` from `drizzle-orm` for query conditions.
++  - `revalidatePath` from `next/cache` to revalidate static paths.
++  - `db`, `games`, and `guesses` schemas for database operations.
++- **`checkGuess` Function:**
++  - Retrieves the game to get the actual word.
++  - Compares the user's guess to the actual word.
++  - Marks letters as correct (`C`), present but wrong position (`~`), or incorrect (`X`).
++- **`create` Function:**
++  - Calls `checkGuess` to get the result string.
++  - Inserts the new guess into the `guesses` table.
++  - Revalidates the game page to update the UI.
++- **`findByGameId` Function:**
++  - Retrieves all guesses associated with a specific game, ordered by creation time.
++- **Exported Service:**
++  - Exports the `guessService` object containing the methods.
++
++</details>
++
++---
++
++### 3. Create Server API
++
++**Task:** Create an API layer that exposes the services to the components, facilitating interaction between the client and server logic.
++
++**Why:** An API layer organizes your server functions, making them accessible to your React components, similar to how you'd use services and controllers in Angular.
++
++**Hints:**
++
++- **Controllers:**
++  - Create controllers that call the service functions.
++  - Ensure they handle any necessary request/response transformations.
++- **API Export:**
++  - Organize the controllers under an `api` object for easy import and use in components.
++
++**Example for `game.controller.ts`:**
++
++```typescript
++// src/server/controllers/game.controller.ts
++
++"use server";
++
++import { gameService } from "../services/game.service";
++
++export const create = async () => {
++  // TODO: Call the service function to create a new game
++};
++
++export const getById = async (id: number) => {
++  // TODO: Call the service function to get a game by ID
++};
++```
++
++**Solution Code for `game.controller.ts`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/server/controllers/game.controller.ts
++
++"use server";
++
++import { gameService } from "../services/game.service";
++
++// Controller function to create a new game
++export const create = async () => {
++  // Call the create function from the game service
++  return gameService.create();
++};
++
++// Controller function to get a game by ID
++export const getById = async (id: number) => {
++  // Call the getById function from the game service
++  return gameService.getById(id);
++};
++```
++
++_Comments:_
++
++- **"use server":**
++  - Indicates that these functions are server-side only.
++- **Imports:**
++  - Imports `gameService` to use its methods.
++- **Controller Functions:**
++  - `create`: Exposes the `create` method from `gameService`.
++  - `getById`: Exposes the `getById` method from `gameService`.
++
++</details>
++
++Similarly, create `guess.controller.ts` and `api.ts`.
++
++**Solution Code for `guess.controller.ts`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/server/controllers/guess.controller.ts
++
++"use server";
++
++import { guessService } from "../services/guess.service";
++
++// Controller function to create a new guess
++export const create = async (guess: string, gameId: number) => {
++  // Call the create function from the guess service
++  return guessService.create(guess, gameId);
++};
++
++// Controller function to find guesses by game ID
++export const findByGameId = async (gameId: number) => {
++  // Call the findByGameId function from the guess service
++  return guessService.findByGameId(gameId);
++};
++```
++
++_Comments:_
++
++- **"use server":**
++  - Indicates that these functions are server-side only.
++- **Imports:**
++  - Imports `guessService` to use its methods.
++- **Controller Functions:**
++  - `create`: Exposes the `create` method from `guessService`.
++  - `findByGameId`: Exposes the `findByGameId` method from `guessService`.
++
++</details>
++
++**Solution Code for `api.ts`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/server/api.ts
++
++import * as games from "./controllers/game.controller";
++import * as guesses from "./controllers/guess.controller";
++
++// Export the API controllers
++export const api = {
++  games,
++  guesses,
++};
++```
++
++_Comments:_
++
++- **Imports:**
++  - Imports all exports from `game.controller` and `guess.controller` as `games` and `guesses`.
++- **API Object:**
++  - Organizes the controllers under the `api` object for easy access.
++
++</details>
++
++---
++
++### 4. Update the Home Page
++
++**Task:** Modify the home page to allow users to start a new game by creating a "New Game" button.
++
++**Why:** Users need a way to initiate a new game session, similar to navigating to a new route in Angular when starting a new game.
++
++**Hints:**
++
++- **Client-Side Interactivity:**
++  - Use `"use client";` at the top since the component will handle events.
++- **Router Navigation:**
++  - Use Next.js' `useRouter` hook to navigate programmatically.
++- **Event Handling:**
++  - On button click, call the API to create a new game and navigate to the game page.
++
++**Example:**
++
++```typescript
++// src/app/page.tsx
++
++"use client";
++
++import { useRouter } from "next/navigation";
++import { Button } from "~/components/ui/button";
++import { api } from "~/server/api";
++
++export default function HomePage() {
++  const router = useRouter();
++
++  return (
++    <main className="flex h-full items-center justify-center">
++      <Button
++        onClick={async () => {
++          // TODO: Create a new game and navigate to the game page
++        }}
++      >
++        New Game
++      </Button>
++    </main>
++  );
++}
++```
++
++**Helpful Links:**
++
++- [Next.js useRouter Hook](https://nextjs.org/docs/api-reference/next/router#userouter)
++- [Handling Events in React](https://reactjs.org/docs/handling-events.html)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/app/page.tsx
++
++"use client";
++
++import { useRouter } from "next/navigation";
++import { Button } from "~/components/ui/button";
++import { api } from "~/server/api";
++
++// Home page component
++export default function HomePage() {
++  const router = useRouter();
++
++  return (
++    <main className="flex h-full items-center justify-center">
++      <Button
++        onClick={async () => {
++          // Call the API to create a new game
++          const game = await api.games.create();
++          // Navigate to the game page using the new game's ID
++          router.push(`/game/${game.id}`);
++        }}
++      >
++        New Game
++      </Button>
++    </main>
++  );
++}
++```
++
++_Comments:_
++
++- **"use client":**
++  - Enables client-side rendering for event handling.
++- **Imports:**
++  - `useRouter` for navigation.
++  - `Button` component for UI.
++  - `api` to access the game creation method.
++- **Event Handling:**
++  - On button click, calls `api.games.create()` to create a new game.
++  - Uses `router.push()` to navigate to the new game's page.
++- **Styling:**
++  - Centers the button using Tailwind CSS classes.
++
++</details>
++
++---
++
++### 5. Update the Game Page
++
++**Task:** Modify the game page to fetch and display the game's data, including previous guesses.
++
++**Why:** The game page needs to reflect the current state of the game, similar to fetching and displaying data in an Angular component.
++
++**Hints:**
++
++- **Data Fetching:**
++  - Use server-side functions to fetch game data.
++- **Props Passing:**
++  - Pass the game ID and guesses to the `GameBoard` component.
++- **Type Definitions:**
++  - Ensure the component's props are correctly typed.
++
++**Example:**
++
++```typescript
++// src/app/game/[gameId]/page.tsx
++
++import { GameBoard } from "~/components/game-board";
++import { api } from "~/server/api";
++
++export default async function GamePage({
++  params: { gameId },
++}: {
++  params: { gameId: number };
++}) {
++  // TODO: Fetch the guesses for the current game
++  // TODO: Pass the game ID and guesses to the GameBoard component
++
++  return (
++    <div className="flex h-full items-center justify-center">
++      {/* Render the GameBoard component with appropriate props */}
++    </div>
++  );
++}
++```
++
++**Helpful Links:**
++
++- [Next.js Dynamic Routes](https://nextjs.org/docs/routing/dynamic-routes)
++- [Passing Props in React](https://reactjs.org/docs/components-and-props.html)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/app/game/[gameId]/page.tsx
++
++import { GameBoard } from "~/components/game-board";
++import { api } from "~/server/api";
++
++// Game page component for a specific game ID
++export default async function GamePage({
++  params: { gameId },
++}: {
++  params: { gameId: number };
++}) {
++  // Fetch the guesses for the current game using the game ID
++  const guesses = await api.guesses.findByGameId(gameId);
++
++  return (
++    <div className="flex h-full items-center justify-center">
++      {/* Render the GameBoard component, passing gameId and guesses as props */}
++      <GameBoard gameId={gameId} guesses={guesses} />
++    </div>
++  );
++}
++```
++
++_Comments:_
++
++- **Imports:**
++  - `GameBoard` component to display the game board.
++  - `api` to fetch game data.
++- **Async Function:**
++  - The component is an async function to allow data fetching.
++- **Data Fetching:**
++  - Calls `api.guesses.findByGameId(gameId)` to get the guesses.
++- **Rendering:**
++  - Passes `gameId` and `guesses` to `GameBoard` as props.
++- **Styling:**
++  - Centers the game board using Tailwind CSS classes.
++
++</details>
++
++---
++
++### 6. Update the `GameBoard` Component
++
++**Task:** Modify the `GameBoard` component to accept and use the new props: `gameId` and `guesses`.
++
++**Why:** The component needs to display real game data and handle user interactions accordingly, similar to data-bound components in Angular.
++
++**Hints:**
++
++- **Props Interface:**
++  - Define a TypeScript type or interface for the component's props.
++- **Component Update:**
++  - Use the `guesses` prop to render the `GuessList`.
++  - Pass `gameId` to `GuessInput` for submitting new guesses.
++
++**Example:**
++
++```typescript
++// src/components/game-board.tsx
++
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++type GameBoardProps = {
++  gameId: number;
++  // TODO: Define the type for guesses
++};
++
++export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
++  return (
++    <div className="flex flex-col gap-3">
++      {/* Render GuessList and GuessInput with appropriate props */}
++    </div>
++  );
++};
++```
++
++**Helpful Links:**
++
++- [TypeScript Interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html)
++- [React Props](https://reactjs.org/docs/components-and-props.html)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/game-board.tsx
++
++import { type api } from "~/server/api";
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++// Define the props type for GameBoard
++type GameBoardProps = {
++  gameId: number;
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++// GameBoard component that displays the game board
++export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
++  return (
++    // Use flex layout to stack components vertically with spacing
++    <div className="flex flex-col gap-3">
++      {/* Render the list of previous guesses */}
++      <GuessList guesses={guesses} />
++      {/* Render the input component for new guesses */}
++      <GuessInput gameId={gameId} />
++    </div>
++  );
++};
++```
++
++_Comments:_
++
++- **Imports:**
++  - `api` type for typing the `guesses` prop.
++  - `GuessInput` and `GuessList` components.
++- **Props Type Definition:**
++  - `gameId`: The ID of the current game.
++  - `guesses`: The list of guesses fetched from the API.
++- **Component Structure:**
++  - Renders `GuessList` with the `guesses` prop.
++  - Renders `GuessInput` with the `gameId` prop.
++- **Styling:**
++  - Arranges components vertically with gaps using Tailwind CSS classes.
++
++</details>
++
++---
++
++### 7. Update the `GuessInput` Component
++
++**Task:** Modify the `GuessInput` component to submit guesses to the server when the user presses Enter.
++
++**Why:** The component needs to interact with the server to store guesses, similar to submitting form data in Angular.
++
++**Hints:**
++
++- **Props Interface:**
++  - Accept `gameId` as a prop.
++- **Event Handling:**
++  - On Enter key press, call the API to submit the guess.
++- **State Management:**
++  - Maintain the input state and clear it after submission.
++
++**Example:**
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { useState } from "react";
++import { InputOTP } from "./ui/input-otp";
++
++type GuessInputProps = {
++  gameId: number;
++};
++
++export const GuessInput = ({ gameId }: GuessInputProps) => {
++  const [guess, setGuess] = useState<string>("");
++
++  return (
++    <InputOTP
++      value={guess}
++      onChange={(value) => setGuess(value)}
++      onKeyDown={async (e) => {
++        if (e.key === "Enter") {
++          // TODO: Submit the guess to the server
++          // Clear the input after submission
++        }
++      }}
++    >
++      {/* Render the input slots */}
++    </InputOTP>
++  );
++};
++```
++
++**Helpful Links:**
++
++- [React useState Hook](https://reactjs.org/docs/hooks-state.html)
++- [Handling Events in React](https://reactjs.org/docs/handling-events.html)
++
++**Solution Code:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { REGEXP_ONLY_CHARS } from "input-otp";
++import { useState } from "react";
++
++import { api } from "~/server/api";
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++// Define the props type for GuessInput
++type GuessInputProps = {
++  gameId: number;
++};
++
++// GuessInput component for entering guesses
++export const GuessInput = ({ gameId }: GuessInputProps) => {
++  const [guess, setGuess] = useState<string>("");
++
++  return (
++    <InputOTP
++      maxLength={5} // Limit input to 5 characters
++      pattern={REGEXP_ONLY_CHARS} // Allow only alphabetic characters
++      value={guess} // Bind the input value to the state
++      onChange={(value) => setGuess(value)} // Update state on change
++      onKeyDown={async (e) => {
++        if (e.key === "Enter") {
++          // Submit the guess to the server
++          await api.guesses.create(guess, gameId);
++          // Clear the input field after submission
++          setGuess("");
++        }
++      }}
++    >
++      <InputOTPGroup>
++        {/* Create 5 input slots for each character in the guess */}
++        {[...Array(5)].map((_, index) => (
++          <InputOTPSlot
++            key={index}
++            index={index}
++            className="h-12 w-12 text-2xl uppercase"
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++_Comments:_
++
++- **"use client":**
++  - Enables client-side rendering for interactivity.
++- **Imports:**
++  - `useState` for state management.
++  - `api` to submit the guess.
++  - `InputOTP` components for the input UI.
++- **Props:**
++  - `gameId` to associate the guess with the correct game.
++- **Event Handling:**
++  - On Enter key press, calls `api.guesses.create()` to submit the guess.
++  - Clears the input field after submission.
++- **State Management:**
++  - Uses `guess` state to track the current input.
++- **Input Component:**
++  - Renders 5 input slots for the guess letters.
++
++</details>
++
++---
++
++### 8. Update the `GuessList` and `GuessItem` Components
++
++**Task:** Modify these components to work with the new guess data structure returned from the server.
++
++**Why:** They need to display actual guess data, including results, similar to rendering server data in Angular components.
++
++**Hints:**
++
++- **Type Adjustments:**
++  - Update the props to reflect the data structure of the guesses.
++- **Data Rendering:**
++  - Use the guess data to render each guess item.
++
++**Example for `GuessList`:**
++
++```typescript
++// src/components/guess-list.tsx
++
++import { GuessItem } from "./guess-item";
++
++type GuessListProps = {
++  // TODO: Define the type for guesses
++};
++
++export const GuessList = ({ guesses }: GuessListProps) => {
++  return (
++    <div className="flex flex-col gap-3">
++      {/* Map over the guesses and render GuessItem components */}
++    </div>
++  );
++};
++```
++
++**Solution Code for `GuessList`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/guess-list.tsx
++
++"use client";
++
++import { type api } from "~/server/api";
++import { GuessItem } from "./guess-item";
++
++// Define the props type for GuessList
++type GuessListProps = {
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++// GuessList component to display the list of guesses
++export const GuessList = ({ guesses }: GuessListProps) => {
++  return (
++    <div className="flex flex-col gap-3">
++      {/* Iterate over the guesses array */}
++      {guesses.map((guess) => (
++        // Render a GuessItem for each guess
++        <GuessItem key={guess.id} guess={guess} />
++      ))}
++    </div>
++  );
++};
++```
++
++_Comments:_
++
++- **Imports:**
++  - `api` type for typing the `guesses` prop.
++  - `GuessItem` component.
++- **Props Type Definition:**
++  - `guesses`: An array of guess objects from the API.
++- **Rendering:**
++  - Maps over `guesses` and renders a `GuessItem` for each.
++  - Uses `guess.id` as the `key` prop.
++
++</details>
++
++**Solution Code for `GuessItem`:**
++
++<details>
++<summary>Click to reveal solution</summary>
++
++```typescript
++// src/components/guess-item.tsx
++
++"use client";
++
++import { cn } from "~/lib/utils";
++import { type api } from "~/server/api";
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++// Define the props type for GuessItem
++type GuessItemProps = {
++  guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
++};
++
++// GuessItem component to display an individual guess
++export const GuessItem = ({ guess }: GuessItemProps) => {
++  return (
++    <InputOTP readOnly maxLength={5} value={guess.guess}>
++      <InputOTPGroup>
++        {/* Create an input slot for each character in the guess */}
++        {[0, 1, 2, 3, 4].map((index) => (
++          <InputOTPSlot
++            key={index}
++            index={index}
++            className={cn("h-12 w-12 text-2xl uppercase")}
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++_Comments:_
++
++- **Imports:**
++  - `api` type for typing the `guess` prop.
++  - `cn` utility function for class names.
++  - `InputOTP` components.
++- **Props Type Definition:**
++  - `guess`: An individual guess object from the API.
++- **Rendering:**
++  - Uses `InputOTP` in `readOnly` mode to display the guess.
++  - Renders input slots for each character.
++- **Styling:**
++  - Applies consistent styling to the input slots.
++
++</details>
++
++---
++
++## Checking Your Progress
++
++Now that you've implemented the game logic, it's time to verify that everything works as expected.
++
++**Instructions:**
++
++1. **Start the Development Server:**
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Create a New Game:**
++
++   ![New Game Screenshot](img/5.png)
++
++   - Navigate to `http://localhost:3000` in your web browser.
++   - You should see a "New Game" button on the home page.
++   - Click the button to create a new game.
++   - You should be redirected to a game page with a unique game ID (e.g., `http://localhost:3000/game/1`).
++
++3. **Interact with the Game Board:**
++
++   ![Game Board Screenshot](img/6.png)
++
++   - On the game page, you should see an empty game board and an input field for entering guesses.
++   - Enter a 5-letter word and press **Enter**.
++   - Your guess should appear on the game board.
++   - Repeat the process to make additional guesses.
++
++4. **Data Persistence:**
++
++   - Refresh the page to ensure that your previous guesses persist.
++   - This confirms that the guesses are being stored in the database.
++
++5. **Start Another Game:**
++
++   - Return to the home page and create another new game.
++   - Verify that each game maintains its own state and guesses.
++
++**If everything works correctly, congratulations!** You've successfully implemented the core game logic for your Wordle clone.
++
++---
++
++## Next Steps
++
++In the next section, we'll focus on creating an on-screen keyboard component and integrating it with the game logic to enhance the user experience. This will involve:
++
++- **Building the Keyboard Component:**
++  - We'll create an interactive on-screen keyboard.
++- **State Management:**
++  - Update the game state based on user interactions with the keyboard.
++- **UI Feedback:**
++  - Provide visual feedback for correct, incorrect, and partially correct letters.
++
++---
+diff --git a/docs/04-keyboard.md b/docs/04-keyboard.md
+new file mode 100644
+index 0000000..e0b8402
+--- /dev/null
++++ b/docs/04-keyboard.md
+@@ -0,0 +1,470 @@
++# 04: Keyboard Implementation
++
++Welcome to the fourth section of our tutorial! In this part, you'll enhance your Wordle clone by adding an on-screen keyboard. This keyboard will improve the user experience by providing an alternative input method and visual feedback, similar to how you might enhance an Angular application with additional UI components.
++
++## Exercise Objectives
++
++- **Install** the required dependencies for the keyboard component.
++- **Create** the `GuessKeyboard` component.
++- **Implement** a context for managing the guess state.
++- **Create** a `GuessProvider` to supply the context to components.
++- **Develop** a custom `useGuess` hook for easy access to the guess state.
++- **Update** the game page to include the keyboard and provider.
++- **Adjust** the `GameBoard` and `GuessInput` components to use the new context.
++- **Verify** the functionality by running the application.
++
++---
++
++## Prerequisites
++
++Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-03-game-logic` branch.
++
++**To get up to speed:**
++
++1. **Switch to the branch:**
++
++   ```bash
++   git checkout checkpoint-03-game-logic
++   ```
++
++2. **Install dependencies:**
++
++   ```bash
++   yarn install
++   ```
++
++3. **Start the development server:**
++
++   ```bash
++   yarn dev
++   ```
++
++Once you've completed these steps, you're ready to implement the on-screen keyboard.
++
++---
++
++## Tasks and Hints
++
++### 1. Install Required Dependencies
++
++**Task:** Install the `react-simple-keyboard` library to provide an on-screen keyboard component.
++
++**Why:** This library will help us create a customizable keyboard, enhancing user experience without building one from scratch.
++
++**Instructions:**
++
++- Run the following command to install the dependency:
++
++  ```bash
++  yarn add react-simple-keyboard
++  ```
++
++**Helpful Links:**
++
++- [react-simple-keyboard Documentation](https://hodgef.com/simple-keyboard/)
++
++---
++
++### 2. Create the `GuessKeyboard` Component
++
++**Task:** In `src/components/guess-keyboard.tsx`, create the `GuessKeyboard` component that renders the on-screen keyboard.
++
++**Why:** This component will allow users to input guesses using an on-screen keyboard, similar to mobile-friendly interfaces.
++
++**Hints:**
++
++- **Client-Side Component:**
++  - Include `"use client";` at the top since the component handles user interactions.
++- **Imports:**
++  - Import the `Keyboard` component from `react-simple-keyboard`.
++  - Import necessary styles.
++- **Props Definition:**
++  - Define `GuessKeyboardProps` to accept `gameId`.
++- **State Management:**
++  - Use a custom hook (we'll create it later) to manage the guess state.
++- **Event Handling:**
++  - Implement the `onKeyPress` function to handle key presses.
++
++**Example:**
++
++```typescript
++// src/components/guess-keyboard.tsx
++
++"use client";
++
++import "react-simple-keyboard/build/css/index.css";
++import Keyboard from "react-simple-keyboard";
++
++import { useGuess } from "~/lib/hooks/use-guess";
++import { api } from "~/server/api";
++
++type GuessKeyboardProps = {
++  gameId: number;
++};
++
++export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
++  const { guess, setGuess } = useGuess();
++
++  return (
++    <Keyboard
++      theme="hg-theme-default !bg-secondary/75"
++      buttonTheme={[
++        {
++          class:
++            "!bg-background !text-foreground !border-none !shadow-none hover:!bg-secondary/50 active:!bg-white/25",
++          buttons:
++            "Q W E R T Y U I O P A S D F G H J K L Z X C V B N M {delete} {enter}",
++        },
++      ]}
++      layout={{
++        default: [
++          "Q W E R T Y U I O P {delete}",
++          "A S D F G H J K L {enter}",
++          "Z X C V B N M",
++        ],
++      }}
++      onKeyPress={async (input) => {
++        if (input === "{delete}") {
++          // Remove the last character from the guess
++          setGuess(guess.slice(0, -1));
++          return;
++        }
++
++        if (input === "{enter}") {
++          // Submit the guess to the server
++          await api.guesses.create(guess, gameId);
++          // Clear the guess after submission
++          setGuess("");
++          return;
++        }
++
++        if (guess.length === 5) {
++          // Prevent adding more than 5 characters
++          return;
++        }
++
++        // Append the input character to the guess
++        setGuess(guess + input);
++      }}
++    />
++  );
++};
++```
++
++---
++
++### 3. Create a Guess Context
++
++**Task:** In `src/lib/store/guess-context.ts`, create a context to manage the guess state across components.
++
++**Why:** Context provides a way to pass data through the component tree without having to pass props down manually, similar to shared services in Angular.
++
++**Hints:**
++
++- **Context Creation:**
++  - Use `createContext` from React.
++- **Type Definition:**
++  - Define a `GuessContextType` with `guess` and `setGuess`.
++- **Default Values:**
++  - Provide default values for the context.
++
++**Example:**
++
++```typescript
++// src/lib/store/guess-context.ts
++
++import { createContext } from "react";
++
++// Define the context type
++export type GuessContextType = {
++  guess: string;
++  setGuess: (guess: string) => void;
++};
++
++// Create the GuessContext with default values
++export const GuessContext = createContext<GuessContextType>({
++  guess: "",
++  setGuess: () => undefined,
++});
++```
++
++---
++
++### 4. Create a `GuessProvider`
++
++**Task:** In `src/lib/store/guess-provider.tsx`, create a provider component that supplies the `GuessContext` to its child components.
++
++**Why:** The provider allows any child component to access the guess state, similar to providing a service in Angular at a component level.
++
++**Hints:**
++
++- **Client-Side Component:**
++  - Include `"use client";` at the top.
++- **State Management:**
++  - Use `useState` to manage the `guess` state.
++- **Context Provider:**
++  - Wrap `children` with `GuessContext.Provider`.
++
++**Example:**
++
++```typescript
++// src/lib/store/guess-provider.tsx
++
++"use client";
++
++import { useState } from "react";
++import { GuessContext } from "./guess-context";
++
++export const GuessProvider = ({ children }: { children: React.ReactNode }) => {
++  const [guess, setGuess] = useState<string>("");
++
++  return (
++    <GuessContext.Provider value={{ guess, setGuess }}>
++      {children}
++    </GuessContext.Provider>
++  );
++};
++```
++
++---
++
++### 5. Create a `useGuess` Hook
++
++**Task:** In `src/lib/hooks/use-guess.ts`, create a custom hook to access the `GuessContext`.
++
++**Why:** Custom hooks provide a convenient way to reuse logic across components, similar to Angular services.
++
++**Hints:**
++
++- **Imports:**
++  - Import `useContext` from React.
++  - Import `GuessContext`.
++- **Hook Definition:**
++  - Create a function `useGuess` that returns `useContext(GuessContext)`.
++
++**Example:**
++
++```typescript
++// src/lib/hooks/use-guess.ts
++
++import { useContext } from "react";
++import { GuessContext } from "../store/guess-context";
++
++export const useGuess = () => {
++  return useContext(GuessContext);
++};
++```
++
++---
++
++### 6. Update the Game Page
++
++**Task:** In `src/app/game/[gameId]/page.tsx`, wrap the content with `GuessProvider` and include the `GuessKeyboard` component.
++
++**Why:** The `GuessProvider` needs to wrap components that consume the `GuessContext`, and the `GuessKeyboard` adds the on-screen keyboard to the page.
++
++**Hints:**
++
++- **Imports:**
++  - Import `GuessProvider` and `GuessKeyboard`.
++- **Component Hierarchy:**
++  - Wrap the content with `<GuessProvider>`.
++  - Place `GuessKeyboard` appropriately in the layout.
++- **Styling Adjustments:**
++  - Modify the layout to accommodate the keyboard.
++
++**Example:**
++
++```typescript
++// src/app/game/[gameId]/page.tsx
++
++import { GameBoard } from "~/components/game-board";
++import { GuessKeyboard } from "~/components/guess-keyboard";
++import { GuessProvider } from "~/lib/store/guess-provider";
++import { api } from "~/server/api";
++
++export default async function GamePage({
++  params: { gameId },
++}: {
++  params: { gameId: number };
++}) {
++  const guesses = await api.guesses.findByGameId(gameId);
++
++  return (
++    <GuessProvider>
++      <div className="flex h-full flex-col items-center gap-6">
++        <div className="flex flex-1 items-center justify-center">
++          <GameBoard gameId={gameId} guesses={guesses} />
++        </div>
++        <div className="flex w-full max-w-3xl items-center">
++          <GuessKeyboard gameId={gameId} />
++        </div>
++      </div>
++    </GuessProvider>
++  );
++}
++```
++
++---
++
++### 7. Update the `GameBoard` Component
++
++**Task:** In `src/components/game-board.tsx`, adjust the component to improve its layout within the new page structure.
++
++**Why:** Adjustments may be needed to ensure the `GameBoard` aligns properly with the keyboard and other elements.
++
++**Hints:**
++
++- **Styling Adjustments:**
++  - Modify CSS classes to adjust alignment and spacing.
++- **Flex Properties:**
++  - Use `flex-grow` or other flex properties as needed.
++
++**Example:**
++
++```typescript
++// src/components/game-board.tsx
++
++import { type api } from "~/server/api";
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++type GameBoardProps = {
++  gameId: number;
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
++  return (
++    <div className="flex grow flex-col items-center gap-3">
++      <GuessList guesses={guesses} />
++      <GuessInput gameId={gameId} />
++    </div>
++  );
++};
++```
++
++---
++
++### 8. Update the `GuessInput` Component
++
++**Task:** In `src/components/guess-input.tsx`, modify the component to use the `useGuess` hook instead of local state.
++
++**Why:** Centralizing the guess state allows for synchronization between the input field and the on-screen keyboard.
++
++**Hints:**
++
++- **Remove Local State:**
++  - Remove `useState` and the local `guess` state.
++- **Use Custom Hook:**
++  - Import and use `useGuess` to get `guess` and `setGuess`.
++- **Event Handling:**
++  - Update event handlers to use the new `guess` state.
++
++**Example:**
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { REGEXP_ONLY_CHARS } from "input-otp";
++
++import { useGuess } from "~/lib/hooks/use-guess";
++import { api } from "~/server/api";
++
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++type GuessInputProps = {
++  gameId: number;
++};
++
++export const GuessInput = ({ gameId }: GuessInputProps) => {
++  const { guess, setGuess } = useGuess();
++
++  return (
++    <InputOTP
++      maxLength={5}
++      pattern={REGEXP_ONLY_CHARS}
++      value={guess}
++      onChange={(value) => setGuess(value)}
++      onKeyDown={async (e) => {
++        if (e.key === "Enter") {
++          // Submit the guess to the server
++          await api.guesses.create(guess, gameId);
++          // Clear the guess after submission
++          setGuess("");
++        }
++      }}
++    >
++      <InputOTPGroup>
++        {[...Array(5)].map((_, index) => (
++          <InputOTPSlot
++            key={index}
++            index={index}
++            className="h-12 w-12 text-2xl uppercase"
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++---
++
++## Checking Your Progress
++
++Now that you've implemented the on-screen keyboard and related components, it's time to test your application.
++
++**Instructions:**
++
++1. **Start the Development Server:**
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Create a New Game:**
++
++   - Navigate to `http://localhost:3000`.
++   - Click the "New Game" button to start a new game.
++
++3. **Verify the Keyboard Presence:**
++
++   ![Keyboard](img/7.png)
++
++   - On the game page, you should see the on-screen keyboard below the game board.
++   - The keyboard should display the correct layout.
++
++4. **Test Keyboard Functionality:**
++
++   - Click on letter keys; the letters should appear in the input field.
++   - Use the "{delete}" key to remove letters.
++   - Use the "{enter}" key to submit a guess.
++
++5. **Check Guess Synchronization:**
++
++   - Ensure that typing with your physical keyboard also updates the on-screen input.
++   - The input field should reflect input from both physical and on-screen keyboards.
++
++6. **Verify Guess Submission:**
++
++   - After submitting a guess, it should appear on the game board.
++   - The guess should be stored and persist after page refresh.
++
++If everything works as expected, congratulations! You've successfully added an on-screen keyboard to your Wordle clone.
++
++---
++
++## Next Steps
++
++In the next section, we'll focus on adding visual feedback for guesses and implementing game-over conditions. This will involve:
++
++- **Enhancing the UI:**
++  - Providing color-coded feedback for correct and incorrect letters.
++- **Game Logic:**
++  - Determining when the game is won or lost.
++  - Handling game-over scenarios.
++
++---
+diff --git a/docs/05-word-validation.md b/docs/05-word-validation.md
+new file mode 100644
+index 0000000..9af0b7f
+--- /dev/null
++++ b/docs/05-word-validation.md
+@@ -0,0 +1,534 @@
++# 05: Word Validation
++
++Welcome to the fifth section of our tutorial! In this part, you'll implement word validation in your Wordle clone. This will ensure that users can only submit valid guesses, enhancing the game's integrity and user experience. Additionally, you'll add error notifications to inform users when their guesses are invalid, similar to form validation feedback in Angular applications.
++
++## Exercise Objectives
++
++- **Implement** a function to validate if a word is acceptable.
++- **Create** a custom hook for guess creation with validation.
++- **Integrate** toast notifications for error handling.
++- **Update** components to use the new validation logic.
++- **Enhance** the UI to display guess results with color coding.
++
++---
++
++## Prerequisites
++
++Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-04-keyboard` branch.
++
++**To get up to speed:**
++
++1. **Switch to the branch:**
++
++   ```bash
++   git checkout checkpoint-04-keyboard
++   ```
++
++2. **Install dependencies:**
++
++   ```bash
++   yarn install
++   ```
++
++3. **Start the development server:**
++
++   ```bash
++   yarn dev
++   ```
++
++Once you've completed these steps, you're ready to implement word validation.
++
++---
++
++## Tasks and Hints
++
++### 1. Add Toast Notifications
++
++**Task:** Update your application's layout to include a toast notification system. This will allow you to display error messages to users when their guesses are invalid.
++
++**Why:** Providing immediate feedback enhances user experience and helps users understand why their input was rejected, similar to form validation messages in Angular.
++
++**Instructions:**
++
++- **Update** `src/app/layout.tsx` to include the `Toaster` component.
++
++**Example:**
++
++```typescript
++// src/app/layout.tsx
++
++import "~/styles/globals.css";
++
++import { GeistSans } from "geist/font/sans";
++import { type Metadata } from "next";
++
++// Import the Toaster component for notifications
++import { Toaster } from "~/components/ui/sonner";
++
++export const metadata: Metadata = {
++  title: "Wordle Clone",
++  description: "Our awesome wordle clone",
++};
++
++export default function RootLayout({
++  children,
++}: Readonly<{ children: React.ReactNode }>) {
++  return (
++    <html lang="en" className={`${GeistSans.variable} dark`}>
++      <body className="h-screen">{children}</body>
++      {/* Add the Toaster component to display toast notifications */}
++      <Toaster closeButton={true} expand={true} visibleToasts={4} />
++    </html>
++  );
++}
++```
++
++**Comments:**
++
++- **Imports:**
++  - Importing `Toaster` from `"~/components/ui/sonner"`.
++- **Toaster Component:**
++  - Placed outside the `<body>` but inside the `<html>` to ensure it's globally available.
++  - Configured with `closeButton`, `expand`, and `visibleToasts` props to control its behavior.
++
++---
++
++### 2. Implement Word Validation Function
++
++**Task:** Create a function that checks if a given word is valid according to your word list.
++
++**Why:** This function will be used to validate user guesses before they're submitted, preventing invalid words from being processed.
++
++**Instructions:**
++
++- **Update** `src/lib/utils.ts` to include the `isValidWord` function.
++
++**Example:**
++
++```typescript
++// src/lib/utils.ts
++
++import { type ClassValue, clsx } from "clsx";
++import { twMerge } from "tailwind-merge";
++
++// Import your list of valid words
++import { words } from "./words";
++
++export function cn(...inputs: ClassValue[]) {
++  return twMerge(clsx(inputs));
++}
++
++export function getRandomWord() {
++  const randomIndex = Math.floor(Math.random() * words.length);
++  const word = words[randomIndex];
++  if (!word) {
++    throw new Error("Error retrieving random word");
++  }
++  return word;
++}
++
++// Function to check if a word is valid
++export function isValidWord(word: string) {
++  return words.includes(word.toLowerCase());
++}
++```
++
++**Comments:**
++
++- **isValidWord Function:**
++  - Accepts a `word` string.
++  - Converts the word to lowercase and checks if it's included in the `words` array.
++  - Returns a boolean indicating whether the word is valid.
++
++---
++
++### 3. Create a Custom Hook for Guess Creation
++
++**Task:** Develop a custom hook `useCreateGuess` that handles guess creation, including validation and error handling.
++
++**Why:** Encapsulating this logic in a hook promotes reusability and clean code, similar to services in Angular.
++
++**Instructions:**
++
++- **Create** a new file `src/lib/hooks/use-create-guess.ts`.
++- **Implement** validation logic using `zod` schema.
++- **Use** toast notifications to display validation errors.
++
++**Example:**
++
++```typescript
++// src/lib/hooks/use-create-guess.ts
++
++import { REGEXP_ONLY_CHARS } from "input-otp";
++import { toast } from "sonner";
++import { z } from "zod";
++
++import { api } from "~/server/api";
++
++import { isValidWord } from "../utils";
++import { useGuess } from "./use-guess";
++
++// Define the validation schema using zod
++const CreateGuessSchema = z.object({
++  guess: z
++    .string()
++    .length(5, "Guess must be 5 characters long")
++    .refine((value) => new RegExp(REGEXP_ONLY_CHARS).test(value), {
++      message: "Guess must contain only letters",
++    })
++    .refine((value) => isValidWord(value), {
++      message: "Guess must be a valid word",
++    }),
++  gameId: z.union([z.string(), z.number()]).transform((value) => Number(value)),
++});
++
++// Custom hook for creating a guess with validation
++export const useCreateGuess = () => {
++  const { setGuess } = useGuess();
++
++  return async (guess: string, gameId: number) => {
++    // Validate the input data against the schema
++    const result = CreateGuessSchema.safeParse({ guess, gameId });
++    if (!result.success) {
++      // If validation fails, display error messages using toast notifications
++      result.error.errors.forEach((error) => {
++        toast.error(error.message);
++      });
++      return;
++    }
++    // If validation passes, create the guess using the API
++    await api.guesses.create(guess, gameId);
++    // Clear the current guess after submission
++    setGuess("");
++  };
++};
++```
++
++**Comments:**
++
++- **Imports:**
++
++  - `zod` for schema validation.
++  - `toast` from `sonner` for displaying notifications.
++  - `isValidWord` function to check word validity.
++  - `useGuess` hook to access and update the guess state.
++
++- **CreateGuessSchema:**
++
++  - Validates that `guess` is a 5-letter string containing only letters and is a valid word.
++  - Transforms `gameId` to a number.
++
++- **useCreateGuess Hook:**
++  - Returns an asynchronous function that takes `guess` and `gameId`.
++  - Uses `safeParse` to validate the input; if invalid, displays errors.
++  - Calls `api.guesses.create` to submit the guess.
++  - Resets the guess state using `setGuess("")`.
++
++---
++
++### 4. Update `GuessInput` Component
++
++**Task:** Modify the `GuessInput` component to use the `useCreateGuess` hook for submitting guesses.
++
++**Why:** This ensures that guesses entered via the input field are validated and handled consistently.
++
++**Instructions:**
++
++- **Update** `src/components/guess-input.tsx`.
++- **Replace** direct API calls with the `createGuess` function from the hook.
++
++**Example:**
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { REGEXP_ONLY_CHARS } from "input-otp";
++
++import { useCreateGuess } from "~/lib/hooks/use-create-guess";
++import { useGuess } from "~/lib/hooks/use-guess";
++
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++type GuessInputProps = {
++  gameId: number;
++};
++
++export const GuessInput = ({ gameId }: GuessInputProps) => {
++  const { guess, setGuess } = useGuess();
++
++  // Use the custom hook for creating guesses
++  const createGuess = useCreateGuess();
++
++  return (
++    <InputOTP
++      maxLength={5}
++      pattern={REGEXP_ONLY_CHARS}
++      value={guess}
++      onChange={(value) => setGuess(value)}
++      onKeyDown={async (e) => {
++        if (e.key === "Enter") {
++          // Use the createGuess function to handle submission
++          await createGuess(guess, gameId);
++        }
++      }}
++    >
++      <InputOTPGroup>
++        {[...Array(5)].map((_, index) => (
++          <InputOTPSlot
++            key={index}
++            index={index}
++            className="h-12 w-12 text-2xl uppercase"
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++**Comments:**
++
++- **Imports:**
++  - `useCreateGuess` hook replaces direct API calls.
++- **Event Handling:**
++  - On Enter key press, calls `createGuess(guess, gameId)` instead of directly interacting with the API.
++- **Benefits:**
++  - Centralizes validation and error handling logic.
++  - Ensures consistency across different input methods.
++
++---
++
++### 5. Update `GuessKeyboard` Component
++
++**Task:** Modify the `GuessKeyboard` component to use the `useCreateGuess` hook for submitting guesses via the on-screen keyboard.
++
++**Why:** This maintains consistency in validation and error handling between the keyboard and input field.
++
++**Instructions:**
++
++- **Update** `src/components/guess-keyboard.tsx`.
++- **Use** the `createGuess` function when the Enter key is pressed.
++
++**Example:**
++
++```typescript
++// src/components/guess-keyboard.tsx
++
++"use client";
++
++import "react-simple-keyboard/build/css/index.css";
++
++import Keyboard from "react-simple-keyboard";
++
++import { useCreateGuess } from "~/lib/hooks/use-create-guess";
++import { useGuess } from "~/lib/hooks/use-guess";
++
++type GuessKeyboardProps = {
++  gameId: number;
++};
++
++export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
++  const { guess, setGuess } = useGuess();
++
++  // Use the custom hook for creating guesses
++  const createGuess = useCreateGuess();
++
++  return (
++    <Keyboard
++      theme="hg-theme-default !bg-secondary/75"
++      buttonTheme={[
++        {
++          class:
++            "!bg-background !text-foreground !border-none !shadow-none hover:!bg-secondary/50 active:!bg-white/25",
++          buttons:
++            "Q W E R T Y U I O P A S D F G H J K L Z X C V B N M {delete} {enter}",
++        },
++      ]}
++      layout={{
++        default: [
++          "Q W E R T Y U I O P {delete}",
++          "A S D F G H J K L {enter}",
++          "Z X C V B N M",
++        ],
++      }}
++      onKeyPress={async (input) => {
++        if (input === "{delete}") {
++          setGuess(guess.slice(0, -1));
++          return;
++        }
++
++        if (input === "{enter}") {
++          // Use the createGuess function to handle submission
++          await createGuess(guess, gameId);
++          return;
++        }
++
++        if (guess.length === 5) {
++          // Prevent adding more than 5 characters
++          return;
++        }
++
++        // Append the input character to the guess
++        setGuess(guess + input);
++      }}
++    />
++  );
++};
++```
++
++**Comments:**
++
++- **Imports:**
++  - `useCreateGuess` hook is now used in this component.
++- **Event Handling:**
++  - When the `{enter}` key is pressed, calls `createGuess(guess, gameId)`.
++- **Consistency:**
++  - Both physical and on-screen keyboards now use the same validation logic.
++
++---
++
++### 6. Update `GuessItem` Component
++
++**Task:** Enhance the `GuessItem` component to display the result of each guess with appropriate color coding.
++
++**Why:** Visual feedback helps users understand which letters are correct, similar to the original Wordle game.
++
++**Instructions:**
++
++- **Update** `src/components/guess-item.tsx`.
++- **Map** the result characters to corresponding colors.
++
++**Example:**
++
++```typescript
++// src/components/guess-item.tsx
++
++"use client";
++
++import { cn } from "~/lib/utils";
++import { type api } from "~/server/api";
++
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++type GuessItemProps = {
++  guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
++};
++
++// Helper component to render each slot with the correct color
++function GuessItemSlot({ index, result }: { index: number; result: string }) {
++  return (
++    <InputOTPSlot
++      index={index}
++      className={cn("h-12 w-12 text-2xl uppercase", {
++        "bg-red-500 text-red-50": result === "X", // Incorrect letter
++        "bg-green-500 text-green-50": result === "C", // Correct letter in correct position
++        "bg-yellow-500 text-yellow-50": result === "~", // Correct letter in wrong position
++      })}
++    />
++  );
++}
++
++export const GuessItem = ({ guess }: GuessItemProps) => {
++  return (
++    <InputOTP readOnly maxLength={5} value={guess.guess}>
++      <InputOTPGroup>
++        {[0, 1, 2, 3, 4].map((index) => (
++          <GuessItemSlot
++            key={index}
++            index={index}
++            result={guess.result[index] ?? ""}
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++**Comments:**
++
++- **Imports:**
++  - `cn` utility function for conditional class names.
++- **GuessItemSlot Component:**
++  - Determines the color of each slot based on the `result` character.
++  - Uses `cn` to apply the appropriate background and text colors.
++- **Mapping Results:**
++
++  - `"C"`: Green for correct letter and position.
++  - `"~"`: Yellow for correct letter but wrong position.
++  - `"X"`: Red for incorrect letter.
++
++- **Rendering:**
++  - Iterates over each character in the guess and displays it with the correct styling.
++
++---
++
++## Checking Your Progress
++
++Now that you've implemented word validation and enhanced user feedback, it's time to test your application.
++
++**Instructions:**
++
++1. **Start the Development Server:**
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Navigate to a Game:**
++
++   - Open your browser and go to `http://localhost:3000`.
++   - Start a new game or continue an existing one.
++
++3. **Test Input Constraints:**
++
++   ![Word Validation](img/8.png)
++
++   - **Enter Invalid Characters:**
++     - Try entering numbers or special characters.
++     - The input should reject these characters.
++   - **Exceed Character Limit:**
++     - Attempt to enter more than 5 letters.
++     - The input should stop accepting letters after the fifth character.
++
++4. **Test Word Validation:**
++
++   - **Invalid Word:**
++     - Enter a 5-letter word that's not in the word list (e.g., "ABCDE").
++     - Upon submission, a toast notification should display an error message like "Guess must be a valid word".
++   - **Valid Word:**
++     - Enter a valid 5-letter word (e.g., "APPLE").
++     - The guess should be accepted and appear on the game board without errors.
++
++5. **Verify Toast Notifications:**
++
++   - Ensure that error messages appear as toast notifications at the bottom of the screen.
++   - Test various invalid inputs to see different error messages.
++
++6. **Check Guess Visualization:**
++
++   - After submitting a valid guess, verify that the letters are color-coded correctly:
++     - **Green:** Correct letter in the correct position.
++     - **Yellow:** Correct letter in the wrong position.
++     - **Red/Default:** Incorrect letter.
++
++If everything works as expected, congratulations! You've successfully enhanced your Wordle clone with word validation and improved user feedback.
++
++---
++
++## Next Steps
++
++In the next section, we'll focus on implementing game-over conditions and adding a feature to start a new game after completion. This will involve:
++
++- **Game Logic Enhancements:**
++
++  - Determining when the game is won or lost.
++  - Handling scenarios where the player runs out of guesses.
++
++- **User Interface Updates:**
++  - Displaying game-over messages.
++  - Providing options to start a new game.
++
++---
+diff --git a/docs/06-game-over.md b/docs/06-game-over.md
+new file mode 100644
+index 0000000..9f3ab8d
+--- /dev/null
++++ b/docs/06-game-over.md
+@@ -0,0 +1,494 @@
++# 06: Game Over Implementation
++
++Welcome to the sixth section of our tutorial! In this part, you'll implement game over logic in your Wordle clone. This includes handling game completion, displaying results, and allowing users to start a new game. If you're familiar with Angular/Spring Boot, you'll find parallels in how we manage state and user interactions in a Next.js/React environment.
++
++## Exercise Objectives
++
++- **Update** the game page to handle game status.
++- **Modify** the `GameBoard` component to display game results.
++- **Create** a `GameResults` component for win/lose messages.
++- **Develop** a custom hook for creating new games.
++- **Adjust** the home page to use the new game creation hook.
++- **Enhance** the guess service to handle game completion logic.
++
++---
++
++## Prerequisites
++
++Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-05-word-validation` branch.
++
++**To get up to speed:**
++
++1. **Switch to the branch:**
++
++   ```bash
++   git checkout checkpoint-05-word-validation
++   ```
++
++2. **Install dependencies:**
++
++   ```bash
++   yarn install
++   ```
++
++3. **Start the development server:**
++
++   ```bash
++   yarn dev
++   ```
++
++Once you've completed these steps, you're ready to implement the game over logic.
++
++---
++
++## Tasks and Hints
++
++### 1. Update the Game Page
++
++**Task:** Modify the game page to fetch both the game status and guesses, and conditionally render the keyboard based on the game status.
++
++**Why:** To determine when the game is over and to display or hide certain components accordingly, similar to conditionally displaying elements in Angular templates.
++
++**Instructions:**
++
++- **Fetch** both the game and guesses data.
++- **Pass** the game status to the `GameBoard` component.
++- **Conditionally render** the keyboard based on the game's status.
++
++**Example:**
++
++```typescript
++// src/app/game/[gameId]/page.tsx
++
++import { GameBoard } from "~/components/game-board";
++import { GuessKeyboard } from "~/components/guess-keyboard";
++import { GuessProvider } from "~/lib/store/guess-provider";
++import { api } from "~/server/api";
++
++// This is a server component; it does not have "use client" at the top
++// We can fetch data directly from the server inside this component
++export default async function GamePage({
++  params: { gameId },
++}: {
++  params: { gameId: number };
++}) {
++  // Fetch both game and guesses data from the server
++  const game = await api.games.getById(gameId);
++  const guesses = await api.guesses.findByGameId(gameId);
++
++  return (
++    <GuessProvider>
++      <div className="flex h-full flex-col items-center gap-6">
++        <div className="flex flex-1 items-center justify-center">
++          {/* Pass game status to GameBoard */}
++          <GameBoard gameId={gameId} status={game.status} guesses={guesses} />
++        </div>
++        {/* Conditionally render the keyboard only if the game is in progress */}
++        {game.status === "in_progress" && (
++          <div className="flex w-full max-w-3xl items-center">
++            <GuessKeyboard gameId={gameId} />
++          </div>
++        )}
++      </div>
++    </GuessProvider>
++  );
++}
++```
++
++**Comments:**
++
++- **Data Fetching:**
++  - Fetches the game details (`game`) and the list of guesses (`guesses`) using the `api`.
++- **Passing Props:**
++  - Passes `status` to the `GameBoard` component to inform it about the game's current state.
++- **Conditional Rendering:**
++  - Uses `{game.status === "in_progress" && ...}` to render the `GuessKeyboard` only when the game is not over.
++
++---
++
++### 2. Update the `GameBoard` Component
++
++**Task:** Modify the `GameBoard` component to handle different game statuses and incorporate the new `GameResults` component.
++
++**Why:** To display the appropriate content based on whether the game is in progress, won, or lost, similar to using `*ngIf` in Angular templates.
++
++**Instructions:**
++
++- **Adjust** the component to accept the `status` prop.
++- **Display** the `GuessInput` only if the game is in progress.
++- **Include** the `GameResults` component to show game outcomes.
++
++**Example:**
++
++```typescript
++// src/components/game-board.tsx
++
++import { type api } from "~/server/api";
++import { type games } from "~/server/db/schema";
++
++import { GameResults } from "./game-results";
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++type GameBoardProps = {
++  gameId: number;
++  status: (typeof games.status.enumValues)[number];
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
++  return (
++    <div className="flex grow flex-col items-center gap-6">
++      {/* Always show the list of guesses */}
++      <GuessList guesses={guesses} />
++      {/* Only show GuessInput if the game is still in progress */}
++      {status === "in_progress" && <GuessInput gameId={gameId} />}
++      {/* Show game results when the game is over */}
++      <GameResults status={status} />
++    </div>
++  );
++};
++```
++
++**Comments:**
++
++- **Props Update:**
++  - Accepts `status` as a prop to determine the game's current state.
++- **Conditional Rendering:**
++  - Renders `GuessInput` only if `status` is `"in_progress"`.
++  - Includes `GameResults` component to display messages when the game is over.
++
++---
++
++### 3. Create the `GameResults` Component
++
++**Task:** Develop a `GameResults` component to display win or lose messages and provide a "Play Again" button.
++
++**Why:** To enhance user experience by giving immediate feedback upon game completion, similar to showing alerts or modals in Angular.
++
++**Instructions:**
++
++- **Create** a new file `src/components/game-results.tsx`.
++- **Handle** different game statuses (`won`, `lost`, `in_progress`).
++- **Implement** a "Play Again" button using a custom hook.
++
++**Example:**
++
++```typescript
++// src/components/game-results.tsx
++
++"use client";
++
++import { useCreateGame } from "~/lib/hooks/use-create-game";
++import { type games } from "~/server/db/schema";
++
++import { Button } from "./ui/button";
++
++type GameResultsProps = {
++  status: (typeof games.status.enumValues)[number];
++};
++
++// Separate component for the "Play Again" button
++const PlayAgainButton = () => {
++  const createGame = useCreateGame();
++
++  return (
++    <Button size="lg" onClick={createGame}>
++      Play again!
++    </Button>
++  );
++};
++
++export const GameResults = ({ status }: GameResultsProps) => {
++  // Use a switch statement to handle different game statuses
++  switch (status) {
++    case "in_progress":
++      return null; // Don't show anything if the game is still in progress
++    case "won":
++      return (
++        <div className="flex flex-col gap-6">
++          <div className="text-3xl font-bold text-green-400">
++            Bam! You won! 🎉
++          </div>
++          <PlayAgainButton />
++        </div>
++      );
++    case "lost":
++      return (
++        <div className="flex flex-col gap-6">
++          <div className="text-3xl font-bold text-red-400">You lost! 😭</div>
++          <PlayAgainButton />
++        </div>
++      );
++  }
++};
++```
++
++**Comments:**
++
++- **"use client":**
++  - Indicates that this component is client-side because it uses hooks.
++- **PlayAgainButton Component:**
++  - Uses `useCreateGame` hook to start a new game when clicked.
++- **GameResults Component:**
++  - Uses a `switch` statement to render different content based on `status`.
++  - Displays appropriate messages and the `PlayAgainButton` when the game is over.
++
++---
++
++### 4. Create a Custom Hook for Game Creation
++
++**Task:** Develop a `useCreateGame` hook that handles creating a new game and navigating to it.
++
++**Why:** To encapsulate the game creation logic, making it reusable and keeping components clean, similar to services in Angular.
++
++**Instructions:**
++
++- **Create** a new file `src/lib/hooks/use-create-game.ts`.
++- **Use** Next.js's `useRouter` for navigation.
++- **Implement** the game creation logic using the API.
++
++**Example:**
++
++```typescript
++// src/lib/hooks/use-create-game.ts
++
++import { useRouter } from "next/navigation";
++
++import { api } from "~/server/api";
++
++export const useCreateGame = (withRedirect = true) => {
++  const router = useRouter();
++
++  return async () => {
++    // Create a new game using the API
++    const game = await api.games.create();
++
++    if (withRedirect) {
++      // Redirect to the new game page if withRedirect is true
++      router.push(`/game/${game.id}`);
++    }
++
++    return game;
++  };
++};
++```
++
++**Comments:**
++
++- **Parameters:**
++  - `withRedirect`: Determines whether to navigate to the new game after creation.
++- **Functionality:**
++  - Creates a new game by calling `api.games.create()`.
++  - Uses `router.push` to navigate to the new game's page.
++- **Reusability:**
++  - Can be used in multiple components where game creation is needed.
++
++---
++
++### 5. Update the Home Page
++
++**Task:** Modify the home page to use the `useCreateGame` hook, simplifying the code.
++
++**Why:** To utilize the custom hook for cleaner code and centralized logic, similar to using services in Angular components.
++
++**Instructions:**
++
++- **Update** `src/app/page.tsx`.
++- **Replace** existing game creation logic with the `useCreateGame` hook.
++
++**Example:**
++
++```typescript
++// src/app/page.tsx
++
++"use client";
++
++import { Button } from "~/components/ui/button";
++import { useCreateGame } from "~/lib/hooks/use-create-game";
++
++export default function HomePage() {
++  // Use the custom hook to create a new game
++  const createGame = useCreateGame();
++
++  return (
++    <main className="flex h-full items-center justify-center">
++      <Button
++        onClick={async () => {
++          await createGame();
++          // No need to handle navigation here; it's done in the hook
++        }}
++      >
++        New game
++      </Button>
++    </main>
++  );
++}
++```
++
++**Comments:**
++
++- **Imports:**
++  - Imports `useCreateGame` to handle game creation.
++- **Event Handling:**
++  - On button click, calls `createGame()` without worrying about navigation logic.
++- **Simplification:**
++  - Reduces the code in the component by offloading logic to the custom hook.
++
++---
++
++### 6. Update the Guess Service
++
++**Task:** Enhance the guess service to determine when the game is won or lost and update the game status accordingly.
++
++**Why:** To implement server-side logic for game completion, similar to business logic in a Spring Boot application.
++
++**Instructions:**
++
++- **Update** `src/server/services/guess.service.ts`.
++- **Check** for win or loss conditions after each guess.
++- **Update** the game's status in the database.
++- **Trigger** revalidation of the game page to reflect changes.
++
++**Example:**
++
++```typescript
++// src/server/services/guess.service.ts
++
++import { asc, count, eq } from "drizzle-orm";
++import { revalidatePath } from "next/cache";
++
++import { db } from "../db";
++import { games, guesses } from "../db/schema";
++import { gameService } from "./game.service";
++
++// ... (previous code remains the same)
++
++const create = async (guess: string, gameId: number) => {
++  const result = await checkGuess(guess, gameId);
++
++  const [createdGuess] = await db
++    .insert(guesses)
++    .values({
++      gameId,
++      guess: guess.toUpperCase(),
++      result,
++    })
++    .returning();
++
++  if (!createdGuess) {
++    throw new Error("Failed to create guess");
++  }
++
++  const count = await countByGameId(gameId);
++
++  // Check for game over conditions
++  if (count === 6 && createdGuess.result.includes("X")) {
++    // If it's the 6th guess and not all correct, the game is lost
++    await gameService.update(gameId, "lost");
++  }
++
++  if (createdGuess.result === "CCCCC") {
++    // If all letters are correct, the game is won
++    await gameService.update(gameId, "won");
++  }
++
++  // Trigger a revalidation of the game page to reflect the new state
++  revalidatePath(`/game/${gameId}`);
++
++  return createdGuess;
++};
++
++// ... (rest of the code remains the same)
++
++const countByGameId = async (gameId: number) => {
++  // Count the number of guesses for a specific game
++  const [gameCount] = await db
++    .select({ count: count() })
++    .from(guesses)
++    .where(eq(guesses.gameId, gameId));
++
++  if (!gameCount) {
++    throw new Error("Error counting guesses");
++  }
++
++  return gameCount.count;
++};
++
++export const guessService = {
++  create,
++  findByGameId,
++};
++```
++
++**Comments:**
++
++- **Game Over Logic:**
++  - Checks if the player has made 6 guesses and hasn't guessed the word correctly to determine a loss.
++  - Checks if the guess result is `"CCCCC"` (all letters correct) to determine a win.
++- **Updating Game Status:**
++  - Calls `gameService.update` to update the game's status in the database.
++- **Revalidation:**
++  - Uses `revalidatePath` to refresh the game page so that the client sees the updated game status.
++- **Helper Function `countByGameId`:**
++  - Counts the number of guesses made in the game to check against the maximum allowed guesses.
++
++---
++
++## Checking Your Progress
++
++Now that you've implemented the game over logic and new game creation, it's time to test your application.
++
++**Instructions:**
++
++1. **Start the Development Server:**
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Start a New Game:**
++
++   - Navigate to `http://localhost:3000`.
++   - Click the "New game" button on the home page.
++   - You should be redirected to a new game page (e.g., `http://localhost:3000/game/1`).
++
++3. **Play Through a Game:**
++
++   - **Win Scenario:**
++     ![Game Won Screenshot](img/10.png)
++     - Guess the correct word within six attempts.
++     - The keyboard should disappear upon winning.
++     - A victory message ("Bam! You won! 🎉") should be displayed.
++     - A "Play again!" button should appear.
++   - **Lose Scenario:**
++     ![Game Over Screenshot](img/9.png)
++     - Make six incorrect guesses.
++     - The keyboard should disappear upon losing.
++     - A losing message ("You lost! 😭") should be displayed.
++     - A "Play again!" button should appear.
++
++4. **Check Game Status Persistence:**
++
++   - Refresh the page after winning or losing.
++   - The game over state should persist, showing the same message and not resetting the game.
++
++5. **Start a New Game from Game Over State:**
++
++   - Click the "Play again!" button.
++   - You should be redirected to a new game page with a fresh board and keyboard.
++
++If everything works as expected, congratulations! You've successfully implemented game over logic in your Wordle clone.
++
++---
++
++## Next Steps
++
++In the next section, we'll focus on adding final touches to our game, such as:
++
++- **UI Enhancements:**
++
++  - Adding animations for guess submissions.
++  - Improving the overall styling and responsiveness.
++
++---
+diff --git a/docs/07-styling-polish.md b/docs/07-styling-polish.md
+new file mode 100644
+index 0000000..bff11c1
+--- /dev/null
++++ b/docs/07-styling-polish.md
+@@ -0,0 +1,575 @@
++# 07: Styling and Polish
++
++Welcome to the final section of our tutorial! In this part, you'll add visual polish to your Wordle clone, enhancing the user experience with improved styling and engaging effects. We'll focus on:
++
++- Enhancing the game board for better visibility.
++- Creating an engaging game over dialog with animations.
++- Refining the styling of the guess input and on-screen keyboard.
++
++These changes will make your game more enjoyable and visually appealing, similar to refining UI components in Angular applications.
++
++## Exercise Objectives
++
++- **Enhance** the game board's appearance for better user engagement.
++- **Improve** the guess input styling to match the game board.
++- **Create** an engaging game over dialog with animations.
++- **Refine** the on-screen keyboard's styling for consistency.
++- **Add** celebratory effects using `react-confetti`.
++
++---
++
++## Prerequisites
++
++Before you begin, ensure you've completed the previous section or are up to date with the `checkpoint-06-game-over` branch.
++
++**To get up to speed:**
++
++1. **Switch to the branch:**
++
++   ```bash
++   git checkout checkpoint-06-game-over
++   ```
++
++2. **Install dependencies:**
++
++   ```bash
++   yarn install
++   ```
++
++3. **Start the development server:**
++
++   ```bash
++   yarn dev
++   ```
++
++Once you've completed these steps, you're ready to add the final polish to your Wordle clone.
++
++---
++
++## Tasks and Hints
++
++### 0. Install `react-confetti`
++
++**Task:** Install the `react-confetti` library to add a celebratory effect when the player wins the game.
++
++**Why:** Visual effects enhance user experience, making the game more engaging and rewarding upon winning.
++
++**Instructions:**
++
++- Run the following command to install the dependency:
++
++  ```bash
++  yarn add react-confetti
++  ```
++
++---
++
++### 1. Enhance the Game Board
++
++**Task:** Improve the appearance of your game board for better visibility and user engagement.
++
++**Why:** A well-designed game board enhances user experience, making the game more enjoyable and accessible.
++
++**Instructions:**
++
++- **Update** the `GuessItem` component in `src/components/guess-item.tsx`.
++- **Adjust** the styling to increase the size and improve the color scheme.
++
++**Example:**
++
++```typescript
++// src/components/guess-item.tsx
++
++function GuessItemSlot({ index, result }: { index: number; result: string }) {
++  return (
++    <InputOTPSlot
++      index={index}
++      className={cn(
++        // Increase size and adjust styling for better visibility
++        "h-16 w-16 border-none text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none",
++        {
++          // Update color scheme for more vibrant feedback
++          "bg-red-500 text-red-50": result === "X",
++          "bg-green-500 text-green-50": result === "C",
++          "bg-yellow-500 text-yellow-50": result === "~",
++        }
++      )}
++    />
++  );
++}
++
++export const GuessItem = ({ guess }: GuessItemProps) => {
++  return (
++    <InputOTP readOnly maxLength={5} value={guess.guess}>
++      <InputOTPGroup className="gap-2">
++        {/* Add gap between guess slots */}
++        {[0, 1, 2, 3, 4].map((index) => (
++          <GuessItemSlot
++            key={index}
++            index={index}
++            result={guess.result[index]}
++          />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++**Comments:**
++
++- **Increased Size:**
++  - Updated `h-12 w-12` to `h-16 w-16` for larger slots.
++  - Changed `text-2xl` to `text-3xl` for bigger letters.
++- **Styling Adjustments:**
++  - Added `font-medium` for bolder text.
++  - Used `border-none` to remove borders for a cleaner look.
++  - Adjusted `first:rounded-l-none` and `last:rounded-r-none` to customize corner rounding.
++- **Color Scheme:**
++  - Used more vibrant colors (`bg-red-500`, `bg-green-500`, `bg-yellow-500`) for better feedback.
++- **Spacing:**
++  - Added `gap-2` in `InputOTPGroup` to create space between slots.
++
++---
++
++### 2. Improve the Guess Input
++
++**Task:** Enhance the appearance of the guess input to match the styled guess items.
++
++**Why:** Consistent styling across components provides a cohesive user experience.
++
++**Instructions:**
++
++- **Update** the `GuessInput` component in `src/components/guess-input.tsx`.
++- **Create** a separate `GuessItemSlot` component for consistent styling.
++
++**Example:**
++
++```typescript
++// src/components/guess-input.tsx
++
++"use client";
++
++import { useGuess } from "~/lib/hooks/use-guess";
++import { api } from "~/server/api";
++
++import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
++
++type GuessInputProps = {
++  gameId: number;
++};
++
++// Create a separate component for consistent styling
++function GuessItemSlot({ index }: { index: number }) {
++  return (
++    <InputOTPSlot
++      index={index}
++      // Match styling with guess items
++      className="h-16 w-16 border text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none"
++    />
++  );
++}
++
++export const GuessInput = ({ gameId }: GuessInputProps) => {
++  const { guess, setGuess } = useGuess();
++
++  return (
++    <InputOTP
++      maxLength={5}
++      value={guess}
++      onChange={(value) => setGuess(value)}
++      onComplete={async (value) => {
++        try {
++          // Submit the guess when input is complete
++          await api.guesses.create(value, gameId);
++          setGuess("");
++        } catch (error) {
++          console.error(error);
++        }
++      }}
++    >
++      <InputOTPGroup className="gap-2">
++        {/* Add gap between input slots */}
++        {[0, 1, 2, 3, 4].map((index) => (
++          <GuessItemSlot key={index} index={index} />
++        ))}
++      </InputOTPGroup>
++    </InputOTP>
++  );
++};
++```
++
++**Comments:**
++
++- **Separate Component:**
++  - Created `GuessItemSlot` to reuse styling between `GuessItem` and `GuessInput`.
++- **Styling Adjustments:**
++  - Matched `h-16 w-16`, `text-3xl`, and `font-medium` to align with `GuessItem`.
++  - Added `border` to distinguish the input slots.
++- **Consistency:**
++  - Ensured the input slots have the same look and feel as the displayed guesses.
++- **Functionality:**
++  - Used `onComplete` to submit the guess automatically when the user finishes typing.
++- **Error Handling:**
++  - Wrapped API call in a `try-catch` block to handle potential errors gracefully.
++
++---
++
++### 3. Create an Engaging Game Over Dialog
++
++**Task:** Replace the simple game results display with a more engaging dialog, including animations.
++
++**Why:** Providing a celebratory effect upon winning enhances user satisfaction and game enjoyment.
++
++**Instructions:**
++
++- **Create** a new file `src/components/game-results-dialog.tsx`.
++- **Use** `react-confetti` for the win animation.
++- **Display** all guesses in the dialog.
++
++**Example:**
++
++```typescript
++// src/components/game-results-dialog.tsx
++
++"use client";
++
++import { useMemo } from "react";
++import Confetti from "react-confetti";
++
++import { useCreateGame } from "~/lib/hooks/use-create-game";
++import { type api } from "~/server/api";
++import { type games } from "~/server/db/schema";
++
++import { GuessItem } from "./guess-item";
++import { Button } from "./ui/button";
++import { Dialog, DialogContent } from "./ui/dialog";
++
++type GameResultsDialogProps = {
++  status: (typeof games.status.enumValues)[number];
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++export const GameResultsDialog = ({
++  status,
++  guesses,
++}: GameResultsDialogProps) => {
++  const createGame = useCreateGame();
++
++  if (status === "in_progress") return null;
++
++  return (
++    <Dialog open={true}>
++      <DialogContent
++        // Style the dialog for a more engaging appearance
++        className="flex flex-col items-center gap-6 rounded-2xl p-12 md:max-w-fit"
++        withClose={false}
++      >
++        {status === "won" ? (
++          <>
++            <div className="flex flex-col items-center gap-6">
++              <div className="text-center">
++                {/* Large, bold text for win message */}
++                <div className="text-7xl font-bold">you are</div>
++                <div className="text-7xl font-bold text-green-500">
++                  awesome!
++                </div>
++              </div>
++              {/* Display all guesses */}
++              {guesses.map((guess) => (
++                <GuessItem key={guess.id} guess={guess} />
++              ))}
++            </div>
++            {/* Add confetti effect for wins */}
++            <Confetti
++              className="h-full w-full"
++              numberOfPieces={200}
++              gravity={0.05}
++            />
++          </>
++        ) : (
++          <div className="flex flex-col items-center gap-6">
++            <div className="text-center">
++              {/* Large, bold text for lose message */}
++              <div className="text-7xl font-bold">better luck</div>
++              <div className="text-7xl font-bold text-red-500">next time!</div>
++            </div>
++            {/* Display all guesses */}
++            {guesses.map((guess) => (
++              <GuessItem key={guess.id} guess={guess} />
++            ))}
++          </div>
++        )}
++        {/* Play again button */}
++        <Button
++          variant="outline"
++          className="h-14 w-full rounded-xl text-xl font-semibold"
++          size="lg"
++          onClick={() => createGame()}
++        >
++          Play again!
++        </Button>
++      </DialogContent>
++    </Dialog>
++  );
++};
++```
++
++**Comments:**
++
++- **Dialog Component:**
++  - Uses `Dialog` and `DialogContent` to create a modal dialog.
++  - `open={true}` keeps the dialog visible when the game is over.
++- **Styling Enhancements:**
++  - Applied `flex`, `gap`, `rounded-2xl`, and `p-12` for improved layout and appearance.
++- **Win Scenario:**
++  - Displays a congratulatory message with large, bold text.
++  - Shows all guesses using the `GuessItem` component.
++  - Includes a confetti effect using `Confetti` component from `react-confetti`.
++- **Lose Scenario:**
++  - Displays an encouraging message with large, bold text.
++  - Shows all guesses.
++- **Play Again Button:**
++  - Styled with `h-14`, `w-full`, `rounded-xl`, `text-xl`, and `font-semibold`.
++  - Calls `createGame()` to start a new game when clicked.
++- **Conditional Rendering:**
++  - Uses a ternary operator to switch between win and lose scenarios.
++
++---
++
++### 4. Update the `GameBoard` Component
++
++**Task:** Modify the `GameBoard` component to use the new `GameResultsDialog` for displaying game over messages.
++
++**Why:** Integrating the new dialog provides a more engaging user experience upon game completion.
++
++**Instructions:**
++
++- **Update** `src/components/game-board.tsx`.
++- **Replace** the old `GameResults` component with `GameResultsDialog`.
++
++**Example:**
++
++```typescript
++// src/components/game-board.tsx
++
++import { type api } from "~/server/api";
++import { type games } from "~/server/db/schema";
++
++import { GameResultsDialog } from "./game-results-dialog";
++import { GuessInput } from "./guess-input";
++import { GuessList } from "./guess-list";
++
++type GameBoardProps = {
++  gameId: number;
++  status: (typeof games.status.enumValues)[number];
++  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
++};
++
++export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
++  return (
++    <div className="flex grow flex-col items-center gap-6">
++      <div className="flex flex-col gap-2">
++        {/* Display the list of guesses */}
++        <GuessList guesses={guesses} />
++        {/* Only show GuessInput if the game is still in progress */}
++        {status === "in_progress" && <GuessInput gameId={gameId} />}
++      </div>
++      {/* Add the new GameResultsDialog component */}
++      <GameResultsDialog status={status} guesses={guesses} />
++    </div>
++  );
++};
++```
++
++**Comments:**
++
++- **Imports:**
++  - Imported `GameResultsDialog` instead of the old `GameResults` component.
++- **Component Structure:**
++  - Wrapped `GuessList` and `GuessInput` inside a `div` with `flex-col` and `gap-2` for better spacing.
++- **Integration:**
++  - Added `<GameResultsDialog status={status} guesses={guesses} />` to display the game over dialog when appropriate.
++- **Clean-up:**
++  - Removed the old `GameResults` component to avoid redundancy.
++
++---
++
++### 5. Refine the On-Screen Keyboard
++
++**Task:** Improve the styling of the on-screen keyboard for a more polished look.
++
++**Why:** Consistent and refined styling enhances the overall user experience.
++
++**Instructions:**
++
++- **Update** the `GuessKeyboard` component in `src/components/guess-keyboard.tsx`.
++- **Adjust** the keyboard layout and button styling.
++
++**Example:**
++
++```typescript
++// src/components/guess-keyboard.tsx
++
++"use client";
++
++import "react-simple-keyboard/build/css/index.css";
++
++import Keyboard from "react-simple-keyboard";
++
++import { useGuess } from "~/lib/hooks/use-guess";
++import { api } from "~/server/api";
++
++type GuessKeyboardProps = {
++  gameId: number;
++};
++
++export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
++  const { guess, setGuess } = useGuess();
++
++  return (
++    <Keyboard
++      layout={{
++        default: [
++          "Q W E R T Y U I O P",
++          "A S D F G H J K L",
++          "{enter} Z X C V B N M {bksp}",
++        ],
++      }}
++      display={{
++        "{enter}": "enter",
++        "{bksp}": "⌫",
++      }}
++      maxLength={5}
++      value={guess}
++      onChange={(value) => setGuess(value)}
++      onKeyPress={async (button) => {
++        if (button === "{enter}" && guess.length === 5) {
++          try {
++            // Submit the guess when Enter is pressed
++            await api.guesses.create(guess, gameId);
++            setGuess("");
++          } catch (error) {
++            console.error(error);
++          }
++        }
++      }}
++      buttonTheme={[
++        {
++          // Improve button styling for a more polished look
++          class:
++            "!bg-background !text-foreground !border-none !shadow-none hover:!bg-secondary/50 active:!bg-white/25 !h-16",
++          buttons:
++            "Q W E R T Y U I O P A S D F G H J K L Z X C V B N M {bksp} {enter}",
++        },
++      ]}
++    />
++  );
++};
++```
++
++**Comments:**
++
++- **Layout Adjustments:**
++  - Modified the keyboard layout for better ergonomics.
++  - Moved `{enter}` and `{bksp}` keys to more intuitive positions.
++- **Display Customization:**
++  - Customized key labels: `{enter}` displays as "enter", `{bksp}` displays as "⌫".
++- **Styling Enhancements:**
++  - Increased button height with `!h-16` for larger keys.
++  - Refined button classes for consistent appearance with the rest of the app.
++- **Functionality:**
++  - Added `maxLength={5}` to prevent input beyond five characters.
++  - Ensured that pressing "Enter" only submits when the guess length is 5.
++- **Error Handling:**
++  - Wrapped the API call in a `try-catch` block to handle errors.
++
++---
++
++## Checking Your Progress
++
++Now that you've implemented these styling and polish improvements, it's time to test your application.
++
++**Instructions:**
++
++1. **Start the Development Server:**
++
++   ```bash
++   yarn dev
++   ```
++
++2. **Navigate to a Game:**
++
++   - Open your browser and go to `http://localhost:3000`.
++   - Start a new game by clicking the "New game" button.
++
++3. **Check the Game Board Appearance:**
++
++   - **Game Board:**
++     ![Game Screenshot](img/1.png)
++     - The guess slots should be larger (`h-16 w-16`) with bigger letters (`text-3xl`).
++     - There should be a gap between each letter due to `gap-2`.
++     - The color-coding for guesses should be more vibrant.
++
++4. **Test the Guess Input:**
++
++   - **Consistency:**
++     - The input slots should match the styling of the guess slots.
++   - **Functionality:**
++     - Typing letters should fill the slots.
++     - The input should automatically submit when all slots are filled.
++
++5. **Test the On-Screen Keyboard:**
++
++   - **Appearance:**
++     - The keyboard should have larger keys (`!h-16`).
++     - Keys should have consistent styling with the rest of the app.
++   - **Functionality:**
++     - Pressing keys should update the guess input.
++     - The "enter" key should submit the guess when appropriate.
++
++6. **Play Through a Game:**
++
++   - **Make Guesses:**
++     - Observe the enhanced feedback with the updated color scheme.
++     - Ensure the guess input clears after each submission.
++
++7. **Check the Game Over Dialog:**
++
++   - **Winning:**
++     ![Game Won Screenshot](img/2.png)
++     - Win the game to see the confetti animation.
++     - The dialog should display a congratulatory message in large, bold text.
++   - **Losing:**
++     ![Game Over Screenshot](img/3.png)
++     - Lose the game to see the encouraging message.
++   - **Common Elements:**
++     - The dialog should display all your guesses.
++     - A "Play again!" button should be present and functional.
++
++If everything works as expected, congratulations! You've successfully polished your Wordle clone.
++
++## Next Steps
++
++Now that you've completed the tutorial, consider exploring additional enhancements:
++
++- **Animations:**
++  - Add flip or bounce animations to the guess slots when submitting guesses.
++- **Accessibility:**
++  - Ensure the game is accessible by adding ARIA labels and keyboard navigation.
++- **Mobile Responsiveness:**
++  - Optimize the layout and components for mobile devices.
++- **Leaderboard Feature:**
++  - Implement a leaderboard to track high scores or fastest wins.
++- **Social Sharing:**
++  - Allow users to share their results on social media platforms.
++
++By continuing to build on your application, you'll further refine your skills in React and Next.js and create an even more engaging user experience.
++
++---
++
++By following this structured approach and incorporating insightful comments in your code, you've enhanced your Wordle clone in a manner similar to refining UI components in Angular applications.
++
++Congratulations on completing the tutorial! 🎉
++
++---
+diff --git a/docs/img/1.png b/docs/img/1.png
+new file mode 100644
+index 0000000..99986a2
+Binary files /dev/null and b/docs/img/1.png differ
+diff --git a/docs/img/10.png b/docs/img/10.png
+new file mode 100644
+index 0000000..c16679b
+Binary files /dev/null and b/docs/img/10.png differ
+diff --git a/docs/img/2.png b/docs/img/2.png
+new file mode 100644
+index 0000000..f0b9c03
+Binary files /dev/null and b/docs/img/2.png differ
+diff --git a/docs/img/3.png b/docs/img/3.png
+new file mode 100644
+index 0000000..3af9dac
+Binary files /dev/null and b/docs/img/3.png differ
+diff --git a/docs/img/4.png b/docs/img/4.png
+new file mode 100644
+index 0000000..8a02506
+Binary files /dev/null and b/docs/img/4.png differ
+diff --git a/docs/img/5.png b/docs/img/5.png
+new file mode 100644
+index 0000000..7c92dc0
+Binary files /dev/null and b/docs/img/5.png differ
+diff --git a/docs/img/6.png b/docs/img/6.png
+new file mode 100644
+index 0000000..09e589a
+Binary files /dev/null and b/docs/img/6.png differ
+diff --git a/docs/img/7.png b/docs/img/7.png
+new file mode 100644
+index 0000000..4cc1728
+Binary files /dev/null and b/docs/img/7.png differ
+diff --git a/docs/img/8.png b/docs/img/8.png
+new file mode 100644
+index 0000000..9846f26
+Binary files /dev/null and b/docs/img/8.png differ
+diff --git a/docs/img/9.png b/docs/img/9.png
+new file mode 100644
+index 0000000..4ccc7d1
+Binary files /dev/null and b/docs/img/9.png differ
+diff --git a/src/server/db/schema.ts b/src/server/db/schema.ts
+index 7d23d4d..dcf9fc0 100644
+--- a/src/server/db/schema.ts
++++ b/src/server/db/schema.ts
+@@ -1,8 +1,8 @@
+ // Example model schema from the Drizzle docs
+ // https://orm.drizzle.team/docs/sql-schema-declaration
+ 
+-import { sql } from "drizzle-orm";
+-import { index, int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
++import { relations, sql } from "drizzle-orm";
++import { int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
+ 
+ /**
+  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
+@@ -10,21 +10,44 @@ import { index, int, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
+  *
+  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
+  */
+-export const createTable = sqliteTableCreator((name) => `nextjs-wordle-dev-day-2_${name}`);
+-
+-export const posts = createTable(
+-  "post",
+-  {
+-    id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+-    name: text("name", { length: 256 }),
+-    createdAt: int("created_at", { mode: "timestamp" })
+-      .default(sql`(unixepoch())`)
+-      .notNull(),
+-    updatedAt: int("updated_at", { mode: "timestamp" }).$onUpdate(
+-      () => new Date()
+-    ),
+-  },
+-  (example) => ({
+-    nameIndex: index("name_idx").on(example.name),
+-  })
++export const createTable = sqliteTableCreator(
++  (name) => `nextjs-wordle-dev-day_${name}`,
+ );
++
++export const games = createTable("game", {
++  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
++  word: text("word", { length: 5 }).notNull(),
++  status: text("status", { enum: ["in_progress", "won", "lost"] }).notNull(),
++  createdAt: int("created_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .notNull(),
++  updatedAt: int("updated_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .$onUpdateFn(() => new Date())
++    .notNull(),
++});
++
++export const gameRelations = relations(games, ({ many }) => ({
++  guesses: many(guesses),
++}));
++
++export const guesses = createTable("guess", {
++  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
++  gameId: int("game_id", { mode: "number" }).references(() => games.id),
++  guess: text("guess", { length: 5 }).notNull(),
++  result: text("result", { length: 5 }).notNull(),
++  createdAt: int("created_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .notNull(),
++  updatedAt: int("updated_at", { mode: "timestamp" })
++    .default(sql`(unixepoch())`)
++    .$onUpdateFn(() => new Date())
++    .notNull(),
++});
++
++export const guessRelations = relations(guesses, ({ one }) => ({
++  game: one(games, {
++    fields: [guesses.gameId],
++    references: [games.id],
++  }),
++}));

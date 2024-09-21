@@ -1,4 +1,4 @@
-# Wordle Clone Tutorial
+# Next.js Dev Day - Wordle Clone
 
 Welcome to the **Wordle Clone Tutorial**! This project guides you through building a fully functional Wordle clone using **Next.js**, **Drizzle ORM**, **shadcn/ui**, and other modern web technologies. By the end of this tutorial, you'll have a deeper understanding of building interactive web applications with a robust backend and a polished frontend.
 
@@ -137,15 +137,7 @@ cp .env.example .env
 
 The database credentials are pre-configured in the `.env.example` file, so you don't need to change anything for this tutorial.
 
-### 6. Run the database migrations
-
-Ensure that your database schema is up to date by running:
-
-```bash
-yarn drizzle:push
-```
-
-### 7. Run the development server
+### 6. Run the development server
 
 Start the development server by running:
 
@@ -153,7 +145,7 @@ Start the development server by running:
 yarn dev
 ```
 
-### 8. Open the application
+### 7. Open the application
 
 Navigate to [http://localhost:3000](http://localhost:3000) in your browser to see the Wordle clone in action.
 
@@ -194,6 +186,7 @@ In the `docs` folder of this project, you'll find detailed tutorials and additio
    - Displaying game results and handling new game creation.
 
 7. **Section 07: Styling and Polish**
+
    - Enhancing the UI with improved styling and animations.
    - Adding visual effects for a more engaging experience.
 
@@ -225,59 +218,3 @@ For example:
 ```bash
 git checkout checkpoint-03-game-logic
 ```
-
-## Additional Features Implemented
-
-Throughout the tutorial, the following features and improvements are made:
-
-- **On-Screen Keyboard**: A custom on-screen keyboard is implemented using `react-simple-keyboard`, allowing users to input guesses interactively.
-
-- **Shared State Management**: A context (`GuessContext`) and custom hooks (`useGuess`) are created to manage shared state between components, similar to services in Angular.
-
-- **Word Validation**: Validation logic is added to ensure that only valid words can be submitted as guesses. Errors are displayed using toast notifications from `sonner`.
-
-- **Game Over Logic**: The game can detect win or loss conditions, updating the game status accordingly and displaying appropriate messages.
-
-- **Game Results Dialog**: An engaging game over dialog is created using `react-confetti` to celebrate wins and encourage the player after losses.
-
-- **Styling Enhancements**: The UI is refined with improved styling, larger and more vibrant guess slots, and consistent design across components.
-
-- **Custom Hooks**: Hooks like `useCreateGame` and `useCreateGuess` are developed to encapsulate logic, making components cleaner and more maintainable.
-
-## Running the Application
-
-To run the application and see all the features in action:
-
-1. **Start the development server**:
-
-   ```bash
-   yarn dev
-   ```
-
-2. **Open the application**:
-
-   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
-
-3. **Start a new game**:
-
-   - Click the **"New game"** button on the home page.
-   - You'll be redirected to a new game page (e.g., `http://localhost:3000/game/1`).
-
-4. **Play the game**:
-
-   - Use the on-screen keyboard or your physical keyboard to input guesses.
-   - Submit valid 5-letter words to try and guess the correct word.
-   - The game board will provide feedback with color-coded letters.
-
-5. **Experience game over scenarios**:
-
-   - **Win the game** by guessing the correct word:
-     - A celebratory dialog with confetti will appear.
-     - A **"Play again!"** button allows you to start a new game.
-   - **Lose the game** after 6 incorrect guesses:
-     - An encouraging dialog will appear with a **"Play again!"** button.
-
-6. **Enjoy the polished UI**:
-
-   - Notice the enhanced styling and responsive design.
-   - Interact with the refined on-screen keyboard and game components.
