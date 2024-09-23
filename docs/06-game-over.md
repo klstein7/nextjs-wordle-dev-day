@@ -36,22 +36,31 @@ In this section, you'll enhance your Wordle clone by implementing logic to handl
 
 ### Exercise 1: Updating the Game Page
 
-Your first task is to modify the game page to fetch both the game status and the user's guesses. This will allow you to determine whether the game is in progress, won, or lost, and render components accordingly.
+Your task is to modify the existing `GamePage` component to fetch the game status and guesses, and pass this information to the `GameBoard` component. You'll also add conditional rendering for the `GuessKeyboard` component.
 
 **Instructions:**
 
-1. Open `src/app/game/[gameId]/page.tsx`.
-2. Fetch both the `game` and `guesses` data from the server using the `api`.
-3. Pass the `game.status` to the `GameBoard` component.
-4. Conditionally render the `GuessKeyboard` component only if the game is in progress.
+1. **Update the Game Page File:**
+
+   - Open the file at `src/app/game/[gameId]/page.tsx`.
+
+2. **Fetch Game and Guesses Data:**
+
+   - Use the `api` object to fetch both the game and guesses data.
+
+3. **Modify the `GamePage` Component:**
+
+   - Pass the game status and guesses to the `GameBoard` component.
+   - Add conditional rendering for the `GuessKeyboard` component.
 
 **Hints:**
 
-- Since this is a server component, you can directly fetch data using the `api` without hooks.
-- Use conditional rendering to display the keyboard only when `game.status` is `"in_progress"`.
-- This approach is similar to how you might fetch data and conditionally render components in Angular templates.
+- Use `await api.games.getById(gameId)` to fetch the game data.
+- Use `await api.guesses.findByGameId(gameId)` to fetch the guesses data.
+- The `GuessKeyboard` should only be rendered if the game status is "in_progress".
+- Remember that this is a server component, so you can use `async/await` directly in the component function.
 
-Here's a starting point for your updated game page:
+Here's a starting point for your updated `GamePage` component:
 
 ```typescript
 // src/app/game/[gameId]/page.tsx
@@ -61,35 +70,28 @@ import { GuessKeyboard } from "~/components/guess-keyboard";
 import { GuessProvider } from "~/lib/store/guess-provider";
 import { api } from "~/server/api";
 
-// This is a server component; it does not have "use client" at the top
-// We can fetch data directly from the server inside this component
 export default async function GamePage({
   params: { gameId },
 }: {
   params: { gameId: number };
 }) {
-  // TODO: Fetch both game and guesses data from the server using the api
+  // TODO: Fetch game and guesses data
 
   return (
     <GuessProvider>
       <div className="flex h-full flex-col items-center gap-6">
         <div className="flex flex-1 items-center justify-center">
-          {/* TODO: Pass game status to GameBoard */}
-          <GameBoard gameId={gameId} guesses={guesses} />
+          {/* TODO: Pass game status and guesses to GameBoard */}
+          <GameBoard gameId={gameId} />
         </div>
-        {/* TODO: Conditionally render the GuessKeyboard only if the game is in progress */}
-        <div className="flex w-full max-w-3xl items-center">
-          <GuessKeyboard gameId={gameId} />
-        </div>
+        {/* TODO: Conditionally render GuessKeyboard */}
       </div>
     </GuessProvider>
   );
 }
 ```
 
-When you're ready, check your implementation against the provided solution.
-
----
+**Try to implement this component before looking at the solution.**
 
 <details>
 <summary>👉 Click here to see the solution 👈</summary>
@@ -102,8 +104,6 @@ import { GuessKeyboard } from "~/components/guess-keyboard";
 import { GuessProvider } from "~/lib/store/guess-provider";
 import { api } from "~/server/api";
 
-// This is a server component; it does not have "use client" at the top
-// We can fetch data directly from the server inside this component
 export default async function GamePage({
   params: { gameId },
 }: {
@@ -132,9 +132,17 @@ export default async function GamePage({
 }
 ```
 
-</details>
+**Explanation:**
 
----
+- **Data Fetching:**
+  - Used `api.games.getById(gameId)` to fetch the current game's data, including its status.
+  - Used `api.guesses.findByGameId(gameId)` to fetch all guesses associated with the game.
+- **Passing Game Status:**
+  - Passed the `game.status` prop to the `GameBoard` component to manage game state within the board.
+- **Conditional Rendering:**
+  - Rendered the `GuessKeyboard` component only if `game.status` is `"in_progress"`, ensuring the keyboard is hidden when the game is over.
+
+</details>
 
 ### Exercise 2: Updating the `GameBoard` Component
 
@@ -142,16 +150,24 @@ Next, you'll modify the `GameBoard` component to handle different game statuses 
 
 **Instructions:**
 
-1. Open `src/components/game-board.tsx`.
-2. Update the component to accept a `status` prop.
-3. Conditionally render the `GuessInput` component only if the game is in progress.
-4. Add the `GameResults` component to display the game outcome.
+1. **Update the GameBoard File:**
+
+   - Open the file at `src/components/game-board.tsx`.
+
+2. **Modify the `GameBoardProps` Type:**
+
+   - Add a `status` property to the `GameBoardProps` type.
+
+3. **Update the `GameBoard` Component:**
+
+   - Add conditional rendering for the `GuessInput` component.
+   - Add the `GameResults` component to display game outcome.
 
 **Hints:**
 
-- The `status` prop allows the component to render different content based on the game's state.
-- Use conditional rendering to show or hide components based on the `status`.
-- This approach is similar to handling conditional content in Angular templates using `*ngIf`.
+- The `status` prop should be of type `(typeof games.status.enumValues)[number]`.
+- Only render the `GuessInput` component if the game status is "in_progress".
+- The `GameResults` component should always be rendered, but it will handle displaying content based on the game status internally.
 
 Here's a starting point for your updated `GameBoard` component:
 
@@ -167,26 +183,22 @@ import { GuessList } from "./guess-list";
 
 type GameBoardProps = {
   gameId: number;
-  // TODO: Accept a status prop of type games.status
+  // TODO: Add status prop
   guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
 };
 
 export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
   return (
     <div className="flex grow flex-col items-center gap-6">
-      {/* Always show the list of guesses */}
       <GuessList guesses={guesses} />
-      {/* TODO: Conditionally render GuessInput if the game is in progress */}
-      {/* <GuessInput gameId={gameId} /> */}
-      {/* TODO: Add GameResults component to display game outcome */}
+      {/* TODO: Conditionally render GuessInput */}
+      {/* TODO: Add GameResults component */}
     </div>
   );
 };
 ```
 
-When you're ready, check your implementation against the provided solution.
-
----
+**Try to implement this component before looking at the solution.**
 
 <details>
 <summary>👉 Click here to see the solution 👈</summary>
@@ -210,20 +222,24 @@ type GameBoardProps = {
 export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
   return (
     <div className="flex grow flex-col items-center gap-6">
-      {/* Always show the list of guesses */}
       <GuessList guesses={guesses} />
-      {/* Only show GuessInput if the game is still in progress */}
       {status === "in_progress" && <GuessInput gameId={gameId} />}
-      {/* Show game results when the game is over */}
       <GameResults status={status} />
     </div>
   );
 };
 ```
 
-</details>
+**Explanation:**
 
----
+- **Props Update:**
+  - Updated the `GameBoardProps` type to include the `status` property.
+- **Conditional Rendering:**
+  - Displayed the `GuessInput` component only when the game status is `"in_progress"`.
+- **Game Results:**
+  - Added the `GameResults` component to show the outcome of the game when it's over.
+
+</details>
 
 ### Exercise 3: Creating the `GameResults` Component
 
@@ -231,16 +247,26 @@ Now, you'll create a new `GameResults` component that displays a message based o
 
 **Instructions:**
 
-1. Create a new file at `src/components/game-results.tsx`.
-2. Implement the `GameResults` component that accepts a `status` prop.
-3. Use a `switch` statement or conditional rendering to display different messages based on the `status`.
-4. Create a `PlayAgainButton` component that uses a custom hook `useCreateGame` (to be created in the next exercise).
+1. **Create the GameResults File:**
+
+   - Create a new file at `src/components/game-results.tsx`.
+
+2. **Implement the `GameResults` Component:**
+
+   - Create a component that accepts a `status` prop.
+   - Display different messages based on the game status.
+   - Include a "Play Again" button that creates a new game.
+
+3. **Implement the `PlayAgainButton` Component:**
+
+   - Create a separate component for the "Play Again" button.
+   - Use the `useCreateGame` hook to handle creating a new game.
 
 **Hints:**
 
-- The `status` can be `"in_progress"`, `"won"`, or `"lost"`.
-- Use React's `use client` directive at the top of the file since this component will handle user interactions.
-- This is similar to creating a reusable component in Angular that displays content based on input properties.
+- Use a `switch` statement to handle different game statuses.
+- The `useCreateGame` hook should be imported from `~/lib/hooks/use-create-game`.
+- Remember to mark this as a client component with `"use client";` at the top of the file.
 
 Here's a starting point for your `GameResults` component:
 
@@ -255,31 +281,17 @@ import { type games } from "~/server/db/schema";
 import { Button } from "./ui/button";
 
 type GameResultsProps = {
-  // TODO: Accept a status prop of type games.status
+  status: (typeof games.status.enumValues)[number];
 };
 
-// Separate component for the "Play Again" button
-const PlayAgainButton = () => {
-  // TODO: Use the useCreateGame hook
-  // const createGame = useCreateGame();
+// TODO: Implement PlayAgainButton component
 
-  return (
-    <Button size="lg" onClick={/* TODO: Call createGame */}>
-      Play again!
-    </Button>
-  );
-};
-
-export const GameResults = (/* TODO: Destructure status from props */) => {
-  // TODO: Use a switch statement or conditional rendering based on status
-  // Render different messages for "won" and "lost" statuses
-  return null;
+export const GameResults = ({ status }: GameResultsProps) => {
+  // TODO: Implement game results logic
 };
 ```
 
-When you're ready, check your implementation against the provided solution.
-
----
+**Try to implement this component before looking at the solution.**
 
 <details>
 <summary>👉 Click here to see the solution 👈</summary>
@@ -298,7 +310,6 @@ type GameResultsProps = {
   status: (typeof games.status.enumValues)[number];
 };
 
-// Separate component for the "Play Again" button
 const PlayAgainButton = () => {
   const createGame = useCreateGame();
 
@@ -310,10 +321,9 @@ const PlayAgainButton = () => {
 };
 
 export const GameResults = ({ status }: GameResultsProps) => {
-  // Use a switch statement to handle different game statuses
   switch (status) {
     case "in_progress":
-      return null; // Don't show anything if the game is still in progress
+      return null;
     case "won":
       return (
         <div className="flex flex-col items-center gap-6">
@@ -336,9 +346,17 @@ export const GameResults = ({ status }: GameResultsProps) => {
 };
 ```
 
-</details>
+**Explanation:**
 
----
+- **Client-Side Component:**
+  - Added `"use client";` at the top because the component handles client-side interactions.
+- **`PlayAgainButton` Component:**
+  - Used the `useCreateGame` hook to create a new game when the button is clicked.
+- **Status-Based Rendering:**
+  - Used a `switch` statement to display different messages based on the `status` prop.
+  - Rendered a victory message for `"won"` status and a defeat message for `"lost"` status, each accompanied by the `PlayAgainButton`.
+
+</details>
 
 ### Exercise 4: Creating a Custom Hook for Game Creation
 
@@ -346,15 +364,21 @@ To encapsulate the logic for creating a new game and navigating to it, you'll de
 
 **Instructions:**
 
-1. Create a new file at `src/lib/hooks/use-create-game.ts`.
-2. Implement the `useCreateGame` hook that creates a new game using the `api`.
-3. Use Next.js's `useRouter` for navigation to redirect the user to the new game page after creation.
+1. **Create the useCreateGame File:**
+
+   - Create a new file at `src/lib/hooks/use-create-game.ts`.
+
+2. **Implement the `useCreateGame` Hook:**
+
+   - Create a function that uses the `api` to create a new game.
+   - Use the Next.js `useRouter` hook to handle navigation.
+   - Add an option to control whether to redirect after game creation.
 
 **Hints:**
 
-- The hook should return a function that can be called to create a new game.
-- This is similar to creating a service in Angular that handles navigation and data operations.
-- Remember to handle asynchronous operations with `async` and `await`.
+- Import `useRouter` from `next/navigation`.
+- Use `api.games.create()` to create a new game.
+- Use `router.push()` to navigate to the new game page.
 
 Here's a starting point for your `useCreateGame` hook:
 
@@ -368,22 +392,11 @@ import { api } from "~/server/api";
 export const useCreateGame = (withRedirect = true) => {
   const router = useRouter();
 
-  return async () => {
-    // TODO: Create a new game using the API
-    // const game = await api.games.create();
-
-    if (withRedirect) {
-      // TODO: Redirect to the new game page using router.push
-    }
-
-    // return game;
-  };
+  // TODO: Implement game creation logic
 };
 ```
 
-When you're ready, check your implementation against the provided solution.
-
----
+**Try to implement this hook before looking at the solution.**
 
 <details>
 <summary>👉 Click here to see the solution 👈</summary>
@@ -407,241 +420,22 @@ export const useCreateGame = (withRedirect = true) => {
       router.push(`/game/${game.id}`);
     }
 
+    // Return the new game object if needed
     return game;
   };
 };
 ```
 
-</details>
+**Explanation:**
 
----
-
-### Exercise 5: Updating the Home Page
-
-You'll modify the home page to use the `useCreateGame` hook, simplifying the code and improving reusability.
-
-**Instructions:**
-
-1. Open `src/app/page.tsx`.
-2. Import the `useCreateGame` hook.
-3. Replace any existing game creation logic with a call to `useCreateGame`.
-
-**Hints:**
-
-- This change ensures that the game creation and navigation logic is centralized.
-- This is similar to injecting a service into an Angular component to handle operations.
-
-Here's a starting point for your updated home page:
-
-```typescript
-// src/app/page.tsx
-
-"use client";
-
-import { Button } from "~/components/ui/button";
-// TODO: Import the useCreateGame hook
-// import { useCreateGame } from "~/lib/hooks/use-create-game";
-
-export default function HomePage() {
-  // TODO: Use the useCreateGame hook
-  // const createGame = useCreateGame();
-
-  return (
-    <main className="flex h-full items-center justify-center">
-      <Button
-        onClick={/* TODO: Call createGame when the button is clicked */}
-      >
-        New game
-      </Button>
-    </main>
-  );
-}
-```
-
-When you're ready, check your implementation against the provided solution.
-
----
-
-<details>
-<summary>👉 Click here to see the solution 👈</summary>
-
-```typescript
-// src/app/page.tsx
-
-"use client";
-
-import { Button } from "~/components/ui/button";
-import { useCreateGame } from "~/lib/hooks/use-create-game";
-
-export default function HomePage() {
-  // Use the useCreateGame hook
-  const createGame = useCreateGame();
-
-  return (
-    <main className="flex h-full items-center justify-center">
-      <Button onClick={createGame}>New game</Button>
-    </main>
-  );
-}
-```
+- **Router for Navigation:**
+  - Used `useRouter` from Next.js to handle client-side navigation.
+- **Game Creation Logic:**
+  - Created an asynchronous function that calls `api.games.create()` to create a new game.
+- **Conditional Redirect:**
+  - If `withRedirect` is `true`, used `router.push` to navigate to the new game's page.
 
 </details>
-
----
-
-### Exercise 6: Updating the Guess Service
-
-To implement the game over logic, you'll enhance the guess service to determine when the game is won or lost and update the game status accordingly.
-
-**Instructions:**
-
-1. Open `src/server/services/guess.service.ts`.
-2. Modify the `create` function to check for game over conditions after a guess is made.
-3. Update the game status to `"won"` if the user has guessed the word correctly.
-4. Update the game status to `"lost"` if the user has used all six guesses without guessing correctly.
-5. Use `revalidatePath` to refresh the game page after updating the game status.
-
-**Hints:**
-
-- Use helper functions to count the number of guesses made.
-- Compare the result of the guess to determine if the word was guessed correctly.
-- This is similar to updating the application's state and triggering UI updates in an Angular service.
-
-Here's a starting point for your updated guess service:
-
-```typescript
-// src/server/services/guess.service.ts
-
-import { asc, count, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-
-import { db } from "../db";
-import { games, guesses } from "../db/schema";
-import { gameService } from "./game.service";
-
-// ... (previous code remains the same)
-
-const create = async (guess: string, gameId: number) => {
-  const result = await checkGuess(guess, gameId);
-
-  const [createdGuess] = await db
-    .insert(guesses)
-    .values({
-      gameId,
-      guess: guess.toUpperCase(),
-      result,
-    })
-    .returning();
-
-  if (!createdGuess) {
-    throw new Error("Failed to create guess");
-  }
-
-  // TODO: Count the number of guesses made for this game
-  // const count = await countByGameId(gameId);
-
-  // TODO: Check for game over conditions
-  // If the guess result is "CCCCC", update game status to "won"
-  // If the count is 6 and the word hasn't been guessed, update game status to "lost"
-
-  // TODO: Revalidate the game page to reflect the new state
-  // revalidatePath(`/game/${gameId}`);
-
-  return createdGuess;
-};
-
-// ... (rest of the code remains the same)
-
-// Helper function to count guesses by game ID
-const countByGameId = async (gameId: number) => {
-  // TODO: Implement the function to count guesses
-};
-
-export const guessService = {
-  create,
-  findByGameId,
-};
-```
-
-When you're ready, check your implementation against the provided solution.
-
----
-
-<details>
-<summary>👉 Click here to see the solution 👈</summary>
-
-```typescript
-// src/server/services/guess.service.ts
-
-import { asc, count, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-
-import { db } from "../db";
-import { games, guesses } from "../db/schema";
-import { gameService } from "./game.service";
-
-// ... (previous code remains the same)
-
-const create = async (guess: string, gameId: number) => {
-  const result = await checkGuess(guess, gameId);
-
-  const [createdGuess] = await db
-    .insert(guesses)
-    .values({
-      gameId,
-      guess: guess.toUpperCase(),
-      result,
-    })
-    .returning();
-
-  if (!createdGuess) {
-    throw new Error("Failed to create guess");
-  }
-
-  // Count the number of guesses made for this game
-  const count = await countByGameId(gameId);
-
-  // Check for game over conditions
-  if (createdGuess.result === "CCCCC") {
-    // If all letters are correct, the game is won
-    await gameService.update(gameId, "won");
-  } else if (count === 6) {
-    // If it's the 6th guess and the word hasn't been guessed, the game is lost
-    await gameService.update(gameId, "lost");
-  }
-
-  // Revalidate the game page to reflect the new state
-  revalidatePath(`/game/${gameId}`);
-
-  return createdGuess;
-};
-
-// ... (rest of the code remains the same)
-
-// Helper function to count guesses by game ID
-const countByGameId = async (gameId: number) => {
-  // Count the number of guesses for a specific game
-  const [gameCount] = await db
-    .select({ count: count() })
-    .from(guesses)
-    .where(eq(guesses.gameId, gameId));
-
-  if (!gameCount) {
-    throw new Error("Error counting guesses");
-  }
-
-  return gameCount.count;
-};
-
-export const guessService = {
-  create,
-  findByGameId,
-};
-```
-
-</details>
-
----
 
 ## Checking Your Progress
 
@@ -665,23 +459,18 @@ Now that you've implemented the game over logic and new game creation, it's time
 
    - **Win Scenario:**
 
-     ![Game Won Screenshot](img/10.png)
-
      - Guess the correct word within six attempts.
      - Upon winning:
        - The keyboard should disappear.
        - A victory message ("Bam! You won! 🎉") should be displayed.
        - A "Play again!" button should appear.
 
-   - **Lose Scenario:**
-
-     ![Game Over Screenshot](img/9.png)
-
-     - Make six incorrect guesses.
-     - Upon losing:
-       - The keyboard should disappear.
-       - A losing message ("You lost! 😭") should be displayed.
-       - A "Play again!" button should appear.
+- **Lose Scenario:**
+  - Make six incorrect guesses.
+  - Upon losing:
+    - The keyboard should disappear.
+    - A losing message ("You lost! 😭") should be displayed.
+    - A "Play again!" button should appear.
 
 4. **Check Game Status Persistence:**
 
@@ -693,22 +482,23 @@ Now that you've implemented the game over logic and new game creation, it's time
    - Click the "Play again!" button.
    - You should be redirected to a new game page with a fresh board and keyboard.
 
-If everything works as expected, congratulations! You've successfully implemented the game over logic in your Wordle clone.
+**Expected Behavior:**
 
----
+- The game should correctly determine when the player has won or lost.
+- Appropriate messages and options should be displayed based on the game status.
+- Starting a new game should reset the game state and allow the player to play again.
+
+If everything works as expected, congratulations! You've successfully implemented the game over logic in your Wordle clone.
 
 ## Next Steps
 
 In the next section, we'll focus on adding final touches to our game, such as:
 
 - **UI Enhancements:**
-
   - Adding animations for guess submissions.
   - Improving the overall styling and responsiveness.
 
 By continuing to refine your application, you'll enhance the user experience and solidify your understanding of state management and component interaction in React, similar to advanced techniques in Angular applications.
-
----
 
 ## Helpful Resources
 
@@ -716,17 +506,30 @@ To further enhance your understanding, you might find the following resources he
 
 1. **Next.js Documentation:**
 
-   - [Data Fetching in Next.js](https://nextjs.org/docs/basic-features/data-fetching)
+   - [Data Fetching in Next.js](https://nextjs.org/docs/app/building-your-application/data-fetching)
      - Learn more about how data fetching works in Next.js, especially in server components.
 
 2. **React Conditional Rendering:**
 
-   - [React Docs: Conditional Rendering](https://reactjs.org/docs/conditional-rendering.html)
+   - [React Docs: Conditional Rendering](https://react.dev/learn/conditional-rendering)
      - Understand how to render components based on certain conditions.
 
 3. **State Management in React:**
 
-   - [React Context API](https://reactjs.org/docs/context.html)
+   - [React Context API](https://react.dev/learn/passing-data-deeply-with-context)
      - Explore how to manage and share state across components without prop drilling.
 
----
+4. **Custom Hooks in React:**
+
+   - [Building Your Own Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)
+     - Learn how to create reusable logic with custom hooks, like the `useCreateGame` hook we implemented.
+
+5. **Next.js Routing:**
+
+   - [Next.js Routing Documentation](https://nextjs.org/docs/app/building-your-application/routing)
+     - Dive deeper into Next.js routing, including dynamic routes and navigation.
+
+6. **Tailwind CSS Documentation:**
+
+   - [Tailwind CSS](https://tailwindcss.com/docs)
+     - Explore more Tailwind CSS classes to enhance your UI styling.

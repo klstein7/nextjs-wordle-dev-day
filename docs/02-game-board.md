@@ -8,19 +8,19 @@ Before you begin, ensure you've completed the previous section or are up to date
 
 **To get up to speed:**
 
-1. **Switch to the branch:**
+1. **Switch to the Branch:**
 
    ```bash
    git checkout checkpoint-01-drizzle-setup
    ```
 
-2. **Install dependencies:**
+2. **Install Dependencies:**
 
    ```bash
    yarn install
    ```
 
-3. **Set up your database schema:**
+3. **Set Up Your Database Schema:**
 
    ```bash
    yarn db:push
@@ -36,19 +36,34 @@ First, you'll set up the game page in Next.js. In Next.js, pages are created usi
 
 ### Exercise 1: Creating the Game Page
 
-Your task is to create a new file for the game page and implement a basic component that renders a placeholder for the game board. In Next.js, the file path determines the route, similar to how you might define routes in Angular's routing module.
+Your task is to create a new file for the game page and implement a basic component that renders a placeholder for the game board. In Next.js, the file path determines the route, similar to how you might define routes in Angular's router module.
 
 **Instructions:**
 
-1. Create a new file at `src/app/game/[gameId]/page.tsx`. The `[gameId]` in the file name creates a dynamic route segment, conceptually similar to route parameters in Angular's router.
-2. Import a placeholder `GameBoard` component (we'll create this later).
-3. Implement a `GamePage` component that renders the `GameBoard` component centered on the page.
+1. **Create the Game Page File:**
+
+   - Create a new file at `src/app/game/[gameId]/page.tsx`.
+   - The `[gameId]` in the file name creates a **dynamic route segment**, conceptually similar to route parameters in Angular's router (e.g., `/:gameId`).
+
+2. **Import the `GameBoard` Component:**
+
+   - We'll create this component in a later exercise.
+
+3. **Implement the `GamePage` Component:**
+
+   - Render the `GameBoard` component centered on the page.
 
 **Hints:**
 
-- Use the `export default function` syntax to create your `GamePage` component. This is similar to how you'd export a component class in Angular.
-- To center the `GameBoard`, you can use Tailwind CSS classes. Consider using `flex`, `h-full`, `items-center`, and `justify-center` on a wrapping `div`. This is analogous to using flexbox in Angular's template styles.
-- Remember, in Next.js 13+, pages in the `app` directory are server components by default, so you don't need to use "use client" here. This is different from Angular where all components run on the client.
+- Use the `export default function` syntax to create your `GamePage` component. This is similar to defining a component in Angular, but in React, we use functions instead of classes or decorators.
+
+- To center the `GameBoard`, you can use Tailwind CSS classes. Consider using `flex`, `h-full`, `items-center`, and `justify-center` on a wrapping `div`. This is analogous to using Flexbox in Angular templates or styles.
+
+- **Understanding Server Components:**
+  - In Next.js 13, components inside the `app` directory are **server components** by default.
+  - Server components are rendered on the server and sent as HTML to the client.
+  - They cannot contain client-side interactivity (like state or event handlers).
+  - Unlike Angular, which runs entirely on the client side, Next.js allows you to build both server-rendered and client-rendered components seamlessly.
 
 Here's a starting point for your `GamePage` component:
 
@@ -65,7 +80,7 @@ export default function GamePage() {
 }
 ```
 
-When you're ready, check your implementation against the provided solution.
+**Try to implement this component before looking at the solution.**
 
 ---
 
@@ -77,14 +92,29 @@ When you're ready, check your implementation against the provided solution.
 
 import { GameBoard } from "~/components/game-board";
 
+// The GamePage component is a server component by default
 export default function GamePage() {
   return (
+    // Center the GameBoard using Tailwind CSS classes
     <div className="flex h-full items-center justify-center">
       <GameBoard />
     </div>
   );
 }
 ```
+
+**Explanation:**
+
+- **Tailwind CSS Classes:**
+
+  - `flex`: Applies `display: flex`.
+  - `h-full`: Sets the height to 100%.
+  - `items-center`: Vertically centers the content.
+  - `justify-center`: Horizontally centers the content.
+
+- **Server Component:**
+  - Since we're not using any state or lifecycle methods, this component remains a server component.
+  - In Angular, all components run on the client side, but Next.js allows us to optimize rendering by splitting between server and client components.
 
 </details>
 
@@ -94,23 +124,34 @@ export default function GamePage() {
 
 Next, you'll create the `GameBoard` component, which acts as the container for the game's UI elements—similar to a parent component in Angular.
 
-### Exercise 2: Implementing the GameBoard Component
+### Exercise 2: Implementing the `GameBoard` Component
 
-Your task is to create the `GameBoard` component that will contain the list of guesses and the input for new guesses. In React, components are similar to Angular components, but they're typically more focused on the UI and less on application logic.
+Your task is to create the `GameBoard` component that will contain the list of guesses and the input for new guesses.
 
 **Instructions:**
 
-1. Create a new file at `src/components/game-board.tsx`.
-2. Import placeholder components for `GuessInput` and `GuessList` (we'll create these later).
-3. Implement the `GameBoard` component that renders both `GuessList` and `GuessInput`.
-4. Use a temporary hardcoded array of guesses for demonstration.
+1. **Create the File:**
+
+   - Create a new file at `src/components/game-board.tsx`.
+
+2. **Import Child Components:**
+
+   - Import `GuessInput` and `GuessList` components (we'll create these later).
+
+3. **Implement the `GameBoard` Component:**
+
+   - Render both `GuessList` and `GuessInput` components.
+   - Use a temporary hardcoded array of guesses for demonstration.
 
 **Hints:**
 
-- Use the `export const` syntax to create your `GameBoard` component as a named export. This is similar to exporting a component in Angular, but React components are typically function-based rather than class-based.
-- Create a `guesses` array with some sample strings like `["HELLO", "WORLD"]`. This mimics component state, which you'd typically manage with hooks in React (we'll cover this later).
-- Use Tailwind CSS classes to style your component. Consider using `flex` and `flex-col` to stack the `GuessList` and `GuessInput` vertically. This is similar to using flexbox in Angular templates.
-- Pass the `guesses` array as a prop to the `GuessList` component. This demonstrates React's one-way data flow, which is different from Angular's two-way binding.
+- Use the `export const` syntax to create your `GameBoard` component as a named export. This is similar to exporting a component in Angular, but React components are typically functions.
+
+- Create a `guesses` array with some sample strings like `["HELLO", "WORLD"]`. This mimics component state, which you'd typically manage with services or state management libraries in Angular.
+
+- Use Tailwind CSS classes to style your component. Consider using `flex` and `flex-col` to stack the `GuessList` and `GuessInput` vertically.
+
+- Pass the `guesses` array as a prop to the `GuessList` component. This demonstrates React's one-way data flow, which differs from Angular's two-way binding with `[(ngModel)]`.
 
 Here's a starting point for your `GameBoard` component:
 
@@ -133,8 +174,6 @@ export const GameBoard = () => {
 };
 ```
 
-Try implementing this component before looking at the solution.
-
 ---
 
 <details>
@@ -146,17 +185,38 @@ Try implementing this component before looking at the solution.
 import { GuessInput } from "./guess-input";
 import { GuessList } from "./guess-list";
 
+// The GameBoard component acts as the main container for the game
 export const GameBoard = () => {
+  // Sample guesses array for demonstration
   const guesses = ["HELLO", "WORLD"];
 
   return (
+    // Stack the components vertically with spacing
     <div className="flex flex-col gap-3">
+      {/* Pass guesses to GuessList via props */}
       <GuessList guesses={guesses} />
+      {/* Render the GuessInput component */}
       <GuessInput />
     </div>
   );
 };
 ```
+
+**Explanation:**
+
+- **Guesses Array:**
+
+  - We use a hardcoded array to simulate existing guesses.
+  - In a real application, this data might come from a server or global state.
+
+- **Tailwind CSS Classes:**
+
+  - `flex flex-col`: Arranges child components vertically.
+  - `gap-3`: Adds spacing between child components.
+
+- **Props Passing:**
+  - We pass the `guesses` array to the `GuessList` component as props.
+  - In Angular, you might use `@Input()` to pass data to a child component.
 
 </details>
 
@@ -166,26 +226,60 @@ export const GameBoard = () => {
 
 The `GuessInput` component captures the user's input, allowing them to submit guesses. This is similar to creating a form component in Angular that handles user input.
 
-### Exercise 3: Creating the GuessInput Component
+### Exercise 3: Creating the `GuessInput` Component
 
-Your task is to implement the `GuessInput` component that allows users to enter their guesses. This component will use React's state management, which is similar to but distinct from how you'd manage state in Angular.
+Your task is to implement the `GuessInput` component that allows users to enter their guesses. This component will use React's state management.
 
 **Instructions:**
 
-1. Create a new file at `src/components/guess-input.tsx`.
-2. Import necessary dependencies, including React hooks and UI components.
-3. Implement the `GuessInput` component with the following features:
+1. **Create the File:**
+
+   - Create a new file at `src/components/guess-input.tsx`.
+
+2. **Import Dependencies:**
+
+   - Import `useState` from React.
+   - Import the `InputOTP`, `InputOTPGroup`, and `InputOTPSlot` components from our custom UI library.
+
+3. **Implement the `GuessInput` Component:**
+
    - Use state to manage the current guess input.
    - Render an input field that accepts exactly 5 characters.
    - Implement handlers for input changes and guess submission.
 
 **Hints:**
 
-- Start by importing `useState` from 'react'. This hook is React's way of adding state to function components, similar to how you'd define properties in an Angular component class.
-- Use the `useState` hook to create a state variable for the guess and a function to update it. This is more explicit than Angular's two-way binding.
-- The `InputOTP` component from shadcn/ui can be used to create the 5-character input field. This is a third-party component, similar to how you might use Angular Material components. Refer to the [InputOTP documentation](https://ui.shadcn.com/docs/components/input-otp) for details on its props and usage.
-- Use the `onChange` prop of `InputOTP` to update your state when the input changes. This is similar to using `(ngModelChange)` in Angular.
-- Implement an `onKeyDown` handler to check for the Enter key press and handle guess submission. This is similar to using `(keydown.enter)` in Angular templates.
+- **Custom Component Notice:**
+
+  - The `InputOTP` component is a custom component provided in the source code at `src/components/ui/input-otp.tsx`.
+  - It allows users to input a fixed number of characters, making it ideal for our 5-letter Wordle guesses.
+
+- **State Management:**
+
+  - Use the `useState` hook to create a state variable for the guess and a function to update it.
+  - This is similar to managing form control values in Angular using `FormControl` or `ngModel`.
+
+- **Event Handling:**
+
+  - Use the `onChange` prop of `InputOTP` to update your state when the input changes.
+  - Implement an `onKeyDown` handler to check for the Enter key press and handle guess submission.
+
+- **Client Component Directive:**
+  - Since this component uses state and event handlers, it needs to be a **client component**.
+  - Add `"use client";` at the top of the file to indicate this.
+
+**Understanding Server and Client Components:**
+
+- **Server Components:**
+
+  - Rendered on the server.
+  - Cannot use state or effects.
+  - Ideal for static content.
+
+- **Client Components:**
+  - Rendered on the client.
+  - Can use state and effects.
+  - Required for interactivity.
 
 Here's a starting point for your `GuessInput` component:
 
@@ -212,8 +306,6 @@ export const GuessInput = () => {
 };
 ```
 
-Try creating this component before checking the solution.
-
 ---
 
 <details>
@@ -222,29 +314,33 @@ Try creating this component before checking the solution.
 ```typescript
 // src/components/guess-input.tsx
 
-"use client";
+"use client"; // Indicates this is a client component
 
-import { REGEXP_ONLY_CHARS } from "input-otp";
 import { useState } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
+// Regular expression to allow only letters
+import { REGEXP_ONLY_CHARS } from "input-otp";
+
 export const GuessInput = () => {
+  // State variable for the current guess
   const [guess, setGuess] = useState<string>("");
 
   return (
     <InputOTP
-      maxLength={5}
-      pattern={REGEXP_ONLY_CHARS}
-      value={guess}
-      onChange={(value) => setGuess(value)}
+      maxLength={5} // Limit input to 5 characters
+      pattern={REGEXP_ONLY_CHARS} // Allow only letters
+      value={guess} // Bind the input value to state
+      onChange={(value) => setGuess(value)} // Update state on input change
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          console.log(guess);
-          setGuess("");
+          console.log(guess); // Log the guess (we'll handle submission later)
+          setGuess(""); // Clear the input field
         }
       }}
     >
       <InputOTPGroup>
+        {/* Render 5 input slots */}
         {[...Array(5)].map((_, index) => (
           <InputOTPSlot
             key={index}
@@ -258,6 +354,26 @@ export const GuessInput = () => {
 };
 ```
 
+**Explanation:**
+
+- **useState Hook:**
+
+  - We use `useState` to manage the guess input.
+  - In Angular, you might use `FormControl` or `ngModel` for this purpose.
+
+- **InputOTP Component:**
+
+  - `maxLength={5}`: Ensures only 5 characters can be entered.
+  - `pattern={REGEXP_ONLY_CHARS}`: Restricts input to letters only.
+  - `value` and `onChange`: Bind the input value to the component state.
+
+- **Event Handling:**
+
+  - `onKeyDown`: Checks if the Enter key is pressed to trigger submission.
+
+- **Client Component Directive:**
+  - The `"use client";` directive is necessary because we use state and event handlers.
+
 </details>
 
 ---
@@ -266,23 +382,40 @@ export const GuessInput = () => {
 
 The `GuessList` component displays a list of previous guesses, similar to how you'd use `*ngFor` in Angular to render a list of items.
 
-### Exercise 4: Implementing the GuessList Component
+### Exercise 4: Implementing the `GuessList` Component
 
-Your task is to create the `GuessList` component that renders a list of previous guesses. This will demonstrate how React handles list rendering, which is conceptually similar to but syntactically different from Angular's approach.
+Your task is to create the `GuessList` component that renders a list of previous guesses.
 
 **Instructions:**
 
-1. Create a new file at `src/components/guess-list.tsx`.
-2. Import the `GuessItem` component (we'll create this next).
-3. Implement the `GuessList` component that accepts an array of guesses as a prop.
-4. Render a `GuessItem` for each guess in the array.
+1. **Create the File:**
+
+   - Create a new file at `src/components/guess-list.tsx`.
+
+2. **Import the `GuessItem` Component:**
+
+   - We'll create this component in the next exercise.
+
+3. **Implement the `GuessList` Component:**
+
+   - Accepts an array of guesses as a prop.
+   - Renders a `GuessItem` for each guess in the array.
 
 **Hints:**
 
-- Define a type for the component's props that includes a `guesses` property of type `string[]`. This is similar to how you'd define input properties in an Angular component.
-- Use the `map` function to iterate over the `guesses` array and render a `GuessItem` for each guess. This is React's equivalent of Angular's `*ngFor` directive.
-- Remember to provide a unique `key` prop when rendering lists in React. This is similar to Angular's `trackBy` function, but it's a required concept in React when rendering lists.
-- Use Tailwind CSS classes to add some spacing between the guess items, similar to how you'd style components in Angular.
+- **Props Definition:**
+
+  - Define a type for the component's props that includes a `guesses` property of type `string[]`.
+  - In Angular, you'd use `@Input()` to receive data from a parent component.
+
+- **List Rendering:**
+
+  - Use the `map` function to iterate over the `guesses` array and render `GuessItem` components.
+  - This is similar to using `*ngFor` in Angular templates.
+
+- **Key Prop:**
+  - Provide a unique `key` prop when rendering lists in React.
+  - In Angular, you might use `trackBy` for performance optimization.
 
 Here's a starting point for your `GuessList` component:
 
@@ -307,7 +440,7 @@ export const GuessList = ({ guesses }: GuessListProps) => {
 };
 ```
 
-Try implementing this component before looking at the solution.
+**Try implementing this component before looking at the solution.**
 
 ---
 
@@ -322,11 +455,12 @@ Try implementing this component before looking at the solution.
 import { GuessItem } from "./guess-item";
 
 type GuessListProps = {
-  guesses: string[];
+  guesses: string[]; // Define the props type
 };
 
 export const GuessList = ({ guesses }: GuessListProps) => {
   return (
+    // Stack the GuessItem components vertically with spacing
     <div className="flex flex-col gap-3">
       {guesses.map((guess) => (
         <GuessItem key={guess} guess={guess} />
@@ -336,6 +470,21 @@ export const GuessList = ({ guesses }: GuessListProps) => {
 };
 ```
 
+**Explanation:**
+
+- **Props Definition:**
+
+  - We define the type `GuessListProps` to specify that `guesses` is an array of strings.
+
+- **List Rendering:**
+
+  - We use `guesses.map()` to iterate over the guesses and render a `GuessItem` for each.
+  - The `key` prop helps React identify which items have changed.
+
+- **Tailwind CSS Classes:**
+  - `flex flex-col`: Arranges items vertically.
+  - `gap-3`: Adds spacing between items.
+
 </details>
 
 ---
@@ -344,24 +493,38 @@ export const GuessList = ({ guesses }: GuessListProps) => {
 
 The `GuessItem` component displays individual guesses, similar to how you might create a reusable component in Angular.
 
-### Exercise 5: Creating the GuessItem Component
+### Exercise 5: Creating the `GuessItem` Component
 
-Your final task is to implement the `GuessItem` component that displays a single guess. This demonstrates how to create a reusable component in React, which is conceptually similar to creating a reusable component in Angular.
+Your final task is to implement the `GuessItem` component that displays a single guess.
 
 **Instructions:**
 
-1. Create a new file at `src/components/guess-item.tsx`.
-2. Import necessary UI components.
-3. Implement the `GuessItem` component that accepts a single guess as a prop.
-4. Render the guess using the `InputOTP` component in read-only mode.
+1. **Create the File:**
+
+   - Create a new file at `src/components/guess-item.tsx`.
+
+2. **Import UI Components:**
+
+   - Import `InputOTP`, `InputOTPGroup`, and `InputOTPSlot` from our custom UI library.
+
+3. **Implement the `GuessItem` Component:**
+
+   - Accepts a single guess as a prop.
+   - Renders the guess using the `InputOTP` component in read-only mode.
 
 **Hints:**
 
-- Import the necessary components from './ui/input-otp'. This is similar to importing Angular Material components.
-- Define a type for the component's props that includes a `guess` property of type `string`. This is akin to defining input properties in an Angular component.
-- Use the `InputOTP` component with the `readOnly` prop set to `true`. Props in React are similar to input properties in Angular. Refer to the [InputOTP documentation](https://ui.shadcn.com/docs/components/input-otp) for details on available props.
-- Create a separate `GuessItemSlot` component to render each character of the guess. This demonstrates how React encourages breaking UIs into small, reusable pieces.
-- Use an array of indices `[0, 1, 2, 3, 4]` to map over and create the slots. This is another example of list rendering in React, similar to using `*ngFor` in Angular.
+- **Props Definition:**
+
+  - Define a type for the component's props that includes a `guess` property of type `string`.
+
+- **Read-Only Input:**
+
+  - Use the `readOnly` prop on `InputOTP` to prevent editing.
+
+- **Rendering Each Character:**
+  - Create a separate `GuessItemSlot` component to render each character.
+  - Use an array of indices `[0, 1, 2, 3, 4]` to map over and create the slots.
 
 Here's a starting point for your `GuessItem` component:
 
@@ -389,8 +552,6 @@ export function GuessItem({ guess }: GuessItemProps) {
 }
 ```
 
-Try creating this component before checking the solution.
-
 ---
 
 <details>
@@ -404,9 +565,10 @@ Try creating this component before checking the solution.
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
 type GuessItemProps = {
-  guess: string;
+  guess: string; // Define the props type
 };
 
+// A helper component for rendering each slot
 function GuessItemSlot({ index }: { index: number }) {
   return (
     <InputOTPSlot
@@ -420,6 +582,7 @@ export function GuessItem({ guess }: GuessItemProps) {
   return (
     <InputOTP readOnly maxLength={5} value={guess}>
       <InputOTPGroup>
+        {/* Render a slot for each character in the guess */}
         {[0, 1, 2, 3, 4].map((index) => (
           <GuessItemSlot key={index} index={index} />
         ))}
@@ -428,6 +591,24 @@ export function GuessItem({ guess }: GuessItemProps) {
   );
 }
 ```
+
+**Explanation:**
+
+- **Props Definition:**
+
+  - We define `GuessItemProps` with a `guess` property.
+
+- **Read-Only InputOTP:**
+
+  - Setting `readOnly` to `true` displays the input without allowing edits.
+
+- **Rendering Slots:**
+
+  - We map over an array of indices to render each character slot.
+  - The `GuessItemSlot` component renders each slot with consistent styling.
+
+- **Client Component Directive:**
+  - We include `"use client";` because we might add interactivity later.
 
 </details>
 
@@ -443,7 +624,7 @@ Ensure that your root layout is properly set up to provide consistent styling an
 // src/app/layout.tsx
 
 import type { Metadata } from "next";
-import "~/styles/globals.css";
+import "~/styles/globals.css"; // Import global styles
 
 // Define metadata for the application
 export const metadata: Metadata = {
@@ -451,10 +632,12 @@ export const metadata: Metadata = {
   description: "A Wordle clone built with Next.js and Drizzle", // Meta description
 };
 
-// RootLayout component wraps all pages
+// The RootLayout component wraps all pages
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     // Set the language and apply dark mode
     <html lang="en" className="dark">
@@ -468,7 +651,18 @@ export default function RootLayout({
 }
 ```
 
-In this file, you define the `metadata` for SEO purposes and set up the basic structure of your application, importing global styles and applying classes for dark mode and full-height layout.
+**Explanation:**
+
+- **Metadata:**
+
+  - Similar to setting meta tags in `index.html` in Angular.
+
+- **Global Styles:**
+
+  - We import global CSS styles, akin to including styles in `styles.css` in Angular.
+
+- **Layout Structure:**
+  - The `RootLayout` component provides a consistent structure across all pages.
 
 ---
 
@@ -500,14 +694,24 @@ Now that you've implemented all the components, it's time to check your work.
    - **Guess Input:**
 
      - Enter a 5-letter word in the input field.
-     - Each letter should appear in its own box, reflecting the Wordle style.
+     - Each letter should appear in its own box, mimicking the Wordle style.
 
    - **Submitting a Guess:**
+
      - Press **Enter** after typing your guess.
      - The guess should be logged in the console (for now).
      - The input field should clear after submission.
 
-If everything works as expected, congratulations! You've successfully built the game board for your Wordle clone.
+**Expected Result:**
+
+- The game board displays correctly with the sample guesses.
+- The input field functions as expected, logging guesses to the console.
+
+**Troubleshooting Tips:**
+
+- If you encounter errors, check the terminal and browser console for messages.
+- Ensure all components are correctly imported and exported.
+- Verify that you've added `"use client";` to components using state or event handlers.
 
 ---
 
@@ -520,6 +724,7 @@ In the next section, we'll delve into implementing the core game logic and state
   - We'll explore state management solutions to share data between components.
 
 - **Implementing Game Logic:**
+
   - You'll write functions to check user guesses against the target word.
   - Provide feedback by updating the UI based on whether letters are correct, present, or absent.
 
@@ -541,15 +746,17 @@ To deepen your understanding of Next.js and its App Router, you might find the f
    - [Dynamic Routes in Next.js](https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes)
      - Understand how to create dynamic routes that capture parameters, similar to the `[gameId]` route we've used.
 
-3. **Client and Server Components:**
+3. **Server and Client Components:**
 
-   - [React Components in Next.js](https://nextjs.org/docs/getting-started/react-essentials)
-     - Explore the differences between client and server components in Next.js and how to use them effectively.
+   - [Understanding Server and Client Components](https://nextjs.org/docs/getting-started/react-essentials)
+     - Explore the differences between server and client components in Next.js and how to use them effectively.
 
 4. **Shadcn UI:**
+
    - [Shadcn UI](https://ui.shadcn.com/)
      - Shadcn UI is a component library that provides a set of reusable UI components for your Next.js application.
 
----
+5. **React Hooks Documentation:**
 
-This concludes the Game Board Implementation section of our tutorial. You've successfully created the basic structure and UI components for your Wordle clone. In the next section, we'll build upon this foundation to add game logic and state management.
+   - [React Hooks](https://reactjs.org/docs/hooks-intro.html)
+     - Learn more about using hooks like `useState` in React components.
