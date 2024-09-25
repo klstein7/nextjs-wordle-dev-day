@@ -1,16 +1,6 @@
 # 05: Word Validation
 
-Welcome to the fifth section of our tutorial! In this part, you'll implement word validation in your Wordle clone. This will ensure that users can only submit valid guesses, enhancing the game's integrity and user experience. Additionally, you'll add error notifications to inform users when their guesses are invalid, similar to form validation feedback in Angular applications.
-
-## Exercise Objectives
-
-- **Implement** a function to validate if a word is acceptable.
-- **Create** a custom hook for guess creation with validation.
-- **Integrate** toast notifications for error handling.
-- **Update** components to use the new validation logic.
-- **Enhance** the UI to display guess results with color coding.
-
----
+Welcome to the fifth section of the tutorial! In this section, you'll enhance your Wordle clone by implementing **word validation** and improving user feedback. This will ensure that users can only submit valid guesses, enhancing the game's integrity and providing a better user experience. Additionally, you'll add error notifications to inform users when their guesses are invalid, similar to form validation feedback in Angular applications.
 
 ## Prerequisites
 
@@ -40,19 +30,17 @@ Once you've completed these steps, you're ready to implement word validation.
 
 ---
 
-## Tasks and Hints
+## Implementing Word Validation
 
-### 1. Add Toast Notifications
+In this section, you'll add functionality to validate user guesses against a predefined word list. This ensures that only legitimate words are accepted, preventing users from entering random letters or gibberish. Just like form validation in Angular, this step is crucial for maintaining the integrity of the application's data and providing meaningful feedback to the user.
 
-**Task:** Update your application's layout to include a toast notification system. This will allow you to display error messages to users when their guesses are invalid.
+### Adding Toast Notifications
 
-**Why:** Providing immediate feedback enhances user experience and helps users understand why their input was rejected, similar to form validation messages in Angular.
+First, we'll integrate a toast notification system into your application. This will allow you to display error messages in a non-intrusive way, similar to how you might use Angular's snackbar or toast components.
 
-**Instructions:**
+#### Step 1: Importing and Adding the Toaster Component
 
-- **Update** `src/app/layout.tsx` to include the `Toaster` component.
-
-**Example:**
+Open `src/app/layout.tsx` and make the following changes:
 
 ```typescript
 // src/app/layout.tsx
@@ -67,7 +55,7 @@ import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Wordle Clone",
-  description: "Our awesome wordle clone",
+  description: "Our awesome Wordle clone",
 };
 
 export default function RootLayout({
@@ -83,27 +71,23 @@ export default function RootLayout({
 }
 ```
 
-**Comments:**
+**Explanation:**
 
-- **Imports:**
-  - Importing `Toaster` from `"~/components/ui/sonner"`.
-- **Toaster Component:**
-  - Placed outside the `<body>` but inside the `<html>` to ensure it's globally available.
-  - Configured with `closeButton`, `expand`, and `visibleToasts` props to control its behavior.
+- **Import Statements:**
+  - Imported the `Toaster` component from `~/components/ui/sonner`.
+- **Adding the Toaster:**
+  - Placed the `<Toaster>` component inside the `<html>` tag but outside the `<body>` tag. This ensures it's available throughout your application.
+  - Configured the `Toaster` with `closeButton`, `expand`, and `visibleToasts` props to customize its behavior.
 
 ---
 
-### 2. Implement Word Validation Function
+### Implementing the Word Validation Function
 
-**Task:** Create a function that checks if a given word is valid according to your word list.
+Next, we'll create a function to check if a given word is valid according to your word list. This is similar to creating a validator function in Angular forms.
 
-**Why:** This function will be used to validate user guesses before they're submitted, preventing invalid words from being processed.
+#### Step 1: Creating the `isValidWord` Function
 
-**Instructions:**
-
-- **Update** `src/lib/utils.ts` to include the `isValidWord` function.
-
-**Example:**
+Open `src/lib/utils.ts` and add the following code:
 
 ```typescript
 // src/lib/utils.ts
@@ -128,33 +112,30 @@ export function getRandomWord() {
 }
 
 // Function to check if a word is valid
-export function isValidWord(word: string) {
+export function isValidWord(word: string): boolean {
   return words.includes(word.toLowerCase());
 }
 ```
 
-**Comments:**
+**Explanation:**
 
-- **isValidWord Function:**
-  - Accepts a `word` string.
-  - Converts the word to lowercase and checks if it's included in the `words` array.
+- **Import Statements:**
+  - Imported the `words` array from `./words`, which contains your list of valid words.
+- **`isValidWord` Function:**
+  - Accepts a `word` parameter.
+  - Converts the input word to lowercase to ensure case-insensitive validation.
+  - Checks if the lowercase word is included in the `words` array.
   - Returns a boolean indicating whether the word is valid.
 
 ---
 
-### 3. Create a Custom Hook for Guess Creation
+### Creating a Custom Hook for Guess Creation
 
-**Task:** Develop a custom hook `useCreateGuess` that handles guess creation, including validation and error handling.
+We'll develop a custom hook called `useCreateGuess` to handle guess creation with validation and error handling. This centralizes the logic, much like an Angular service would for form submission and validation.
 
-**Why:** Encapsulating this logic in a hook promotes reusability and clean code, similar to services in Angular.
+#### Step 1: Implementing the `useCreateGuess` Hook
 
-**Instructions:**
-
-- **Create** a new file `src/lib/hooks/use-create-guess.ts`.
-- **Implement** validation logic using `zod` schema.
-- **Use** toast notifications to display validation errors.
-
-**Example:**
+Create a new file at `src/lib/hooks/use-create-guess.ts` and add the following code:
 
 ```typescript
 // src/lib/hooks/use-create-guess.ts
@@ -204,40 +185,34 @@ export const useCreateGuess = () => {
 };
 ```
 
-**Comments:**
+**Explanation:**
 
-- **Imports:**
-
-  - `zod` for schema validation.
-  - `toast` from `sonner` for displaying notifications.
-  - `isValidWord` function to check word validity.
-  - `useGuess` hook to access and update the guess state.
-
-- **CreateGuessSchema:**
-
-  - Validates that `guess` is a 5-letter string containing only letters and is a valid word.
-  - Transforms `gameId` to a number.
-
-- **useCreateGuess Hook:**
-  - Returns an asynchronous function that takes `guess` and `gameId`.
-  - Uses `safeParse` to validate the input; if invalid, displays errors.
-  - Calls `api.guesses.create` to submit the guess.
-  - Resets the guess state using `setGuess("")`.
+- **Import Statements:**
+  - Imported necessary modules including `zod` for validation, `toast` for notifications, and the `useGuess` hook.
+- **Validation Schema:**
+  - Defined `CreateGuessSchema` using `z.object` from `zod`.
+  - Validates that the `guess`:
+    - Is a string of exactly 5 characters.
+    - Contains only letters, using `REGEXP_ONLY_CHARS`.
+    - Is a valid word, using the `isValidWord` function.
+  - Validates that `gameId` is a number, converting it if necessary.
+- **`useCreateGuess` Hook:**
+  - Uses the `useGuess` hook to access `setGuess`.
+  - Returns an async function that:
+    - Validates the input against the schema.
+    - Displays error messages using `toast` if validation fails.
+    - Submits the guess via `api.guesses.create` if validation passes.
+    - Clears the current guess after submission.
 
 ---
 
-### 4. Update `GuessInput` Component
+### Updating the `GuessInput` Component
 
-**Task:** Modify the `GuessInput` component to use the `useCreateGuess` hook for submitting guesses.
+We'll modify the `GuessInput` component to use the `useCreateGuess` hook for submitting guesses. This ensures that all guesses entered via the input field are validated and handled consistently.
 
-**Why:** This ensures that guesses entered via the input field are validated and handled consistently.
+#### Step 1: Using the `useCreateGuess` Hook in `GuessInput`
 
-**Instructions:**
-
-- **Update** `src/components/guess-input.tsx`.
-- **Replace** direct API calls with the `createGuess` function from the hook.
-
-**Example:**
+Open `src/components/guess-input.tsx` and update it as follows:
 
 ```typescript
 // src/components/guess-input.tsx
@@ -257,8 +232,6 @@ type GuessInputProps = {
 
 export const GuessInput = ({ gameId }: GuessInputProps) => {
   const { guess, setGuess } = useGuess();
-
-  // Use the custom hook for creating guesses
   const createGuess = useCreateGuess();
 
   return (
@@ -269,7 +242,6 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
       onChange={(value) => setGuess(value)}
       onKeyDown={async (e) => {
         if (e.key === "Enter") {
-          // Use the createGuess function to handle submission
           await createGuess(guess, gameId);
         }
       }}
@@ -288,30 +260,26 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
 };
 ```
 
-**Comments:**
+**Explanation:**
 
-- **Imports:**
-  - `useCreateGuess` hook replaces direct API calls.
-- **Event Handling:**
-  - On Enter key press, calls `createGuess(guess, gameId)` instead of directly interacting with the API.
-- **Benefits:**
-  - Centralizes validation and error handling logic.
-  - Ensures consistency across different input methods.
+- **Import Statements:**
+  - Imported the `useCreateGuess` hook.
+- **Using the Hook:**
+  - Called `useCreateGuess()` to get the `createGuess` function.
+- **Updating Event Handler:**
+  - Replaced the direct API call with `await createGuess(guess, gameId);` in the `onKeyDown` handler for the Enter key.
+- **Consistency:**
+  - This ensures that the guess submission logic is centralized and consistent across components.
 
 ---
 
-### 5. Update `GuessKeyboard` Component
+### Updating the `GuessKeyboard` Component
 
-**Task:** Modify the `GuessKeyboard` component to use the `useCreateGuess` hook for submitting guesses via the on-screen keyboard.
+Similarly, we'll update the `GuessKeyboard` component to use the `useCreateGuess` hook when submitting guesses via the on-screen keyboard.
 
-**Why:** This maintains consistency in validation and error handling between the keyboard and input field.
+#### Step 1: Using the `useCreateGuess` Hook in `GuessKeyboard`
 
-**Instructions:**
-
-- **Update** `src/components/guess-keyboard.tsx`.
-- **Use** the `createGuess` function when the Enter key is pressed.
-
-**Example:**
+Open `src/components/guess-keyboard.tsx` and update it as follows:
 
 ```typescript
 // src/components/guess-keyboard.tsx
@@ -331,8 +299,6 @@ type GuessKeyboardProps = {
 
 export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
   const { guess, setGuess } = useGuess();
-
-  // Use the custom hook for creating guesses
   const createGuess = useCreateGuess();
 
   return (
@@ -360,7 +326,6 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
         }
 
         if (input === "{enter}") {
-          // Use the createGuess function to handle submission
           await createGuess(guess, gameId);
           return;
         }
@@ -378,29 +343,26 @@ export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
 };
 ```
 
-**Comments:**
+**Explanation:**
 
-- **Imports:**
-  - `useCreateGuess` hook is now used in this component.
-- **Event Handling:**
-  - When the `{enter}` key is pressed, calls `createGuess(guess, gameId)`.
+- **Import Statements:**
+  - Imported the `useCreateGuess` hook.
+- **Using the Hook:**
+  - Called `useCreateGuess()` to get the `createGuess` function.
+- **Updating Event Handler:**
+  - Replaced the direct API call with `await createGuess(guess, gameId);` in the `onKeyPress` handler when `{enter}` is pressed.
 - **Consistency:**
-  - Both physical and on-screen keyboards now use the same validation logic.
+  - Ensures that both the physical and on-screen keyboards use the same validation and submission logic.
 
 ---
 
-### 6. Update `GuessItem` Component
+### Updating the `GuessItem` Component
 
-**Task:** Enhance the `GuessItem` component to display the result of each guess with appropriate color coding.
+To enhance the user experience further, we'll modify the `GuessItem` component to display the result of each guess with appropriate color coding. Visual feedback helps users understand which letters are correct or incorrect, similar to the original Wordle game.
 
-**Why:** Visual feedback helps users understand which letters are correct, similar to the original Wordle game.
+#### Step 1: Applying Color Coding Based on Guess Results
 
-**Instructions:**
-
-- **Update** `src/components/guess-item.tsx`.
-- **Map** the result characters to corresponding colors.
-
-**Example:**
+Open `src/components/guess-item.tsx` and update it as follows:
 
 ```typescript
 // src/components/guess-item.tsx
@@ -447,27 +409,26 @@ export const GuessItem = ({ guess }: GuessItemProps) => {
 };
 ```
 
-**Comments:**
+**Explanation:**
 
-- **Imports:**
-  - `cn` utility function for conditional class names.
-- **GuessItemSlot Component:**
-  - Determines the color of each slot based on the `result` character.
-  - Uses `cn` to apply the appropriate background and text colors.
-- **Mapping Results:**
-
-  - `"C"`: Green for correct letter and position.
-  - `"~"`: Yellow for correct letter but wrong position.
-  - `"X"`: Red for incorrect letter.
-
-- **Rendering:**
-  - Iterates over each character in the guess and displays it with the correct styling.
+- **Helper Component `GuessItemSlot`:**
+  - Created a helper component to render each slot with color based on the guess result.
+  - Used the `cn` function to conditionally apply Tailwind CSS classes.
+  - Applied different background and text colors:
+    - **Red (`bg-red-500 text-red-50`):** Incorrect letter (`result === "X"`).
+    - **Green (`bg-green-500 text-green-50`):** Correct letter in correct position (`result === "C"`).
+    - **Yellow (`bg-yellow-500 text-yellow-50`):** Correct letter in wrong position (`result === "~"`).
+- **Updating `GuessItem`:**
+  - Used the `GuessItemSlot` component within the `InputOTPGroup`.
+  - Passed the `result` for each letter to the `GuessItemSlot`.
 
 ---
 
 ## Checking Your Progress
 
-Now that you've implemented word validation and enhanced user feedback, it's time to test your application.
+![Section 5 Checkpoint - Word Validation](img/4.png)
+
+Now that you've implemented word validation and enhanced user feedback, it's time to test your application. Testing ensures that all components work together seamlessly and that the user experience is as intended.
 
 **Instructions:**
 
@@ -484,20 +445,20 @@ Now that you've implemented word validation and enhanced user feedback, it's tim
 
 3. **Test Input Constraints:**
 
-   ![Word Validation](img/8.png)
-
-   - **Enter Invalid Characters:**
+   - **Invalid Characters:**
      - Try entering numbers or special characters.
-     - The input should reject these characters.
+     - The input should reject these characters, preventing invalid data from being submitted.
    - **Exceed Character Limit:**
      - Attempt to enter more than 5 letters.
-     - The input should stop accepting letters after the fifth character.
+     - The input should stop accepting letters after the fifth character, enforcing the game's rules.
 
 4. **Test Word Validation:**
 
    - **Invalid Word:**
+     ![Section 5 Checkpoint - Invalid Word](img/5.png)
      - Enter a 5-letter word that's not in the word list (e.g., "ABCDE").
-     - Upon submission, a toast notification should display an error message like "Guess must be a valid word".
+     - Upon submission, a toast notification should display an error message like "Guess must be a valid word."
+     - This feedback helps users understand that their guess was not accepted due to invalidity.
    - **Valid Word:**
      - Enter a valid 5-letter word (e.g., "APPLE").
      - The guess should be accepted and appear on the game board without errors.
@@ -506,13 +467,21 @@ Now that you've implemented word validation and enhanced user feedback, it's tim
 
    - Ensure that error messages appear as toast notifications at the bottom of the screen.
    - Test various invalid inputs to see different error messages.
+   - This immediate feedback enhances the user experience by providing clear guidance.
 
 6. **Check Guess Visualization:**
 
    - After submitting a valid guess, verify that the letters are color-coded correctly:
      - **Green:** Correct letter in the correct position.
      - **Yellow:** Correct letter in the wrong position.
-     - **Red/Default:** Incorrect letter.
+     - **Red:** Incorrect letter.
+   - This visual representation helps users strategize their next guesses based on the feedback.
+
+**Expected Behavior:**
+
+- The application should prevent invalid inputs and provide immediate feedback.
+- Valid guesses should be accepted and displayed with appropriate color coding.
+- Error messages should help guide the user towards valid inputs.
 
 If everything works as expected, congratulations! You've successfully enhanced your Wordle clone with word validation and improved user feedback.
 
@@ -532,3 +501,22 @@ In the next section, we'll focus on implementing game-over conditions and adding
   - Providing options to start a new game.
 
 ---
+
+## Helpful Resources
+
+To further enhance your understanding, you might find the following resources helpful:
+
+1. **Zod Schema Validation:**
+
+   - [Zod Official Documentation](https://zod.dev/)
+     - Learn more about schema declaration and validation with Zod.
+
+2. **React Context API:**
+
+   - [React Context Documentation](https://react.dev/learn/passing-data-deeply-with-context)
+     - Understand how to share state across components without prop drilling.
+
+3. **Using Custom Hooks:**
+
+   - [Building Your Own Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)
+     - Learn how to create reusable logic with custom hooks.

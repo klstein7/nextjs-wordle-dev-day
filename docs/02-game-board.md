@@ -1,18 +1,6 @@
 # 02: Game Board Implementation
 
-Welcome to the second section of our tutorial! In this exercise, you'll build the game board UI using React and Next.js for our Wordle clone. This will help you understand component composition and state management in React, similar to how you'd structure components in Angular.
-
-## Exercise Objectives
-
-- **Set up** the game page in Next.js.
-- **Create** the `GameBoard` component.
-- **Implement** the `GuessInput` component.
-- **Create** the `GuessList` component.
-- **Implement** the `GuessItem` component.
-- **Update** the root layout for styling.
-- **Check** your progress by running the application.
-
----
+Welcome to the second section of the tutorial! In this section, you'll build the game board UI for your Wordle clone using **React** and **Next.js**. This will help you understand component composition and state management in React, much like how you'd structure components in **Angular**.
 
 ## Prerequisites
 
@@ -20,45 +8,64 @@ Before you begin, ensure you've completed the previous section or are up to date
 
 **To get up to speed:**
 
-1. **Switch to the branch:**
+1. **Switch to the Branch:**
 
    ```bash
    git checkout checkpoint-01-drizzle-setup
    ```
 
-2. **Install dependencies:**
+2. **Install Dependencies:**
 
    ```bash
    yarn install
    ```
 
-3. **Set up your database schema:**
+3. **Set Up Your Database Schema:**
 
    ```bash
    yarn db:push
    ```
 
+Once you've completed these steps, you're ready to implement the game board.
+
 ---
 
-## Tasks and Hints
+## Setting Up the Game Page
 
-### 1. Set Up the Game Page
+First, you'll set up the game page in Next.js. In Next.js, pages are created using the **File-Based Routing** system.
 
-**Task:** In `src/app/game/[gameId]/page.tsx`, create the game page component that will display the game board.
+### Exercise 1: Creating the Game Page
 
-**Why:** This page serves as the main entry point for a game instance, utilizing Next.js dynamic routing to handle different game IDs.
+Your task is to create a new file for the game page and implement a basic component that renders a placeholder for the game board. In Next.js, the file path determines the route.
+
+**Instructions:**
+
+1. **Create the Game Page File:**
+
+   - Create a new file at `src/app/game/[gameId]/page.tsx`.
+   - The `[gameId]` in the file name creates a **dynamic route segment**, conceptually similar to route parameters in Angular's router (e.g., `/:gameId`).
+
+2. **Import the `GameBoard` Component:**
+
+   - We'll create this component in a later exercise.
+
+3. **Implement the `GamePage` Component:**
+
+   - Render the `GameBoard` component centered on the page.
 
 **Hints:**
 
-- **File-Based Routing:**
-  - In Next.js, files inside the `app` directory define routes automatically.
-  - The `[gameId]` in the folder name creates a dynamic route, similar to route parameters in Angular.
-- **Import Statements:**
-  - You'll need to import the `GameBoard` component, which will be the main component on this page.
-- **Styling:**
-  - Use Tailwind CSS classes to center the content vertically and horizontally for a clean UI.
+- Use the `export default function` syntax to create your `GamePage` component. This is similar to defining a component in Angular, but in React, we use functions instead of classes or decorators.
 
-**Example:**
+- To center the `GameBoard`, you can use Tailwind CSS classes. Consider using `flex`, `h-full`, `items-center`, and `justify-center` on a wrapping `div`.
+
+- **Understanding Server Components:**
+  - In Next.js 13, components inside the `app` directory are **server components** by default.
+  - Server components are rendered on the server and sent as HTML to the client.
+  - They cannot contain client-side interactivity (like state or event handlers).
+  - Unlike Angular, which runs entirely on the client side, Next.js allows you to build both server-rendered and client-rendered components seamlessly.
+
+Here's a starting point for your `GamePage` component:
 
 ```typescript
 // src/app/game/[gameId]/page.tsx
@@ -67,68 +74,86 @@ import { GameBoard } from "~/components/game-board";
 
 export default function GamePage() {
   return (
-    <div className="flex h-full items-center justify-center">
-      {/* Render your GameBoard component here */}
-    </div>
+    // TODO: Add a div to center the GameBoard
+    <GameBoard />
   );
 }
 ```
 
-**Helpful Links:**
+**Try to implement this component before looking at the solution.**
 
-- [Next.js Routing Documentation](https://nextjs.org/docs/routing/introduction)
-- [Dynamic Routes in Next.js](https://nextjs.org/docs/routing/dynamic-routes)
-- [Tailwind CSS Flexbox Utilities](https://tailwindcss.com/docs/flex)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/app/game/[gameId]/page.tsx
 
 import { GameBoard } from "~/components/game-board";
 
-// This component represents the game page for a specific game ID
+// The GamePage component is a server component by default
 export default function GamePage() {
   return (
-    // Center the GameBoard component both vertically and horizontally
+    // Center the GameBoard using Tailwind CSS classes
     <div className="flex h-full items-center justify-center">
-      {/* Render the GameBoard component */}
       <GameBoard />
     </div>
   );
 }
 ```
 
-_Comments:_
+**Explanation:**
 
-- **Import Statement:** We import the `GameBoard` component from our components directory.
-- **Function Component:** `GamePage` is a default export function that represents our page component.
-- **Styling:** The `<div>` uses Tailwind CSS classes to create a flex container that centers its content.
-- **Rendering `GameBoard`:** Inside the `<div>`, we render the `GameBoard` component, which we'll define later.
+- **Tailwind CSS Classes:**
+
+  - `flex`: Applies `display: flex`.
+  - `h-full`: Sets the height to 100%.
+  - `items-center`: Vertically centers the content.
+  - `justify-center`: Horizontally centers the content.
+
+- **Server Component:**
+  - Since we're not using any state or lifecycle methods, this component remains a server component.
+  - In Angular, all components run on the client side, but Next.js allows us to optimize rendering by splitting between server and client components.
 
 </details>
 
 ---
 
-### 2. Create the `GameBoard` Component
+## Creating the `GameBoard` Component
 
-**Task:** In `src/components/game-board.tsx`, build the main `GameBoard` component that combines the guess input and the list of guesses.
+Next, you'll create the `GameBoard` component, which acts as the container for the game's UI elements—similar to a parent component in Angular.
 
-**Why:** The `GameBoard` component acts as the container for the game's UI elements, similar to a parent component in Angular.
+### Exercise 2: Implementing the `GameBoard` Component
+
+Your task is to create the `GameBoard` component that will contain the list of guesses and the input for new guesses.
+
+**Instructions:**
+
+1. **Create the File:**
+
+   - Create a new file at `src/components/game-board.tsx`.
+
+2. **Import Child Components:**
+
+   - Import `GuessInput` and `GuessList` components (we'll create these later).
+
+3. **Implement the `GameBoard` Component:**
+
+   - Render both `GuessList` and `GuessInput` components.
+   - Use a temporary hardcoded array of guesses for demonstration.
 
 **Hints:**
 
-- **Component Structure:**
-  - The `GameBoard` should render both the `GuessList` and `GuessInput` components.
-- **State Management:**
-  - Initialize a state or a variable to hold previous guesses. For now, you can use a hardcoded array to simulate this.
-- **Import Statements:**
-  - Import the `GuessInput` and `GuessList` components to be used within `GameBoard`.
+- Use the `export const` syntax to create your `GameBoard` component as a named export. This is similar to exporting a component in Angular, but React components are typically functions.
 
-**Example:**
+- Create a `guesses` array with some sample strings like `["HELLO", "WORLD"]`. This mimics component state, which you'd typically manage with services or state management libraries in Angular.
+
+- Use Tailwind CSS classes to style your component. Consider using `flex` and `flex-col` to stack the `GuessList` and `GuessInput` vertically.
+
+- Pass the `guesses` array as a prop to the `GuessList` component. This demonstrates React's one-way data flow, which differs from Angular's two-way binding with `[(ngModel)]`.
+
+Here's a starting point for your `GameBoard` component:
 
 ```typescript
 // src/components/game-board.tsx
@@ -137,27 +162,22 @@ import { GuessInput } from "./guess-input";
 import { GuessList } from "./guess-list";
 
 export const GameBoard = () => {
-  // Initialize your guesses array here
-  const guesses = ["HELLO", "WORLD"];
+  // TODO: Create a guesses array with some sample strings
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Render the GuessList and GuessInput components here */}
-    </div>
+    // TODO: Add a div with appropriate Tailwind classes
+    <>
+      {/* TODO: Add GuessList component */}
+      {/* TODO: Add GuessInput component */}
+    </>
   );
 };
 ```
 
-**Helpful Links:**
-
-- [React Functional Components](https://reactjs.org/docs/components-and-props.html)
-- [Composition in React](https://reactjs.org/docs/composition-vs-inheritance.html)
-- [Tailwind CSS Spacing](https://tailwindcss.com/docs/spacing)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/components/game-board.tsx
@@ -165,54 +185,103 @@ export const GameBoard = () => {
 import { GuessInput } from "./guess-input";
 import { GuessList } from "./guess-list";
 
-// Define the GameBoard component
+// The GameBoard component acts as the main container for the game
 export const GameBoard = () => {
-  // Temporary hardcoded array of guesses for demonstration
+  // Sample guesses array for demonstration
   const guesses = ["HELLO", "WORLD"];
 
   return (
-    // Use flex layout to stack components vertically with spacing
+    // Stack the components vertically with spacing
     <div className="flex flex-col gap-3">
-      {/* Render the list of previous guesses */}
+      {/* Pass guesses to GuessList via props */}
       <GuessList guesses={guesses} />
-      {/* Render the input component for new guesses */}
+      {/* Render the GuessInput component */}
       <GuessInput />
     </div>
   );
 };
 ```
 
-_Comments:_
+**Explanation:**
 
-- **Imports:** We import `GuessInput` and `GuessList` components which we'll create.
-- **Component Definition:** `GameBoard` is a functional component that represents the main game area.
-- **State (Temporary):** We define a `guesses` array with some placeholder guesses.
-- **Layout:** The `<div>` uses Tailwind CSS classes to create a vertical flex container with gaps between items.
-- **Rendering Children:** We render `GuessList` passing in the `guesses` array, and `GuessInput` below it.
+- **Guesses Array:**
+
+  - We use a hardcoded array to simulate existing guesses.
+  - In a real application, this data might come from a server or global state.
+
+- **Tailwind CSS Classes:**
+
+  - `flex flex-col`: Arranges child components vertically.
+  - `gap-3`: Adds spacing between child components.
+
+- **Props Passing:**
+  - We pass the `guesses` array to the `GuessList` component as props.
+  - In Angular, you might use `@Input()` to pass data to a child component.
 
 </details>
 
 ---
 
-### 3. Implement the `GuessInput` Component
+## Implementing the `GuessInput` Component
 
-**Task:** In `src/components/guess-input.tsx`, create the `GuessInput` component to handle user input for guesses.
+The `GuessInput` component captures the user's input, allowing them to submit guesses. This is similar to creating a form component in Angular that handles user input.
 
-**Why:** This component captures the user's input, allowing them to submit guesses, similar to a form component in Angular.
+### Exercise 3: Creating the `GuessInput` Component
+
+Your task is to implement the `GuessInput` component that allows users to enter their guesses. This component will use React's state management.
+
+**Instructions:**
+
+1. **Create the File:**
+
+   - Create a new file at `src/components/guess-input.tsx`.
+
+2. **Import Dependencies:**
+
+   - Import `useState` from React.
+   - Import the `InputOTP`, `InputOTPGroup`, and `InputOTPSlot` components from our installed shadcn components.
+
+3. **Implement the `GuessInput` Component:**
+
+   - Use state to manage the current guess input.
+   - Render an input field that accepts exactly 5 characters.
+   - Implement handlers for input changes and guess submission.
 
 **Hints:**
 
-- **Client-Side Interactivity:**
-  - Include `"use client";` at the top to enable client-side rendering, necessary for interactive components in Next.js.
-- **State Management:**
-  - Use the `useState` hook to manage the input value of the guess.
-- **Event Handling:**
-  - Update the guess state on input change.
-  - Handle the Enter key to submit the guess and clear the input.
-- **Input Component:**
-  - Utilize the `InputOTP` component to create individual input slots for each character, mimicking the Wordle input style.
+- **Custom Component Notice:**
 
-**Example:**
+  - The `InputOTP` component is a shadcn/ui component provided in the source code at `src/components/ui/input-otp.tsx`.
+  - It allows users to input a fixed number of characters, making it ideal for our 5-letter Wordle guesses.
+
+- **State Management:**
+
+  - Use the `useState` hook to create a state variable for the guess and a function to update it.
+  - This is similar to managing form control values in Angular using `FormControl` or `ngModel`.
+
+- **Event Handling:**
+
+  - Use the `onChange` prop of `InputOTP` to update your state when the input changes.
+  - Implement an `onKeyDown` handler to check for the Enter key press and handle guess submission.
+
+- **Client Component Directive:**
+  - Since this component uses state and event handlers, it needs to be a **client component**.
+  - Add `"use client";` at the top of the file to indicate this.
+
+**Understanding Server and Client Components:**
+
+- **Server Components:**
+
+  - Rendered on the server.
+  - Cannot use state or effects.
+  - Ideal for static content.
+
+- **Client Components:**
+  - Rendered on the client.
+  - Can use state and effects.
+  - Required for interactivity.
+
+Here's a starting point for your `GuessInput` component:
 
 ```typescript
 // src/components/guess-input.tsx
@@ -220,77 +289,61 @@ _Comments:_
 "use client";
 
 import { useState } from "react";
-import { InputOTP } from "./ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
 export const GuessInput = () => {
-  const [guess, setGuess] = useState<string>("");
+  // TODO: Add state for the current guess
 
   return (
     <InputOTP
-      value={guess}
-      onChange={(value) => setGuess(value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          // Handle guess submission
-          setGuess("");
-        }
-      }}
+    // TODO: Add necessary props (maxLength, value, onChange, etc.)
     >
-      {/* Render your input slots here */}
+      <InputOTPGroup>{/* TODO: Add InputOTPSlot components */}</InputOTPGroup>
     </InputOTP>
   );
 };
 ```
 
-**Helpful Links:**
-
-- [React useState Hook](https://reactjs.org/docs/hooks-state.html)
-- [Handling Events in React](https://reactjs.org/docs/handling-events.html)
-- [InputOTP Component Documentation](https://www.npmjs.com/package/input-otp)
-- [Client Components in Next.js](https://nextjs.org/docs/getting-started/react-essentials#client-components)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/components/guess-input.tsx
 
-"use client";
+"use client"; // Indicates this is a client component
 
-import { REGEXP_ONLY_CHARS } from "input-otp";
 import { useState } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
-// Define the GuessInput component
+// Regular expression to allow only letters
+import { REGEXP_ONLY_CHARS } from "input-otp";
+
 export const GuessInput = () => {
-  // State to hold the current guess input by the user
+  // State variable for the current guess
   const [guess, setGuess] = useState<string>("");
 
   return (
-    // InputOTP component handles the OTP-style input
     <InputOTP
       maxLength={5} // Limit input to 5 characters
-      pattern={REGEXP_ONLY_CHARS} // Allow only alphabetic characters
-      value={guess} // Bind the input value to the state
-      onChange={(value) => setGuess(value)} // Update state on change
-      onKeyDown={async (e) => {
+      pattern={REGEXP_ONLY_CHARS} // Allow only letters
+      value={guess} // Bind the input value to state
+      onChange={(value) => setGuess(value)} // Update state on input change
+      onKeyDown={(e) => {
         if (e.key === "Enter") {
-          // When Enter is pressed
-          console.log(guess); // Log the guess (temporary action)
+          console.log(guess); // Log the guess (we'll handle submission later)
           setGuess(""); // Clear the input field
         }
       }}
     >
-      {/* Group the input slots together */}
       <InputOTPGroup>
-        {/* Create 5 input slots for each character in the guess */}
+        {/* Render 5 input slots */}
         {[...Array(5)].map((_, index) => (
           <InputOTPSlot
-            key={index} // Unique key for each slot
-            index={index} // Index prop required by InputOTPSlot
-            className="h-12 w-12 text-2xl uppercase" // Styling for the slot
+            key={index}
+            index={index}
+            className="h-12 w-12 text-2xl uppercase"
           />
         ))}
       </InputOTPGroup>
@@ -299,72 +352,70 @@ export const GuessInput = () => {
 };
 ```
 
-_Comments:_
+**Explanation:**
 
-- **"use client":** Indicates that this component should be rendered on the client-side.
-- **Imports:** We import necessary hooks and components.
-- **State Management:** `useState` hook initializes `guess` state.
+- **useState Hook:**
+
+  - We use `useState` to manage the guess input.
+  - In Angular, you might use `FormControl` or `ngModel` for this purpose.
+
 - **InputOTP Component:**
-  - **Props:**
-    - `maxLength`: Limits input to 5 characters.
-    - `pattern`: Ensures only alphabetic characters are accepted.
-    - `value`: Binds the component to the `guess` state.
-    - `onChange`: Updates the `guess` state when the input changes.
-    - `onKeyDown`: Handles key presses; on "Enter", it logs the guess and clears the input.
-- **InputOTPGroup & InputOTPSlot:**
-  - We create an array of 5 slots using `Array(5)`.
-  - Each `InputOTPSlot` represents a single character input.
-  - Styling is applied to make the slots visually appealing.
+
+  - `maxLength={5}`: Ensures only 5 characters can be entered.
+  - `pattern={REGEXP_ONLY_CHARS}`: Restricts input to letters only.
+  - `value` and `onChange`: Bind the input value to the component state.
+
+- **Event Handling:**
+
+  - `onKeyDown`: Checks if the Enter key is pressed to trigger submission.
+
+- **Client Component Directive:**
+  - The `"use client";` directive is necessary because we use state and event handlers.
 
 </details>
 
 ---
 
-### 4. Create the `GuessList` Component
+## Creating the `GuessList` Component
 
-**Task:** In `src/components/guess-list.tsx`, develop the `GuessList` component to display a list of previous guesses.
+The `GuessList` component displays a list of previous guesses, similar to how you'd use `*ngFor` in Angular to render a list of items.
 
-**Why:** This component displays the history of guesses, similar to iterating over data in an Angular component to render a list.
+### Exercise 4: Implementing the `GuessList` Component
+
+Your task is to create the `GuessList` component that renders a list of previous guesses.
+
+**Instructions:**
+
+1. **Create the File:**
+
+   - Create a new file at `src/components/guess-list.tsx`.
+
+2. **Import the `GuessItem` Component:**
+
+   - We'll create this component in the next exercise.
+
+3. **Implement the `GuessList` Component:**
+
+   - Accepts an array of guesses as a prop.
+   - Renders a `GuessItem` for each guess in the array.
 
 **Hints:**
 
 - **Props Definition:**
-  - Define a TypeScript interface or type for the component's props to enforce type checking.
-- **Mapping Over Guesses:**
-  - Use the `map` method to render a `GuessItem` for each guess in the array.
-- **Component Composition:**
-  - Import the `GuessItem` component, which will display individual guesses.
 
-**Example:**
+  - Define a type for the component's props that includes a `guesses` property of type `string[]`.
+  - In Angular, you'd use `@Input()` to receive data from a parent component.
 
-```typescript
-// src/components/guess-list.tsx
+- **List Rendering:**
 
-import { GuessItem } from "./guess-item";
+  - Use the `map` function to iterate over the `guesses` array and render `GuessItem` components.
+  - This is similar to using `*ngFor` in Angular templates.
 
-type GuessListProps = {
-  guesses: string[];
-};
+- **Key Prop:**
+  - Provide a unique `key` prop when rendering lists in React.
+  - In Angular, you might use `trackBy` for performance optimization.
 
-export const GuessList = ({ guesses }: GuessListProps) => {
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Map over the guesses array and render GuessItem components */}
-    </div>
-  );
-};
-```
-
-**Helpful Links:**
-
-- [React Props](https://reactjs.org/docs/components-and-props.html)
-- [TypeScript Interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html)
-- [Rendering Lists in React](https://reactjs.org/docs/lists-and-keys.html)
-
-**Solution Code:**
-
-<details>
-<summary>Click to reveal solution</summary>
+Here's a starting point for your `GuessList` component:
 
 ```typescript
 // src/components/guess-list.tsx
@@ -374,17 +425,38 @@ export const GuessList = ({ guesses }: GuessListProps) => {
 import { GuessItem } from "./guess-item";
 
 type GuessListProps = {
-  guesses: string[];
+  // TODO: Define the props type
 };
 
-// Define the GuessList component
 export const GuessList = ({ guesses }: GuessListProps) => {
   return (
-    // Use flex layout to stack guess items vertically with spacing
+    // TODO: Add a div with appropriate Tailwind classes
+    <>{/* TODO: Map over guesses and render GuessItem components */}</>
+  );
+};
+```
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
+
+```typescript
+// src/components/guess-list.tsx
+
+"use client";
+
+import { GuessItem } from "./guess-item";
+
+type GuessListProps = {
+  guesses: string[]; // Define the props type
+};
+
+export const GuessList = ({ guesses }: GuessListProps) => {
+  return (
+    // Stack the GuessItem components vertically with spacing
     <div className="flex flex-col gap-3">
-      {/* Iterate over the guesses array */}
       {guesses.map((guess) => (
-        // Render a GuessItem for each guess
         <GuessItem key={guess} guess={guess} />
       ))}
     </div>
@@ -392,100 +464,116 @@ export const GuessList = ({ guesses }: GuessListProps) => {
 };
 ```
 
-_Comments:_
+**Explanation:**
 
-- **"use client":** Ensures client-side rendering.
-- **Props Interface:** `GuessListProps` defines the expected props.
-- **Component Definition:** `GuessList` accepts `guesses` as props.
-- **Layout:** The `<div>` uses Tailwind CSS classes to arrange items vertically with gaps.
-- **Mapping Over Guesses:**
-  - We use `guesses.map` to iterate over each guess.
-  - For each guess, we render a `GuessItem` component.
-  - `key` prop is set to `guess` to help React identify elements.
+- **Props Definition:**
+
+  - We define the type `GuessListProps` to specify that `guesses` is an array of strings.
+
+- **List Rendering:**
+
+  - We use `guesses.map()` to iterate over the guesses and render a `GuessItem` for each.
+  - The `key` prop helps React identify which items have changed.
+
+- **Tailwind CSS Classes:**
+  - `flex flex-col`: Arranges items vertically.
+  - `gap-3`: Adds spacing between items.
 
 </details>
 
 ---
 
-### 5. Implement the `GuessItem` Component
+## Implementing the `GuessItem` Component
 
-**Task:** In `src/components/guess-item.tsx`, create the `GuessItem` component to display individual guesses.
+The `GuessItem` component displays individual guesses.
 
-**Why:** This component displays each guess in a formatted way, similar to individual item components in an Angular list.
+### Exercise 5: Creating the `GuessItem` Component
+
+Your final task is to implement the `GuessItem` component that displays a single guess.
+
+**Instructions:**
+
+1. **Create the File:**
+
+   - Create a new file at `src/components/guess-item.tsx`.
+
+2. **Import UI Components:**
+
+   - Import `InputOTP`, `InputOTPGroup`, and `InputOTPSlot` from our custom UI library.
+
+3. **Implement the `GuessItem` Component:**
+
+   - Accepts a single guess as a prop.
+   - Renders the guess using the `InputOTP` component in read-only mode.
 
 **Hints:**
 
-- **Client-Side Directive:**
-  - Add `"use client";` at the top to enable interactivity if needed.
 - **Props Definition:**
-  - Define the `GuessItemProps` interface to type-check the `guess` prop.
-- **Display Logic:**
-  - Use the `InputOTP` component in read-only mode to display the guess as individual letters.
-- **Helper Component:**
-  - Consider creating a helper component like `GuessItemSlot` to render each letter slot, which keeps the code organized.
 
-**Example:**
+  - Define a type for the component's props that includes a `guess` property of type `string`.
+
+- **Read-Only Input:**
+
+  - Use the `readOnly` prop on `InputOTP` to prevent editing.
+
+- **Rendering Each Character:**
+  - Create a separate `GuessItemSlot` component to render each character.
+  - Use an array of indices `[0, 1, 2, 3, 4]` to map over and create the slots.
+
+Here's a starting point for your `GuessItem` component:
 
 ```typescript
 // src/components/guess-item.tsx
 
 "use client";
 
-import { InputOTP } from "./ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
 type GuessItemProps = {
-  guess: string;
+  // TODO: Define the props type
 };
 
 export function GuessItem({ guess }: GuessItemProps) {
   return (
-    <InputOTP readOnly value={guess}>
-      {/* Render the input slots for each letter in the guess */}
+    <InputOTP
+    // TODO: Add necessary props (readOnly, value, etc.)
+    >
+      <InputOTPGroup>
+        {/* TODO: Add InputOTPSlot components for each character */}
+      </InputOTPGroup>
     </InputOTP>
   );
 }
 ```
 
-**Helpful Links:**
-
-- [React Components and Props](https://reactjs.org/docs/components-and-props.html)
-- [Read-Only Inputs in React](https://reactjs.org/docs/forms.html#controlled-components)
-- [Understanding React Keys](https://reactjs.org/docs/lists-and-keys.html#keys)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/components/guess-item.tsx
 
 "use client";
 
-import { cn } from "~/lib/utils";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
 type GuessItemProps = {
-  guess: string;
+  guess: string; // Define the props type
 };
 
-// Helper component for individual slots
+// A helper component for rendering each slot
 function GuessItemSlot({ index }: { index: number }) {
   return (
-    <InputOTPSlot
-      index={index} // Index prop required by InputOTPSlot
-      className={cn("h-12 w-12 text-2xl uppercase")} // Styling for the slot
-    />
+    <InputOTPSlot index={index} className="h-12 w-12 text-2xl uppercase" />
   );
 }
 
-// Define the GuessItem component
 export function GuessItem({ guess }: GuessItemProps) {
   return (
-    // InputOTP in read-only mode to display the guess
     <InputOTP readOnly maxLength={5} value={guess}>
       <InputOTPGroup>
-        {/* Create an input slot for each character in the guess */}
+        {/* Render a slot for each character in the guess */}
         {[0, 1, 2, 3, 4].map((index) => (
           <GuessItemSlot key={index} index={index} />
         ))}
@@ -495,86 +583,39 @@ export function GuessItem({ guess }: GuessItemProps) {
 }
 ```
 
-_Comments:_
+**Explanation:**
 
-- **"use client":** Enables client-side rendering.
-- **Imports:** We import necessary components and utilities.
-- **Props Interface:** `GuessItemProps` defines the expected props.
-- **Helper Component (`GuessItemSlot`):**
-  - Created for cleaner code and reusability.
-  - Accepts an `index` prop and renders an `InputOTPSlot`.
-  - Applies styling to make slots uniform.
-- **Component Definition (`GuessItem`):**
-  - Renders `InputOTP` in `readOnly` mode to display the guess.
-  - `maxLength` ensures only 5 characters are displayed.
-  - `value` is set to the `guess` prop.
-- **InputOTPGroup & InputOTPSlot:**
-  - We map over indices 0 to 4 to create slots for each character.
-  - Each slot uses `GuessItemSlot` helper component.
+- **Props Definition:**
+
+  - We define `GuessItemProps` with a `guess` property.
+
+- **Read-Only InputOTP:**
+
+  - Setting `readOnly` to `true` displays the input without allowing edits.
+
+- **Rendering Slots:**
+
+  - We map over an array of indices to render each character slot.
+  - The `GuessItemSlot` component renders each slot with consistent styling.
+
+- **Client Component Directive:**
+  - We include `"use client";` because we might add interactivity later.
 
 </details>
 
 ---
 
-### 6. Update the Root Layout
+## Updating the Root Layout
 
-**Task:** In `src/app/layout.tsx`, modify the root layout to ensure proper styling and metadata.
+Ensure that your root layout is properly set up to provide consistent styling and metadata across your application, similar to configuring the main module in Angular.
 
-**Why:** Setting up the root layout ensures consistent styling and metadata across your application, similar to setting up the main template in Angular.
-
-**Hints:**
-
-- **Metadata:**
-  - Use the `Metadata` type to define the `title` and `description` of your app.
-- **Global Styles:**
-  - Ensure global styles are imported to apply base styles across all components.
-- **Layout Structure:**
-  - Wrap your content in `<html>` and `<body>` tags, applying necessary classes for styling.
-
-**Example:**
+**Modify your `src/app/layout.tsx` file to include the following:**
 
 ```typescript
 // src/app/layout.tsx
 
 import type { Metadata } from "next";
-import "~/styles/globals.css";
-
-export const metadata: Metadata = {
-  title: "Your App Title",
-  description: "Your app description",
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
-}
-```
-
-**Helpful Links:**
-
-- [Next.js Layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts)
-- [Metadata in Next.js](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)
-- [Tailwind CSS Dark Mode](https://tailwindcss.com/docs/dark-mode)
-
-**Solution Code:**
-
-<details>
-<summary>Click to reveal solution</summary>
-
-```typescript
-// src/app/layout.tsx
-
-import { GeistSans } from "geist/font/sans";
-import type { Metadata } from "next";
-
-import "~/styles/globals.css";
+import "~/styles/globals.css"; // Import global styles
 
 // Define metadata for the application
 export const metadata: Metadata = {
@@ -582,13 +623,15 @@ export const metadata: Metadata = {
   description: "A Wordle clone built with Next.js and Drizzle", // Meta description
 };
 
-// RootLayout component wraps all pages
+// The RootLayout component wraps all pages
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    // Set the language and apply custom fonts and dark mode
-    <html lang="en" className={`${GeistSans.variable} dark`}>
+    // Set the language and apply dark mode
+    <html lang="en" className="dark">
       {/* Body with full height to enable centering */}
       <body className="h-screen">
         {/* Render the page content */}
@@ -599,29 +642,26 @@ export default function RootLayout({
 }
 ```
 
-_Comments:_
+**Explanation:**
 
-- **Imports:**
-  - `GeistSans`: Custom font import.
-  - `Metadata`: Type for defining metadata.
-  - Global styles are imported from `globals.css`.
-- **Metadata Definition:**
-  - Sets the title and description for SEO and browser display.
-- **RootLayout Component:**
-  - Wraps all pages, providing a consistent layout.
-  - `<html>` tag sets the language and applies classes for fonts and dark mode.
-  - `<body>` tag sets the height to full screen to help with centering content.
-  - `{children}` renders the content of the current page.
+- **Metadata:**
 
-</details>
+  - Similar to setting meta tags in `index.html` in Angular.
+
+- **Global Styles:**
+
+  - We import global CSS styles, akin to including styles in `styles.css` in Angular.
+
+- **Layout Structure:**
+  - The `RootLayout` component provides a consistent structure across all pages.
 
 ---
 
 ## Checking Your Progress
 
-Now that you've implemented all the components, it's time to check your work.
+![Section 1 Checkpoint](img/1.png)
 
-![Game Board Screenshot](img/4.png)
+Now that you've implemented all the components, it's time to check your work.
 
 **Instructions:**
 
@@ -647,25 +687,61 @@ Now that you've implemented all the components, it's time to check your work.
    - **Guess Input:**
 
      - Enter a 5-letter word in the input field.
-     - Each letter should appear in its own box, reflecting the Wordle style.
+     - Each letter should appear in its own box, mimicking the Wordle style.
 
    - **Submitting a Guess:**
+
      - Press **Enter** after typing your guess.
      - The guess should be logged in the console (for now).
      - The input field should clear after submission.
+
+**Expected Result:**
+
+- The game board displays correctly with the sample guesses.
+- The input field functions as expected, logging guesses to the console.
 
 ---
 
 ## Next Steps
 
-In the next section, we'll delve into implementing the core game logic and state management. This will involve:
+In the next section, we'll go into implementing the core game logic and state management. This will involve:
 
-- **Managing global state:**
+- **Managing Global State:**
 
   - We'll explore state management solutions to share data between components.
 
-- **Implementing game logic:**
+- **Implementing Game Logic:**
+
   - You'll write functions to check user guesses against the target word.
   - Provide feedback by updating the UI based on whether letters are correct, present, or absent.
 
 ---
+
+## Helpful Resources
+
+To deepen your understanding of Next.js and its App Router, you might find the following resources helpful:
+
+1. **Next.js Routing Fundamentals:**
+
+   - [Next.js Routing Documentation](https://nextjs.org/docs/app/building-your-application/routing)
+     - Learn how Next.js handles routing using the App Router, including file-based routing and nested layouts.
+
+2. **Dynamic Routes in Next.js:**
+
+   - [Dynamic Routes in Next.js](https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes)
+     - Understand how to create dynamic routes that capture parameters, similar to the `[gameId]` route we've used.
+
+3. **Server and Client Components:**
+
+   - [Understanding Server and Client Components](https://nextjs.org/docs/getting-started/react-essentials)
+     - Explore the differences between server and client components in Next.js and how to use them effectively.
+
+4. **Shadcn UI:**
+
+   - [Shadcn UI](https://ui.shadcn.com/)
+     - Shadcn UI is a component library that provides a set of reusable UI components for your Next.js application.
+
+5. **React Hooks Documentation:**
+
+   - [React Hooks](https://reactjs.org/docs/hooks-intro.html)
+     - Learn more about using hooks like `useState` in React components.
