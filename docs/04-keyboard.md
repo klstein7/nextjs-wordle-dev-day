@@ -1,6 +1,6 @@
 # 04: Keyboard Implementation
 
-Welcome to the fourth section of our tutorial! In this section, you'll enhance your Wordle clone by adding an **on-screen keyboard**. This keyboard will improve the user experience by providing an alternative input method and visual feedback.
+Welcome to the fourth section of the tutorial! In this section, you'll enhance your Wordle clone by adding an **on-screen keyboard**. This keyboard will improve the user experience by providing an alternative input method and visual feedback.
 
 ## Prerequisites
 
@@ -81,11 +81,7 @@ Create a new file at `src/lib/store/guess-provider.tsx`:
 import { useState } from "react";
 import { GuessContext } from "./guess-context";
 
-export const GuessProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const GuessProvider = ({ children }: { children: React.ReactNode }) => {
   // Initialize the guess state
   const [guess, setGuess] = useState<string>("");
 
@@ -393,6 +389,8 @@ Now that you've implemented the on-screen keyboard and updated the components, i
 
 **Instructions:**
 
+![Section 4 Checkpoint](img/3.png)
+
 1. **Start the Development Server:**
 
    ```bash
@@ -434,8 +432,6 @@ Now that you've implemented the on-screen keyboard and updated the components, i
 - Guesses should be submitted correctly and displayed on the game board.
 - The shared `guess` state should work seamlessly across components.
 
-If everything works as expected, congratulations! You've successfully enhanced your Wordle clone with an on-screen keyboard, providing an improved user experience.
-
 ---
 
 ## Next Steps
@@ -449,8 +445,6 @@ In the next section, we'll focus on adding visual feedback for guesses and imple
 - **Game Logic:**
   - Determining when the game is won or lost.
   - Handling game-over scenarios and displaying appropriate messages.
-
-By continuing to build on your application, you'll gain a deeper understanding of state management and component interaction in React.
 
 ---
 

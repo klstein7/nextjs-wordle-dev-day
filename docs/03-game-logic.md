@@ -1,6 +1,6 @@
 # 03: Game Logic Implementation
 
-Welcome to the third section of our tutorial! In this section, you'll add the core game mechanics, state management, and server-side logic to make your Wordle clone fully functional. This involves implementing the game logic on both the server and client sides, similar to how you'd manage services and state in an **Angular** application with **Spring Boot** for backend services.
+Welcome to the third section of the tutorial! In this section, you'll add the core game mechanics, state management, and server-side logic to make your Wordle clone fully functional. This involves implementing the game logic on both the server and client sides, similar to how you'd manage services and state in an **Angular** application with **Spring Boot** for backend services.
 
 ## Prerequisites
 
@@ -173,7 +173,7 @@ const create = async () => {
 // Function to update the status of a game
 export const update = async (
   id: number,
-  status: (typeof games.status.enumValues)[number],
+  status: (typeof games.status.enumValues)[number]
 ) => {
   // TODO: Implement function to update a game's status
 };
@@ -238,7 +238,7 @@ const create = async () => {
 // Function to update the status of a game
 export const update = async (
   id: number,
-  status: (typeof games.status.enumValues)[number],
+  status: (typeof games.status.enumValues)[number]
 ) => {
   // Update the game status in the database
   const [updatedGame] = await db
@@ -626,7 +626,7 @@ export const findByGameId = async (gameId: number) => {
 
 ### Exercise 6: Consolidating the API
 
-To organize your API controllers, you'll create an `api.ts` file. This approach is similar to creating a centralized API module in Angular.
+To organize your API controllers, you'll create an `api.ts` file.
 
 **Instructions:**
 
@@ -666,7 +666,7 @@ export const api = {
 
 ## Updating the Home Page
 
-Now, you'll modify the home page to allow users to start a new game. This is similar to having a component in Angular that navigates to a new route when starting a game, but with the added step of creating a new game via an API call.
+Now, you'll modify the home page to allow users to start a new game.
 
 ### Exercise 7: Implementing the New Game Button
 
@@ -785,7 +785,7 @@ Your task is to update the game page to fetch the game's guesses and pass them t
 
 **Understanding Server Components:**
 
-By default, components in the `app` directory are server components. This means they can fetch data on the server before rendering, similar to server-side rendering in Angular Universal.
+By default, components in the `app` directory are server components. This means they can fetch data on the server before rendering.
 
 **Hints:**
 
@@ -849,8 +849,6 @@ export default async function GamePage({
 
 In Next.js 13, components in the `app` directory are **Server Components** by default. They are rendered on the server and can fetch data directly. If you need to use client-side features like state or event handlers, you need to create **Client Components** by adding the `"use client"` directive at the top of the file.
 
-> **Angular Comparison:** In Angular, components run on the client by default, but with Angular Universal, you can render components on the server for faster initial load times. Next.js Server Components provide a similar benefit by offloading rendering to the server.
-
 ---
 
 ## Checking Your Progress
@@ -858,6 +856,8 @@ In Next.js 13, components in the `app` directory are **Server Components** by de
 Now that you've implemented the game logic, it's time to verify that everything works as expected.
 
 **Instructions:**
+
+![Section 2 Checkpoint](img/2.png)
 
 1. **Start the Development Server:**
 

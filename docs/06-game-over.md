@@ -1,6 +1,6 @@
 # 06: Implementing Game Over Logic
 
-Welcome to the sixth section of our tutorial! In this section, you'll implement the **game over logic** in your Wordle clone. This includes handling game completion, displaying results, and allowing users to start a new game. By the end of this section, your game will offer a complete experience from start to finish.
+Welcome to the sixth section of the tutorial! In this section, you'll implement the **game over logic** in your Wordle clone. This includes handling game completion, displaying results, and allowing users to start a new game. By the end of this section, your game will offer a complete experience from start to finish.
 
 ## Prerequisites
 
@@ -457,15 +457,18 @@ Now that you've implemented the game over logic and new game creation, it's time
 
 3. **Play Through a Game:**
 
-   - **Win Scenario:**
+- **Win Scenario:**
 
-     - Guess the correct word within six attempts.
-     - Upon winning:
-       - The keyboard should disappear.
-       - A victory message ("Bam! You won! 🎉") should be displayed.
-       - A "Play again!" button should appear.
+  ![Section 6 Checkpoint - Win Scenario](img/6.png)
+
+  - Guess the correct word within six attempts.
+  - Upon winning:
+    - The keyboard should disappear.
+    - A victory message ("Bam! You won! 🎉") should be displayed.
+    - A "Play again!" button should appear.
 
 - **Lose Scenario:**
+  ![Section 6 Checkpoint - Lose Scenario](img/7.png)
   - Make six incorrect guesses.
   - Upon losing:
     - The keyboard should disappear.
@@ -497,8 +500,6 @@ In the next section, we'll focus on adding final touches to our game, such as:
 - **UI Enhancements:**
   - Adding animations for guess submissions.
   - Improving the overall styling and responsiveness.
-
-By continuing to refine your application, you'll enhance the user experience and solidify your understanding of state management and component interaction in React, similar to advanced techniques in Angular applications.
 
 ## Helpful Resources
 

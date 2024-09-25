@@ -1,6 +1,6 @@
 # 05: Word Validation
 
-Welcome to the fifth section of our tutorial! In this section, you'll enhance your Wordle clone by implementing **word validation** and improving user feedback. This will ensure that users can only submit valid guesses, enhancing the game's integrity and providing a better user experience. Additionally, you'll add error notifications to inform users when their guesses are invalid, similar to form validation feedback in Angular applications.
+Welcome to the fifth section of the tutorial! In this section, you'll enhance your Wordle clone by implementing **word validation** and improving user feedback. This will ensure that users can only submit valid guesses, enhancing the game's integrity and providing a better user experience. Additionally, you'll add error notifications to inform users when their guesses are invalid, similar to form validation feedback in Angular applications.
 
 ## Prerequisites
 
@@ -426,6 +426,8 @@ export const GuessItem = ({ guess }: GuessItemProps) => {
 
 ## Checking Your Progress
 
+![Section 5 Checkpoint - Word Validation](img/4.png)
+
 Now that you've implemented word validation and enhanced user feedback, it's time to test your application. Testing ensures that all components work together seamlessly and that the user experience is as intended.
 
 **Instructions:**
@@ -453,6 +455,7 @@ Now that you've implemented word validation and enhanced user feedback, it's tim
 4. **Test Word Validation:**
 
    - **Invalid Word:**
+     ![Section 5 Checkpoint - Invalid Word](img/5.png)
      - Enter a 5-letter word that's not in the word list (e.g., "ABCDE").
      - Upon submission, a toast notification should display an error message like "Guess must be a valid word."
      - This feedback helps users understand that their guess was not accepted due to invalidity.
@@ -496,8 +499,6 @@ In the next section, we'll focus on implementing game-over conditions and adding
 - **User Interface Updates:**
   - Displaying game-over messages.
   - Providing options to start a new game.
-
-By continuing to build on your application, you'll deepen your understanding of state management, validation, and user feedback in React, paralleling advanced techniques in Angular applications.
 
 ---
 

@@ -1,44 +1,10 @@
 # 01: Drizzle Setup
 
-Welcome to the first section of our tutorial! In this section, we'll set up **Drizzle ORM** to define the database schema for our Wordle clone. If you're familiar with **Java** and **Spring Boot**, you'll notice similarities between defining entities in Drizzle ORM and creating entity classes using **JPA (Java Persistence API)** in Spring Boot. We'll include short informative tidbits comparing the two frameworks as we proceed.
+Welcome to the first section of the tutorial! In this section, we'll set up **Drizzle ORM** to define the database schema for our Wordle clone. If you're familiar with **Java** and **Spring Boot**, you'll notice similarities between defining entities in Drizzle ORM and creating entity classes using **JPA (Java Persistence API)** in Spring Boot.
 
 ## Prerequisites
 
-Before you begin, ensure you've completed the "Getting Started" steps or have cloned the repository and installed all dependencies.
-
-**To get up to speed:**
-
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/farmcreditca/nextjs-wordle-dev-day.git
-   ```
-
-2. **Navigate to the Project Directory:**
-
-   ```bash
-   cd nextjs-wordle-dev-day
-   ```
-
-3. **Install Dependencies:**
-
-   ```bash
-   yarn install
-   ```
-
-4. **Set Up Your Environment Variables:**
-
-   ```bash
-   cp .env.example .env
-   ```
-
-5. **Open the Project in Your Code Editor:**
-
-   ```bash
-   code .
-   ```
-
-   _Note: We're using **Visual Studio Code** in this tutorial for its excellent support of the technologies we'll be using._
+Before you begin, ensure you've completed the "Getting Started" steps in the project `README.md` or have cloned the repository and installed all dependencies.
 
 ---
 
@@ -70,7 +36,7 @@ First, we'll import key functions and types from Drizzle ORM and create a table 
 
    // Create a table creator function with a custom prefix
    export const createTable = sqliteTableCreator(
-     (name) => `nextjs_wordle_dev_day_${name}`, // Prefixes table names with 'nextjs_wordle_dev_day_'
+     (name) => `nextjs_wordle_dev_day_${name}` // Prefixes table names with 'nextjs_wordle_dev_day_'
    );
    ```
 
@@ -154,7 +120,7 @@ export const games = createTable("game", {
   // Define 'updatedAt' with default current timestamp and auto-update
   updatedAt: int("updated_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
-    .$onUpdate(sql`(unixepoch())`) // Update to current timestamp on update
+    .$onUpdateFn(() => new Date()) // Update to current timestamp on update
     .notNull(),
 });
 ```
@@ -169,7 +135,6 @@ export const games = createTable("game", {
   - Non-null text field with an enum constraint to ensure only specific values are allowed.
 - **`createdAt` and `updatedAt` Fields:**
   - Non-null integer fields representing timestamps.
-  - Use `sql` functions to set default values to the current Unix epoch time.
   - `$onUpdate(sql`(unixepoch())`)` ensures `updatedAt` is updated automatically.
 
 > **Spring Boot Comparison:** In Spring Boot, you would define an entity class `Game` with fields annotated using `@Column`. You might use `@Id` and `@GeneratedValue` for the `id` field, and `@Enumerated` for the `status` field. The timestamp fields could be annotated with `@CreationTimestamp` and `@UpdateTimestamp` from Hibernate.
@@ -256,7 +221,7 @@ export const guesses = createTable("guess", {
   // Define 'updatedAt' with default current timestamp and auto-update
   updatedAt: int("updated_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
-    .$onUpdate(sql`(unixepoch())`)
+    .$onUpdateFn(() => new Date())
     .notNull(),
 });
 ```
@@ -417,9 +382,5 @@ To deepen your understanding of Drizzle ORM and database schema definitions, you
 
    - [Defining Relations in Drizzle ORM](https://orm.drizzle.team/docs/relation-definition)
      - Instructions on how to define relationships between tables.
-
----
-
-By completing this section, you've laid the foundation for the backend of your Wordle clone. Understanding how to define tables and relationships is crucial for any database-driven application. Keep up the great work, and let's move on to bringing the game to life in the next section!
 
 ---

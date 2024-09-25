@@ -1,6 +1,6 @@
 # 02: Game Board Implementation
 
-Welcome to the second section of our tutorial! In this section, you'll build the game board UI for your Wordle clone using **React** and **Next.js**. This will help you understand component composition and state management in React, much like how you'd structure components in **Angular**.
+Welcome to the second section of the tutorial! In this section, you'll build the game board UI for your Wordle clone using **React** and **Next.js**. This will help you understand component composition and state management in React, much like how you'd structure components in **Angular**.
 
 ## Prerequisites
 
@@ -32,11 +32,11 @@ Once you've completed these steps, you're ready to implement the game board.
 
 ## Setting Up the Game Page
 
-First, you'll set up the game page in Next.js. In Next.js, pages are created using the **File-Based Routing** system, similar to how routes are defined in Angular's routing module.
+First, you'll set up the game page in Next.js. In Next.js, pages are created using the **File-Based Routing** system.
 
 ### Exercise 1: Creating the Game Page
 
-Your task is to create a new file for the game page and implement a basic component that renders a placeholder for the game board. In Next.js, the file path determines the route, similar to how you might define routes in Angular's router module.
+Your task is to create a new file for the game page and implement a basic component that renders a placeholder for the game board. In Next.js, the file path determines the route.
 
 **Instructions:**
 
@@ -57,7 +57,7 @@ Your task is to create a new file for the game page and implement a basic compon
 
 - Use the `export default function` syntax to create your `GamePage` component. This is similar to defining a component in Angular, but in React, we use functions instead of classes or decorators.
 
-- To center the `GameBoard`, you can use Tailwind CSS classes. Consider using `flex`, `h-full`, `items-center`, and `justify-center` on a wrapping `div`. This is analogous to using Flexbox in Angular templates or styles.
+- To center the `GameBoard`, you can use Tailwind CSS classes. Consider using `flex`, `h-full`, `items-center`, and `justify-center` on a wrapping `div`.
 
 - **Understanding Server Components:**
   - In Next.js 13, components inside the `app` directory are **server components** by default.
@@ -239,7 +239,7 @@ Your task is to implement the `GuessInput` component that allows users to enter 
 2. **Import Dependencies:**
 
    - Import `useState` from React.
-   - Import the `InputOTP`, `InputOTPGroup`, and `InputOTPSlot` components from our custom UI library.
+   - Import the `InputOTP`, `InputOTPGroup`, and `InputOTPSlot` components from our installed shadcn components.
 
 3. **Implement the `GuessInput` Component:**
 
@@ -251,7 +251,7 @@ Your task is to implement the `GuessInput` component that allows users to enter 
 
 - **Custom Component Notice:**
 
-  - The `InputOTP` component is a custom component provided in the source code at `src/components/ui/input-otp.tsx`.
+  - The `InputOTP` component is a shadcn/ui component provided in the source code at `src/components/ui/input-otp.tsx`.
   - It allows users to input a fixed number of characters, making it ideal for our 5-letter Wordle guesses.
 
 - **State Management:**
@@ -296,11 +296,9 @@ export const GuessInput = () => {
 
   return (
     <InputOTP
-      // TODO: Add necessary props (maxLength, value, onChange, etc.)
+    // TODO: Add necessary props (maxLength, value, onChange, etc.)
     >
-      <InputOTPGroup>
-        {/* TODO: Add InputOTPSlot components */}
-      </InputOTPGroup>
+      <InputOTPGroup>{/* TODO: Add InputOTPSlot components */}</InputOTPGroup>
     </InputOTP>
   );
 };
@@ -433,14 +431,10 @@ type GuessListProps = {
 export const GuessList = ({ guesses }: GuessListProps) => {
   return (
     // TODO: Add a div with appropriate Tailwind classes
-    <>
-      {/* TODO: Map over guesses and render GuessItem components */}
-    </>
+    <>{/* TODO: Map over guesses and render GuessItem components */}</>
   );
 };
 ```
-
-**Try implementing this component before looking at the solution.**
 
 ---
 
@@ -491,7 +485,7 @@ export const GuessList = ({ guesses }: GuessListProps) => {
 
 ## Implementing the `GuessItem` Component
 
-The `GuessItem` component displays individual guesses, similar to how you might create a reusable component in Angular.
+The `GuessItem` component displays individual guesses.
 
 ### Exercise 5: Creating the `GuessItem` Component
 
@@ -542,7 +536,7 @@ type GuessItemProps = {
 export function GuessItem({ guess }: GuessItemProps) {
   return (
     <InputOTP
-      // TODO: Add necessary props (readOnly, value, etc.)
+    // TODO: Add necessary props (readOnly, value, etc.)
     >
       <InputOTPGroup>
         {/* TODO: Add InputOTPSlot components for each character */}
@@ -571,10 +565,7 @@ type GuessItemProps = {
 // A helper component for rendering each slot
 function GuessItemSlot({ index }: { index: number }) {
   return (
-    <InputOTPSlot
-      index={index}
-      className="h-12 w-12 text-2xl uppercase"
-    />
+    <InputOTPSlot index={index} className="h-12 w-12 text-2xl uppercase" />
   );
 }
 
@@ -668,6 +659,8 @@ export default function RootLayout({
 
 ## Checking Your Progress
 
+![Section 1 Checkpoint](img/1.png)
+
 Now that you've implemented all the components, it's time to check your work.
 
 **Instructions:**
@@ -707,17 +700,11 @@ Now that you've implemented all the components, it's time to check your work.
 - The game board displays correctly with the sample guesses.
 - The input field functions as expected, logging guesses to the console.
 
-**Troubleshooting Tips:**
-
-- If you encounter errors, check the terminal and browser console for messages.
-- Ensure all components are correctly imported and exported.
-- Verify that you've added `"use client";` to components using state or event handlers.
-
 ---
 
 ## Next Steps
 
-In the next section, we'll delve into implementing the core game logic and state management. This will involve:
+In the next section, we'll go into implementing the core game logic and state management. This will involve:
 
 - **Managing Global State:**
 
@@ -727,8 +714,6 @@ In the next section, we'll delve into implementing the core game logic and state
 
   - You'll write functions to check user guesses against the target word.
   - Provide feedback by updating the UI based on whether letters are correct, present, or absent.
-
-By continuing to build on your application, you'll deepen your understanding of state management and component interaction in React, similar to advanced techniques in Angular applications.
 
 ---
 
