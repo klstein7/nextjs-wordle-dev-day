@@ -1,18 +1,6 @@
 # 03: Game Logic Implementation
 
-Welcome to the third section of our tutorial! In this part, you'll add the core game mechanics, state management, and server-side logic to make our Wordle clone fully functional. This involves implementing the game logic on both the server and client sides, similar to how you'd manage services and state in an Angular application.
-
-## Exercise Objectives
-
-- **Implement** utility functions for random word selection.
-- **Develop** server-side logic for game and guess management.
-- **Create** an API layer to interact with the server-side logic.
-- **Update** the home page to start new games.
-- **Modify** the game page to fetch and display game data.
-- **Enhance** components to handle real game data.
-- **Verify** the functionality by running the application.
-
----
+Welcome to the third section of the tutorial! In this section, you'll add the core game mechanics, state management, and server-side logic to make your Wordle clone fully functional. This involves implementing the game logic on both the server and client sides, similar to how you'd manage services and state in an **Angular** application with **Spring Boot** for backend services.
 
 ## Prerequisites
 
@@ -42,24 +30,37 @@ Once you've completed these steps, you're ready to implement the game logic.
 
 ---
 
-## Tasks and Hints
+## Implementing Utility Functions
 
-### 1. Update Utility Functions
+First, you'll implement the `getRandomWord` function to select a random word for each new game. This function is akin to a utility service in Angular that provides common functionalities across components.
 
-**Task:** Implement the `getRandomWord` function in `src/lib/utils.ts` to select a random word for each new game.
+> **Angular Comparison:** In Angular, you might create a shared service with methods that can be injected into components. Here, we create a utility function that can be imported where needed.
 
-**Why:** The game requires a random word to be guessed. This function will provide that word when a new game is created.
+### Exercise 1: Creating the `getRandomWord` Function
+
+Your task is to implement the `getRandomWord` function in the `utils` file. In React applications, utility functions like this are often placed in separate files and imported where needed, similar to Angular's approach of using services for shared functionality, but as plain JavaScript functions rather than injectable services.
+
+**Instructions:**
+
+1. **Open the `utils.ts` File:**
+
+   Open the file `src/lib/utils.ts` in your code editor.
+
+2. **Import the `words` Array:**
+
+   Import the `words` array from your word list, which is located in `src/lib/words.ts`. This array contains all possible words that can be used in the game.
+
+3. **Implement the `getRandomWord` Function:**
+
+   Implement a function that selects and returns a random word from the `words` array.
 
 **Hints:**
 
-- **Importing Words:**
-  - You'll need an array of words to select from. Assume you have a `words` array in `src/lib/words.ts`.
-- **Random Selection:**
-  - Use `Math.random()` and `Math.floor()` to select a random index within the bounds of the words array.
-- **Error Handling:**
-  - Check if the selected word exists and handle potential errors gracefully.
+- Use `Math.random()` and `Math.floor()` to generate a random index.
+- Handle the case where no word is found by throwing an error.
+- Convert the selected word to uppercase for consistency.
 
-**Example:**
+**Starting Point:**
 
 ```typescript
 // src/lib/utils.ts
@@ -67,27 +68,25 @@ Once you've completed these steps, you're ready to implement the game logic.
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Import the words array
-import { words } from "./words";
+// TODO: Import the words array
 
+// Utility function for combining class names
 export function cn(...inputs: string[]) {
   return twMerge(clsx(inputs));
 }
 
+// TODO: Implement the getRandomWord function
 export function getRandomWord() {
-  // TODO: Implement the function to return a random word from the words array
+  // Your code here
 }
 ```
 
-**Helpful Links:**
+When you're ready, check your implementation against the provided solution.
 
-- [JavaScript Math.random()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random)
-- [Error Handling in JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Control_flow_and_error_handling)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/lib/utils.ts
@@ -118,70 +117,81 @@ export function getRandomWord() {
 }
 ```
 
-_Comments:_
-
-- **Imports:**
-  - We import `clsx` and `twMerge` for class name utilities.
-  - Import `words` array containing possible words for the game.
-- **`cn` Function:**
-  - Combines class names using `clsx` and `twMerge`.
-- **`getRandomWord` Function:**
-  - Uses `Math.random()` and `Math.floor()` to select a random index.
-  - Retrieves the word at the random index from the `words` array.
-  - Checks if the word exists and throws an error if it doesn't.
-  - Returns the word converted to uppercase.
-
 </details>
 
 ---
 
-### 2. Implement Server-Side Logic
+## Implementing Server-Side Logic
 
-**Task:** Create server-side services to handle game creation, retrieval, and updating, as well as guess management.
+Next, you'll create server-side services to handle game creation, retrieval, updating, and guess management. This mirrors how you'd use services in **Spring Boot** to manage business logic and interact with the database.
 
-**Why:** The server-side logic handles the core game mechanics, including storing game state and processing guesses, similar to backend services in Angular.
+> **Spring Boot Comparison:** In Spring Boot, you might create service classes annotated with `@Service` to encapsulate business logic and interact with repositories for database operations.
+
+### Exercise 2: Creating the Game Service
+
+Your task is to implement the game service with functions for creating, retrieving, and updating games. This service will act similarly to a backend service in a Spring Boot application, encapsulating database operations and business logic.
+
+**Instructions:**
+
+1. **Create the Game Service File:**
+
+   Create a new file at `src/server/services/game.service.ts`.
+
+2. **Implement the Following Functions:**
+
+   - `getById`: Retrieve a game by its ID (similar to a `findById` method in a Spring Boot repository).
+   - `create`: Create a new game with a random word (akin to a `save` method in a Spring Boot service).
+   - `update`: Update the status of an existing game (similar to an `update` method in a Spring Boot service).
 
 **Hints:**
 
-- **Game Service:**
-  - Implement functions to create a new game, get a game by ID, and update a game's status.
-- **Guess Service:**
-  - Implement functions to create a new guess and find guesses by game ID.
-- **Database Operations:**
-  - Use your ORM (e.g., Drizzle ORM) to interact with the database.
-  - Handle errors and edge cases appropriately.
+- Use the `db` instance to interact with your database, much like you would use a repository in Spring Boot.
+- Remember to import necessary dependencies and types.
+- Use the `getRandomWord` function you created earlier for new games.
+- Handle cases where a game is not found or creation fails by throwing errors.
 
-**Example for `game.service.ts`:**
+**Starting Point:**
 
 ```typescript
 // src/server/services/game.service.ts
 
+import { eq } from "drizzle-orm";
+import { getRandomWord } from "~/lib/utils";
 import { db } from "../db";
 import { games } from "../db/schema";
-import { getRandomWord } from "~/lib/utils";
 
+// Function to get a game by its ID
+export const getById = async (id: number) => {
+  // TODO: Implement function to retrieve a game by ID
+};
+
+// Function to create a new game
+const create = async () => {
+  // TODO: Implement function to create a new game
+};
+
+// Function to update the status of a game
+export const update = async (
+  id: number,
+  status: (typeof games.status.enumValues)[number]
+) => {
+  // TODO: Implement function to update a game's status
+};
+
+// Export the gameService with the methods
 export const gameService = {
-  create: async () => {
-    // TODO: Implement game creation logic
-  },
-  getById: async (id: number) => {
-    // TODO: Implement logic to retrieve a game by ID
-  },
-  update: async (id: number, status: string) => {
-    // TODO: Implement logic to update a game's status
-  },
+  create,
+  getById,
+  update,
 };
 ```
 
-**Helpful Links:**
+When you're ready, check your implementation against the provided solution.
 
-- [Drizzle ORM Documentation](https://orm.drizzle.team/)
-- [Error Handling in Async Functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
-
-**Solution Code for `game.service.ts`:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/server/services/game.service.ts
@@ -228,7 +238,7 @@ const create = async () => {
 // Function to update the status of a game
 export const update = async (
   id: number,
-  status: (typeof games.status.enumValues)[number],
+  status: (typeof games.status.enumValues)[number]
 ) => {
   // Update the game status in the database
   const [updatedGame] = await db
@@ -253,49 +263,91 @@ export const gameService = {
 };
 ```
 
-_Comments:_
+**Explanation:**
 
-- **Imports:**
-  - `eq` from `drizzle-orm` for query conditions.
-  - `getRandomWord` to get a random word for new games.
-  - `db` and `games` schema for database operations.
 - **`getById` Function:**
-  - Queries the database for a game with the given ID.
-  - Throws an error if no game is found.
-- **`create` Function:**
-  - Uses `getRandomWord` to get a word.
-  - Inserts a new game into the `games` table with the random word and status `in_progress`.
-  - Returns the created game.
-- **`update` Function:**
-  - Updates the status of a game with the given ID.
+
+  - Retrieves a game by its ID using the `db.query.games.findFirst` method.
   - Throws an error if the game is not found.
-- **Exported Service:**
-  - Exports the `gameService` object containing the methods.
+
+- **`create` Function:**
+
+  - Generates a random word using `getRandomWord`.
+  - Inserts a new game into the database with the word and a status of `"in_progress"`.
+  - Returns the newly created game.
+
+- **`update` Function:**
+  - Updates the status of an existing game by ID.
+  - Throws an error if the game is not found.
+
+> **Spring Boot Comparison:** In Spring Boot, these methods would be part of a `GameService` class, annotated with `@Service`. Database operations would typically use a `GameRepository` interface extending `JpaRepository`.
 
 </details>
 
-**Example for `guess.service.ts`:**
+---
+
+### Exercise 3: Creating the Guess Service
+
+Now, you'll implement the guess service to handle guess-related operations. This service will function similarly to a service layer in a Spring Boot application, managing business logic related to guesses.
+
+**Instructions:**
+
+1. **Create the Guess Service File:**
+
+   Create a new file at `src/server/services/guess.service.ts`.
+
+2. **Implement the Following Functions:**
+
+   - `checkGuess`: Compare a guess against the actual word (similar to a validation method in a Spring Boot service).
+   - `create`: Create a new guess and save it to the database (akin to a `save` method in a Spring Boot service).
+   - `findByGameId`: Retrieve all guesses for a specific game (similar to a `findAllByGameId` method in Spring Boot).
+
+**Hints:**
+
+- The `checkGuess` function should return a string representing the correctness of each letter.
+- Use `'C'` for correct position, `'~'` for correct letter in wrong position, and `'X'` for incorrect letters.
+- Remember to revalidate the game page after creating a new guess using `revalidatePath`.
+- Handle errors appropriately, similar to exception handling in a Spring Boot service.
+
+**Starting Point:**
 
 ```typescript
 // src/server/services/guess.service.ts
 
-import { db } from "../db";
-import { guesses } from "../db/schema";
+import { asc, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
+import { db } from "../db";
+import { games, guesses } from "../db/schema";
+
+// Function to check the guess against the actual word
+const checkGuess = async (guess: string, gameId: number) => {
+  // TODO: Implement logic to compare the guess with the actual word
+};
+
+// Function to create a new guess
+const create = async (guess: string, gameId: number) => {
+  // TODO: Implement logic to create a new guess and save it to the database
+};
+
+// Function to retrieve guesses by game ID
+const findByGameId = async (gameId: number) => {
+  // TODO: Implement logic to retrieve all guesses for a specific game
+};
+
+// Export the guessService with the methods
 export const guessService = {
-  create: async (guess: string, gameId: number) => {
-    // TODO: Implement logic to create a new guess
-  },
-  findByGameId: async (gameId: number) => {
-    // TODO: Implement logic to retrieve guesses by game ID
-  },
+  create,
+  findByGameId,
 };
 ```
 
-**Solution Code for `guess.service.ts`:**
+When you're ready, check your implementation against the provided solution.
+
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/server/services/guess.service.ts
@@ -389,44 +441,64 @@ export const guessService = {
 };
 ```
 
-_Comments:_
+**Explanation:**
 
-- **Imports:**
-  - `asc`, `eq` from `drizzle-orm` for query conditions.
-  - `revalidatePath` from `next/cache` to revalidate static paths.
-  - `db`, `games`, and `guesses` schemas for database operations.
 - **`checkGuess` Function:**
-  - Retrieves the game to get the actual word.
-  - Compares the user's guess to the actual word.
-  - Marks letters as correct (`C`), present but wrong position (`~`), or incorrect (`X`).
+
+  - Retrieves the game from the database.
+  - Compares the guess to the actual word, determining which letters are correct.
+  - Returns a result string indicating correctness.
+
 - **`create` Function:**
-  - Calls `checkGuess` to get the result string.
-  - Inserts the new guess into the `guesses` table.
+
+  - Uses `checkGuess` to get the result.
+  - Inserts the guess into the database.
   - Revalidates the game page to update the UI.
+
 - **`findByGameId` Function:**
-  - Retrieves all guesses associated with a specific game, ordered by creation time.
-- **Exported Service:**
-  - Exports the `guessService` object containing the methods.
+  - Retrieves all guesses for a specific game, ordered by creation time.
+
+> **Spring Boot Comparison:** In Spring Boot, you might have methods in a `GuessService` class to validate guesses and interact with a `GuessRepository`. The `checkGuess` logic would be similar to business logic methods within the service.
 
 </details>
 
 ---
 
-### 3. Create Server API
+## Creating the API Layer
 
-**Task:** Create an API layer that exposes the services to the components, facilitating interaction between the client and server logic.
+You'll now create an API layer that exposes these services to your components, facilitating interaction between the client and server logic. This is similar to defining controllers in a Spring Boot application.
 
-**Why:** An API layer organizes your server functions, making them accessible to your React components, similar to how you'd use services and controllers in Angular.
+> **Spring Boot Comparison:** Controllers in Spring Boot handle HTTP requests and delegate to service classes. In Next.js, server functions can act as controllers.
+
+### Exercise 4: Creating the Game Controller
+
+Your task is to create a game controller that will handle game-related API calls. This controller will act as an intermediary between your React components and the game service.
+
+**Understanding Server Components:**
+
+In Next.js, files in the `app` directory are **server components** by default. When you use the `"use server"` directive at the top of a file, you're indicating that functions within can only be called from server components or through special server actions.
+
+**Instructions:**
+
+1. **Create the Game Controller File:**
+
+   Create a new file at `src/server/controllers/game.controller.ts`.
+
+2. **Import the `gameService`:**
+
+   Import the `gameService` from your services.
+
+3. **Implement and Export the Following Functions:**
+
+   - `create`: Create a new game.
+   - `getById`: Retrieve a game by its ID.
 
 **Hints:**
 
-- **Controllers:**
-  - Create controllers that call the service functions.
-  - Ensure they handle any necessary request/response transformations.
-- **API Export:**
-  - Organize the controllers under an `api` object for easy import and use in components.
+- Use the `"use server"` directive at the top of the file to indicate server-only functions.
+- The controller functions should simply call the corresponding service methods.
 
-**Example for `game.controller.ts`:**
+**Starting Point:**
 
 ```typescript
 // src/server/controllers/game.controller.ts
@@ -435,19 +507,23 @@ _Comments:_
 
 import { gameService } from "../services/game.service";
 
+// Controller function to create a new game
 export const create = async () => {
-  // TODO: Call the service function to create a new game
+  // TODO: Call the create function from the game service
 };
 
+// Controller function to get a game by ID
 export const getById = async (id: number) => {
-  // TODO: Call the service function to get a game by ID
+  // TODO: Call the getById function from the game service
 };
 ```
 
-**Solution Code for `game.controller.ts`:**
+When you're ready, check your implementation against the provided solution.
+
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/server/controllers/game.controller.ts
@@ -469,24 +545,60 @@ export const getById = async (id: number) => {
 };
 ```
 
-_Comments:_
-
-- **"use server":**
-  - Indicates that these functions are server-side only.
-- **Imports:**
-  - Imports `gameService` to use its methods.
-- **Controller Functions:**
-  - `create`: Exposes the `create` method from `gameService`.
-  - `getById`: Exposes the `getById` method from `gameService`.
-
 </details>
 
-Similarly, create `guess.controller.ts` and `api.ts`.
+---
 
-**Solution Code for `guess.controller.ts`:**
+### Exercise 5: Creating the Guess Controller
+
+Now, you'll create a guess controller to handle guess-related API calls. This controller will work similarly to the game controller.
+
+**Instructions:**
+
+1. **Create the Guess Controller File:**
+
+   Create a new file at `src/server/controllers/guess.controller.ts`.
+
+2. **Import the `guessService`:**
+
+   Import the `guessService` from your services.
+
+3. **Implement and Export the Following Functions:**
+
+   - `create`: Create a new guess.
+   - `findByGameId`: Retrieve all guesses for a specific game.
+
+**Hints:**
+
+- Use the `"use server"` directive at the top of the file.
+- The controller functions should directly call the corresponding service methods.
+
+**Starting Point:**
+
+```typescript
+// src/server/controllers/guess.controller.ts
+
+"use server";
+
+import { guessService } from "../services/guess.service";
+
+// Controller function to create a new guess
+export const create = async (guess: string, gameId: number) => {
+  // TODO: Call the create function from the guess service
+};
+
+// Controller function to find guesses by game ID
+export const findByGameId = async (gameId: number) => {
+  // TODO: Call the findByGameId function from the guess service
+};
+```
+
+When you're ready, check your implementation against the provided solution.
+
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/server/controllers/guess.controller.ts
@@ -508,63 +620,89 @@ export const findByGameId = async (gameId: number) => {
 };
 ```
 
-_Comments:_
-
-- **"use server":**
-  - Indicates that these functions are server-side only.
-- **Imports:**
-  - Imports `guessService` to use its methods.
-- **Controller Functions:**
-  - `create`: Exposes the `create` method from `guessService`.
-  - `findByGameId`: Exposes the `findByGameId` method from `guessService`.
-
 </details>
 
-**Solution Code for `api.ts`:**
+---
 
-<details>
-<summary>Click to reveal solution</summary>
+### Exercise 6: Consolidating the API
+
+To organize your API controllers, you'll create an `api.ts` file.
+
+**Instructions:**
+
+1. **Create the API File:**
+
+   Create a new file at `src/server/api.ts`.
+
+2. **Import Controllers:**
+
+   Import all the controllers you've created (game and guess controllers).
+
+3. **Create and Export the `api` Object:**
+
+   Group the controllers under the `api` object for easy access.
+
+**Hints:**
+
+- Grouping your controllers makes it easier to import and use them in your components.
+
+**Starting Point:**
 
 ```typescript
 // src/server/api.ts
 
+// Import game and guess controllers
 import * as games from "./controllers/game.controller";
 import * as guesses from "./controllers/guess.controller";
 
-// Export the API controllers
+// Create and export the api object
 export const api = {
   games,
   guesses,
 };
 ```
 
-_Comments:_
-
-- **Imports:**
-  - Imports all exports from `game.controller` and `guess.controller` as `games` and `guesses`.
-- **API Object:**
-  - Organizes the controllers under the `api` object for easy access.
-
-</details>
-
 ---
 
-### 4. Update the Home Page
+## Updating the Home Page
 
-**Task:** Modify the home page to allow users to start a new game by creating a "New Game" button.
+Now, you'll modify the home page to allow users to start a new game.
 
-**Why:** Users need a way to initiate a new game session, similar to navigating to a new route in Angular when starting a new game.
+### Exercise 7: Implementing the New Game Button
+
+Your task is to update the home page to include a "New Game" button that creates a new game and navigates to the game page.
+
+**Understanding Client Components:**
+
+In Next.js, when you need to use client-side features like state or event handlers, you create **client components**. You indicate this by adding the `"use client"` directive at the top of the file.
+
+**Instructions:**
+
+1. **Open the Home Page File:**
+
+   Open `src/app/page.tsx`.
+
+2. **Add the `"use client"` Directive:**
+
+   Add `"use client"` at the top of the file, since we'll be using client-side hooks.
+
+3. **Import Necessary Dependencies:**
+
+   - `useRouter` from `next/navigation` for navigation.
+   - `Button` from your UI components.
+   - `api` from your server API.
+
+4. **Implement the `HomePage` Component:**
+
+   Create a component that renders a "New Game" button. The button's `onClick` handler should create a new game and navigate to its page.
 
 **Hints:**
 
-- **Client-Side Interactivity:**
-  - Use `"use client";` at the top since the component will handle events.
-- **Router Navigation:**
-  - Use Next.js' `useRouter` hook to navigate programmatically.
-- **Event Handling:**
-  - On button click, call the API to create a new game and navigate to the game page.
+- Use the `useRouter` hook for navigation.
+- The `onClick` handler should be an async function.
+- Remember to handle errors appropriately.
 
-**Example:**
+**Starting Point:**
 
 ```typescript
 // src/app/page.tsx
@@ -575,32 +713,18 @@ import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { api } from "~/server/api";
 
+// Home page component
 export default function HomePage() {
-  const router = useRouter();
-
-  return (
-    <main className="flex h-full items-center justify-center">
-      <Button
-        onClick={async () => {
-          // TODO: Create a new game and navigate to the game page
-        }}
-      >
-        New Game
-      </Button>
-    </main>
-  );
+  // TODO: Implement the component logic
 }
 ```
 
-**Helpful Links:**
+When you're ready, check your implementation against the provided solution.
 
-- [Next.js useRouter Hook](https://nextjs.org/docs/api-reference/next/router#userouter)
-- [Handling Events in React](https://reactjs.org/docs/handling-events.html)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/app/page.tsx
@@ -632,40 +756,43 @@ export default function HomePage() {
 }
 ```
 
-_Comments:_
-
-- **"use client":**
-  - Enables client-side rendering for event handling.
-- **Imports:**
-  - `useRouter` for navigation.
-  - `Button` component for UI.
-  - `api` to access the game creation method.
-- **Event Handling:**
-  - On button click, calls `api.games.create()` to create a new game.
-  - Uses `router.push()` to navigate to the new game's page.
-- **Styling:**
-  - Centers the button using Tailwind CSS classes.
-
 </details>
 
 ---
 
-### 5. Update the Game Page
+## Updating the Game Page
 
-**Task:** Modify the game page to fetch and display the game's data, including previous guesses.
+Finally, you'll modify the game page to fetch and display the game's data, including previous guesses. This is similar to fetching data in a component's lifecycle method in Angular, but leveraging Next.js's server-side rendering capabilities.
 
-**Why:** The game page needs to reflect the current state of the game, similar to fetching and displaying data in an Angular component.
+### Exercise 8: Implementing the Game Page
+
+Your task is to update the game page to fetch the game's guesses and pass them to the `GameBoard` component.
+
+**Instructions:**
+
+1. **Open the Game Page File:**
+
+   Open `src/app/game/[gameId]/page.tsx`.
+
+2. **Import Necessary Dependencies:**
+
+   - `GameBoard` component.
+   - `api` from your server API.
+
+3. **Implement the `GamePage` Component:**
+
+   Create an async function that fetches the guesses for the current game using `api.guesses.findByGameId(gameId)`. Then, render the `GameBoard` component with the necessary props.
+
+**Understanding Server Components:**
+
+By default, components in the `app` directory are server components. This means they can fetch data on the server before rendering.
 
 **Hints:**
 
-- **Data Fetching:**
-  - Use server-side functions to fetch game data.
-- **Props Passing:**
-  - Pass the game ID and guesses to the `GameBoard` component.
-- **Type Definitions:**
-  - Ensure the component's props are correctly typed.
+- Use the `params` object to access `gameId` from the URL.
+- Since this is a server component, you can use async/await directly.
 
-**Example:**
+**Starting Point:**
 
 ```typescript
 // src/app/game/[gameId]/page.tsx
@@ -673,31 +800,22 @@ _Comments:_
 import { GameBoard } from "~/components/game-board";
 import { api } from "~/server/api";
 
+// Game page component for a specific game ID
 export default async function GamePage({
   params: { gameId },
 }: {
   params: { gameId: number };
 }) {
-  // TODO: Fetch the guesses for the current game
-  // TODO: Pass the game ID and guesses to the GameBoard component
-
-  return (
-    <div className="flex h-full items-center justify-center">
-      {/* Render the GameBoard component with appropriate props */}
-    </div>
-  );
+  // TODO: Fetch the guesses and render the GameBoard component
 }
 ```
 
-**Helpful Links:**
+When you're ready, check your implementation against the provided solution.
 
-- [Next.js Dynamic Routes](https://nextjs.org/docs/routing/dynamic-routes)
-- [Passing Props in React](https://reactjs.org/docs/components-and-props.html)
-
-**Solution Code:**
+---
 
 <details>
-<summary>Click to reveal solution</summary>
+<summary>👉 Click here to see the solution 👈</summary>
 
 ```typescript
 // src/app/game/[gameId]/page.tsx
@@ -723,377 +841,13 @@ export default async function GamePage({
 }
 ```
 
-_Comments:_
-
-- **Imports:**
-  - `GameBoard` component to display the game board.
-  - `api` to fetch game data.
-- **Async Function:**
-  - The component is an async function to allow data fetching.
-- **Data Fetching:**
-  - Calls `api.guesses.findByGameId(gameId)` to get the guesses.
-- **Rendering:**
-  - Passes `gameId` and `guesses` to `GameBoard` as props.
-- **Styling:**
-  - Centers the game board using Tailwind CSS classes.
-
 </details>
 
 ---
 
-### 6. Update the `GameBoard` Component
+## Understanding Server and Client Components
 
-**Task:** Modify the `GameBoard` component to accept and use the new props: `gameId` and `guesses`.
-
-**Why:** The component needs to display real game data and handle user interactions accordingly, similar to data-bound components in Angular.
-
-**Hints:**
-
-- **Props Interface:**
-  - Define a TypeScript type or interface for the component's props.
-- **Component Update:**
-  - Use the `guesses` prop to render the `GuessList`.
-  - Pass `gameId` to `GuessInput` for submitting new guesses.
-
-**Example:**
-
-```typescript
-// src/components/game-board.tsx
-
-import { GuessInput } from "./guess-input";
-import { GuessList } from "./guess-list";
-
-type GameBoardProps = {
-  gameId: number;
-  // TODO: Define the type for guesses
-};
-
-export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Render GuessList and GuessInput with appropriate props */}
-    </div>
-  );
-};
-```
-
-**Helpful Links:**
-
-- [TypeScript Interfaces](https://www.typescriptlang.org/docs/handbook/interfaces.html)
-- [React Props](https://reactjs.org/docs/components-and-props.html)
-
-**Solution Code:**
-
-<details>
-<summary>Click to reveal solution</summary>
-
-```typescript
-// src/components/game-board.tsx
-
-import { type api } from "~/server/api";
-import { GuessInput } from "./guess-input";
-import { GuessList } from "./guess-list";
-
-// Define the props type for GameBoard
-type GameBoardProps = {
-  gameId: number;
-  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
-};
-
-// GameBoard component that displays the game board
-export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
-  return (
-    // Use flex layout to stack components vertically with spacing
-    <div className="flex flex-col gap-3">
-      {/* Render the list of previous guesses */}
-      <GuessList guesses={guesses} />
-      {/* Render the input component for new guesses */}
-      <GuessInput gameId={gameId} />
-    </div>
-  );
-};
-```
-
-_Comments:_
-
-- **Imports:**
-  - `api` type for typing the `guesses` prop.
-  - `GuessInput` and `GuessList` components.
-- **Props Type Definition:**
-  - `gameId`: The ID of the current game.
-  - `guesses`: The list of guesses fetched from the API.
-- **Component Structure:**
-  - Renders `GuessList` with the `guesses` prop.
-  - Renders `GuessInput` with the `gameId` prop.
-- **Styling:**
-  - Arranges components vertically with gaps using Tailwind CSS classes.
-
-</details>
-
----
-
-### 7. Update the `GuessInput` Component
-
-**Task:** Modify the `GuessInput` component to submit guesses to the server when the user presses Enter.
-
-**Why:** The component needs to interact with the server to store guesses, similar to submitting form data in Angular.
-
-**Hints:**
-
-- **Props Interface:**
-  - Accept `gameId` as a prop.
-- **Event Handling:**
-  - On Enter key press, call the API to submit the guess.
-- **State Management:**
-  - Maintain the input state and clear it after submission.
-
-**Example:**
-
-```typescript
-// src/components/guess-input.tsx
-
-"use client";
-
-import { useState } from "react";
-import { InputOTP } from "./ui/input-otp";
-
-type GuessInputProps = {
-  gameId: number;
-};
-
-export const GuessInput = ({ gameId }: GuessInputProps) => {
-  const [guess, setGuess] = useState<string>("");
-
-  return (
-    <InputOTP
-      value={guess}
-      onChange={(value) => setGuess(value)}
-      onKeyDown={async (e) => {
-        if (e.key === "Enter") {
-          // TODO: Submit the guess to the server
-          // Clear the input after submission
-        }
-      }}
-    >
-      {/* Render the input slots */}
-    </InputOTP>
-  );
-};
-```
-
-**Helpful Links:**
-
-- [React useState Hook](https://reactjs.org/docs/hooks-state.html)
-- [Handling Events in React](https://reactjs.org/docs/handling-events.html)
-
-**Solution Code:**
-
-<details>
-<summary>Click to reveal solution</summary>
-
-```typescript
-// src/components/guess-input.tsx
-
-"use client";
-
-import { REGEXP_ONLY_CHARS } from "input-otp";
-import { useState } from "react";
-
-import { api } from "~/server/api";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
-
-// Define the props type for GuessInput
-type GuessInputProps = {
-  gameId: number;
-};
-
-// GuessInput component for entering guesses
-export const GuessInput = ({ gameId }: GuessInputProps) => {
-  const [guess, setGuess] = useState<string>("");
-
-  return (
-    <InputOTP
-      maxLength={5} // Limit input to 5 characters
-      pattern={REGEXP_ONLY_CHARS} // Allow only alphabetic characters
-      value={guess} // Bind the input value to the state
-      onChange={(value) => setGuess(value)} // Update state on change
-      onKeyDown={async (e) => {
-        if (e.key === "Enter") {
-          // Submit the guess to the server
-          await api.guesses.create(guess, gameId);
-          // Clear the input field after submission
-          setGuess("");
-        }
-      }}
-    >
-      <InputOTPGroup>
-        {/* Create 5 input slots for each character in the guess */}
-        {[...Array(5)].map((_, index) => (
-          <InputOTPSlot
-            key={index}
-            index={index}
-            className="h-12 w-12 text-2xl uppercase"
-          />
-        ))}
-      </InputOTPGroup>
-    </InputOTP>
-  );
-};
-```
-
-_Comments:_
-
-- **"use client":**
-  - Enables client-side rendering for interactivity.
-- **Imports:**
-  - `useState` for state management.
-  - `api` to submit the guess.
-  - `InputOTP` components for the input UI.
-- **Props:**
-  - `gameId` to associate the guess with the correct game.
-- **Event Handling:**
-  - On Enter key press, calls `api.guesses.create()` to submit the guess.
-  - Clears the input field after submission.
-- **State Management:**
-  - Uses `guess` state to track the current input.
-- **Input Component:**
-  - Renders 5 input slots for the guess letters.
-
-</details>
-
----
-
-### 8. Update the `GuessList` and `GuessItem` Components
-
-**Task:** Modify these components to work with the new guess data structure returned from the server.
-
-**Why:** They need to display actual guess data, including results, similar to rendering server data in Angular components.
-
-**Hints:**
-
-- **Type Adjustments:**
-  - Update the props to reflect the data structure of the guesses.
-- **Data Rendering:**
-  - Use the guess data to render each guess item.
-
-**Example for `GuessList`:**
-
-```typescript
-// src/components/guess-list.tsx
-
-import { GuessItem } from "./guess-item";
-
-type GuessListProps = {
-  // TODO: Define the type for guesses
-};
-
-export const GuessList = ({ guesses }: GuessListProps) => {
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Map over the guesses and render GuessItem components */}
-    </div>
-  );
-};
-```
-
-**Solution Code for `GuessList`:**
-
-<details>
-<summary>Click to reveal solution</summary>
-
-```typescript
-// src/components/guess-list.tsx
-
-"use client";
-
-import { type api } from "~/server/api";
-import { GuessItem } from "./guess-item";
-
-// Define the props type for GuessList
-type GuessListProps = {
-  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
-};
-
-// GuessList component to display the list of guesses
-export const GuessList = ({ guesses }: GuessListProps) => {
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Iterate over the guesses array */}
-      {guesses.map((guess) => (
-        // Render a GuessItem for each guess
-        <GuessItem key={guess.id} guess={guess} />
-      ))}
-    </div>
-  );
-};
-```
-
-_Comments:_
-
-- **Imports:**
-  - `api` type for typing the `guesses` prop.
-  - `GuessItem` component.
-- **Props Type Definition:**
-  - `guesses`: An array of guess objects from the API.
-- **Rendering:**
-  - Maps over `guesses` and renders a `GuessItem` for each.
-  - Uses `guess.id` as the `key` prop.
-
-</details>
-
-**Solution Code for `GuessItem`:**
-
-<details>
-<summary>Click to reveal solution</summary>
-
-```typescript
-// src/components/guess-item.tsx
-
-"use client";
-
-import { cn } from "~/lib/utils";
-import { type api } from "~/server/api";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
-
-// Define the props type for GuessItem
-type GuessItemProps = {
-  guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
-};
-
-// GuessItem component to display an individual guess
-export const GuessItem = ({ guess }: GuessItemProps) => {
-  return (
-    <InputOTP readOnly maxLength={5} value={guess.guess}>
-      <InputOTPGroup>
-        {/* Create an input slot for each character in the guess */}
-        {[0, 1, 2, 3, 4].map((index) => (
-          <InputOTPSlot
-            key={index}
-            index={index}
-            className={cn("h-12 w-12 text-2xl uppercase")}
-          />
-        ))}
-      </InputOTPGroup>
-    </InputOTP>
-  );
-};
-```
-
-_Comments:_
-
-- **Imports:**
-  - `api` type for typing the `guess` prop.
-  - `cn` utility function for class names.
-  - `InputOTP` components.
-- **Props Type Definition:**
-  - `guess`: An individual guess object from the API.
-- **Rendering:**
-  - Uses `InputOTP` in `readOnly` mode to display the guess.
-  - Renders input slots for each character.
-- **Styling:**
-  - Applies consistent styling to the input slots.
-
-</details>
+In Next.js 13, components in the `app` directory are **Server Components** by default. They are rendered on the server and can fetch data directly. If you need to use client-side features like state or event handlers, you need to create **Client Components** by adding the `"use client"` directive at the top of the file.
 
 ---
 
@@ -1103,6 +857,8 @@ Now that you've implemented the game logic, it's time to verify that everything 
 
 **Instructions:**
 
+![Section 2 Checkpoint](img/2.png)
+
 1. **Start the Development Server:**
 
    ```bash
@@ -1111,16 +867,12 @@ Now that you've implemented the game logic, it's time to verify that everything 
 
 2. **Create a New Game:**
 
-   ![New Game Screenshot](img/5.png)
-
    - Navigate to `http://localhost:3000` in your web browser.
    - You should see a "New Game" button on the home page.
    - Click the button to create a new game.
    - You should be redirected to a game page with a unique game ID (e.g., `http://localhost:3000/game/1`).
 
 3. **Interact with the Game Board:**
-
-   ![Game Board Screenshot](img/6.png)
 
    - On the game page, you should see an empty game board and an input field for entering guesses.
    - Enter a 5-letter word and press **Enter**.
@@ -1137,7 +889,13 @@ Now that you've implemented the game logic, it's time to verify that everything 
    - Return to the home page and create another new game.
    - Verify that each game maintains its own state and guesses.
 
-**If everything works correctly, congratulations!** You've successfully implemented the core game logic for your Wordle clone.
+**Expected Behavior:**
+
+- The game board updates with each guess.
+- Guesses persist after refreshing the page.
+- Multiple games can be played independently.
+
+If everything works correctly, congratulations! You've successfully implemented the core game logic for your Wordle clone.
 
 ---
 
@@ -1146,10 +904,38 @@ Now that you've implemented the game logic, it's time to verify that everything 
 In the next section, we'll focus on creating an on-screen keyboard component and integrating it with the game logic to enhance the user experience. This will involve:
 
 - **Building the Keyboard Component:**
-  - We'll create an interactive on-screen keyboard.
+  - Creating an interactive on-screen keyboard.
 - **State Management:**
-  - Update the game state based on user interactions with the keyboard.
+  - Updating the game state based on user interactions with the keyboard.
 - **UI Feedback:**
-  - Provide visual feedback for correct, incorrect, and partially correct letters.
+  - Providing visual feedback for correct, incorrect, and partially correct letters.
+
+By continuing to build on your application, you'll deepen your understanding of state management and component interaction in React, paralleling advanced techniques in Angular applications.
+
+---
+
+## Helpful Resources
+
+To further enhance your understanding, you might find the following resources helpful:
+
+1. **Next.js Server and Client Components:**
+
+   - [Server and Client Components in Next.js](https://nextjs.org/docs/getting-started/react-essentials#server-and-client-components)
+     - Learn more about the differences between server and client components.
+
+2. **Drizzle ORM Documentation:**
+
+   - [Drizzle ORM Docs](https://orm.drizzle.team/)
+     - Comprehensive guide on using Drizzle ORM for database operations.
+
+3. **TypeScript Handbook:**
+
+   - [TypeScript Documentation](https://www.typescriptlang.org/docs/handbook/intro.html)
+     - Deepen your understanding of TypeScript for type safety.
+
+4. **Next.js Data Fetching:**
+
+   - [Data Fetching in Next.js](https://nextjs.org/docs/app/building-your-application/data-fetching)
+     - Learn how to fetch data on the server side in Next.js.
 
 ---
