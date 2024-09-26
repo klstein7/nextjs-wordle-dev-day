@@ -373,7 +373,7 @@ const checkGuess = async (guess: string, gameId: number) => {
   const actualWord = game.word.toUpperCase();
   const upperGuess = guess.toUpperCase();
   const result = new Array(5).fill("X");
-  const charCount = new Map<string, number>();
+  const charCount = new Map();
 
   // Count character occurrences in the actual word
   for (const char of actualWord) {
@@ -716,6 +716,14 @@ import { api } from "~/server/api";
 // Home page component
 export default function HomePage() {
   // TODO: Implement the component logic
+  <Button
+    onClick={async () => {
+      // Call the API to create a new game
+      // Navigate to the game page using the new game's ID
+    }}
+  >
+    New Game
+  </Button>;
 }
 ```
 
@@ -845,19 +853,203 @@ export default async function GamePage({
 
 ---
 
-## Understanding Server and Client Components
+## Updating the Game Components
 
-In Next.js 13, components in the `app` directory are **Server Components** by default. They are rendered on the server and can fetch data directly. If you need to use client-side features like state or event handlers, you need to create **Client Components** by adding the `"use client"` directive at the top of the file.
+With the server-side logic in place and the game page fetching the necessary data, it's time to update the client-side components to display the game state correctly. This involves modifying the `GameBoard`, `GuessList`, `GuessItem`, and `GuessInput` components to interact with the game data and render the guesses appropriately.
 
----
+### Updating the `GameBoard` Component
+
+The `GameBoard` component serves as the main container for the game interface. We'll update it to accept `gameId` and `guesses` as props, which will be passed down to the child components.
+
+```typescript
+// src/components/game-board.tsx
+
+import { type api } from "~/server/api";
+
+import { GuessInput } from "./guess-input";
+import { GuessList } from "./guess-list";
+
+type GameBoardProps = {
+  gameId: number;
+  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+};
+
+export const GameBoard = ({ gameId, guesses }: GameBoardProps) => {
+  return (
+    <div className="flex grow flex-col items-center gap-3">
+      <GuessList guesses={guesses} />
+      <GuessInput gameId={gameId} />
+    </div>
+  );
+};
+```
+
+**Explanation:**
+
+- **Importing Type Definitions:**
+  - Imported `type api` from `~/server/api` to use `Awaited<ReturnType<...>>` for typing the `guesses` prop.
+- **Defining Props:**
+  - Created `GameBoardProps` type to include `gameId` and `guesses`.
+- **Updating the Component:**
+  - Modified the `GameBoard` component to accept `gameId` and `guesses` as props.
+  - Removed the hardcoded `guesses` array.
+  - Passed the `guesses` prop to `GuessList` and `gameId` to `GuessInput`.
+
+### Updating the `GuessList` Component
+
+The `GuessList` component now needs to accept the correct type of `guesses` and render them using the `GuessItem` component with the appropriate types.
+
+```typescript
+// src/components/guess-list.tsx
+
+"use client";
+
+import { type api } from "~/server/api";
+
+import { GuessItem } from "./guess-item";
+
+type GuessListProps = {
+  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+};
+
+export const GuessList = ({ guesses }: GuessListProps) => {
+  return (
+    <div className="flex flex-col gap-3">
+      {guesses.map((guess) => (
+        <GuessItem key={guess.id} guess={guess} />
+      ))}
+    </div>
+  );
+};
+```
+
+**Explanation:**
+
+- **Importing Type Definitions:**
+  - Imported `type api` from `~/server/api` for type definitions.
+- **Defining Props:**
+  - Created `GuessListProps` type with the correct type for `guesses`.
+- **Updating the Component:**
+  - Modified the `GuessList` component to accept `guesses` of the appropriate type.
+  - Updated the mapping over `guesses` to use `guess.id` as the key and pass the `guess` object to `GuessItem`.
+
+### Updating the `GuessItem` Component
+
+The `GuessItem` component will now accept the correct type of `guess` and display the guess appropriately.
+
+```typescript
+// src/components/guess-item.tsx
+
+"use client";
+
+import { cn } from "~/lib/utils";
+import { type api } from "~/server/api";
+
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
+
+type GuessItemProps = {
+  guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
+};
+
+const GuessItemSlot = ({ index }: { index: number }) => {
+  return (
+    <InputOTPSlot
+      index={index}
+      className={cn("h-12 w-12 text-2xl uppercase")}
+    />
+  );
+};
+
+export const GuessItem = ({ guess }: GuessItemProps) => {
+  return (
+    <InputOTP readOnly maxLength={5} value={guess.guess}>
+      <InputOTPGroup>
+        {[0, 1, 2, 3, 4].map((index) => (
+          <GuessItemSlot key={index} index={index} />
+        ))}
+      </InputOTPGroup>
+    </InputOTP>
+  );
+};
+```
+
+**Explanation:**
+
+- **Importing Type Definitions:**
+  - Imported `type api` from `~/server/api` for type definitions.
+- **Defining Props:**
+  - Created `GuessItemProps` type with the correct type for `guess`.
+- **Updating the Component:**
+  - Modified the `GuessItem` component to accept `guess` as a prop.
+  - Used `guess.guess` to get the guess string to display.
+  - Ensured the component displays each letter of the guess.
+
+### Updating the `GuessInput` Component
+
+The `GuessInput` component will now accept `gameId` as a prop and use it when creating a new guess. This allows users to submit their guesses, which will be stored in the database.
+
+```typescript
+// src/components/guess-input.tsx
+
+"use client";
+
+import { REGEXP_ONLY_CHARS } from "input-otp";
+import { useState } from "react";
+
+import { api } from "~/server/api";
+
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
+
+type GuessInputProps = {
+  gameId: number;
+};
+
+export const GuessInput = ({ gameId }: GuessInputProps) => {
+  const [guess, setGuess] = useState<string>("");
+
+  return (
+    <InputOTP
+      maxLength={5}
+      pattern={REGEXP_ONLY_CHARS}
+      value={guess}
+      onChange={(value) => setGuess(value)}
+      onKeyDown={async (e) => {
+        if (e.key === "Enter") {
+          await api.guesses.create(guess, gameId);
+          setGuess("");
+        }
+      }}
+    >
+      <InputOTPGroup>
+        <InputOTPSlot index={0} className="h-12 w-12 text-2xl uppercase" />
+        <InputOTPSlot index={1} className="h-12 w-12 text-2xl uppercase" />
+        <InputOTPSlot index={2} className="h-12 w-12 text-2xl uppercase" />
+        <InputOTPSlot index={3} className="h-12 w-12 text-2xl uppercase" />
+        <InputOTPSlot index={4} className="h-12 w-12 text-2xl uppercase" />
+      </InputOTPGroup>
+    </InputOTP>
+  );
+};
+```
+
+**Explanation:**
+
+- **Defining Props:**
+  - Created `GuessInputProps` type with `gameId: number`.
+- **Updating the Component:**
+  - Modified the `GuessInput` component to accept `gameId` as a prop.
+  - Used the `useGuess` hook to manage the `guess` state.
+  - In the `onKeyDown` handler:
+    - When the user presses **Enter**, calls `api.guesses.create(guess, gameId)` to submit the guess.
+    - Resets the `guess` state after submission.
 
 ## Checking Your Progress
+
+![Section 3 Checkpoint](img/2.png)
 
 Now that you've implemented the game logic, it's time to verify that everything works as expected.
 
 **Instructions:**
-
-![Section 2 Checkpoint](img/2.png)
 
 1. **Start the Development Server:**
 
