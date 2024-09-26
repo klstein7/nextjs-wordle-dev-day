@@ -8,6 +8,8 @@ Welcome to the final section of the tutorial! In this part, you'll add visual po
 
 These changes will make your game more enjoyable and visually appealing, similar to refining UI components in Angular applications.
 
+---
+
 ## Exercise Objectives
 
 - **Enhance** the game board's appearance for better user engagement.
@@ -46,11 +48,9 @@ Once you've completed these steps, you're ready to add the final polish to your 
 
 ---
 
-## Tasks and Hints
+## Exercise 1: Install `react-confetti`
 
-### Exercise 1: Install `react-confetti`
-
-Your first task is to install the `react-confetti` library, which will allow you to add a celebratory effect when the player wins the game.
+To add celebratory effects, we will use the `react-confetti` package to show confetti when the player wins the game.
 
 **Instructions:**
 
@@ -62,133 +62,58 @@ Your first task is to install the `react-confetti` library, which will allow you
 
 ---
 
-### Exercise 2: Enhance the Game Board
+## Exercise 2: Enhance the Game Board
 
 You'll improve the appearance of your game board to make it more engaging for users.
 
-**Instructions:**
+### Changes:
 
-1. Open `src/components/guess-item.tsx`.
-2. Adjust the styling of the `GuessItemSlot` component to increase the size and improve the color scheme.
-
-**Hints:**
-
-- Increase the height and width of the slots for better visibility.
-- Use more vibrant colors to enhance user feedback.
-- Apply consistent styling for a polished look.
-
-Here's a starting point for your updated `GuessItemSlot` component:
+- Increased the size of each slot in the game board for better visibility.
+- Added vibrant colors to provide clear feedback when a guess is correct, partially correct, or incorrect.
 
 ```typescript
 // src/components/guess-item.tsx
 
-function GuessItemSlot({ index, result }: { index: number; result: string }) {
-  return (
-    <InputOTPSlot
-      index={index}
-      className={
-        cn()
-        // TODO: Increase the size of the slots and adjust styling
-        // For example, use "h-16 w-16" and "text-3xl" for larger slots and text
-        // Apply vibrant background colors based on the result
-        // Use "bg-red-500", "bg-green-500", "bg-yellow-500" for different results
-      }
-    />
-  );
-}
-```
+"use client";
 
-When you're ready, check your implementation against the provided solution.
+import { cn } from "~/lib/utils"; // Helper function to conditionally combine class names
+import { type api } from "~/server/api";
 
----
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
-<details>
-<summary>👉 Click here to see the solution 👈</summary>
-
-```typescript
-// src/components/guess-item.tsx
+type GuessItemProps = {
+  guess: Awaited<ReturnType<typeof api.guesses.findByGameId>>[number];
+};
 
 function GuessItemSlot({ index, result }: { index: number; result: string }) {
   return (
     <InputOTPSlot
       index={index}
       className={cn(
-        // Increase size and adjust styling for better visibility
+        // Updated the size of the slots for better visibility
         "h-16 w-16 border-none text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none",
         {
-          // Update color scheme for more vibrant feedback
-          "bg-red-500 text-red-50": result === "X",
-          "bg-green-500 text-green-50": result === "C",
-          "bg-yellow-500 text-yellow-50": result === "~",
+          // Updated colors for incorrect (X), correct (C), and partially correct (~) letters
+          "bg-red-500 text-red-50": result === "X", // Incorrect letter, red background
+          "bg-green-500 text-green-50": result === "C", // Correct letter, green background
+          "bg-yellow-500 text-yellow-50": result === "~", // Partially correct, yellow background
         }
       )}
     />
   );
 }
-```
 
-</details>
-
----
-
-### Exercise 3: Improve the Guess Input
-
-Next, you'll enhance the appearance of the guess input to match the styled guess items.
-
-**Instructions:**
-
-1. Open `src/components/guess-input.tsx`.
-2. Create a separate `GuessItemSlot` component to reuse styling.
-3. Adjust the styling to align with the game board.
-
-**Hints:**
-
-- Use the same height, width, and text size as in `GuessItemSlot` from `guess-item.tsx`.
-- Ensure consistent styling for a cohesive user experience.
-- You can create a shared component or reuse the styling classes.
-
-Here's a starting point for your updated `GuessInput` component:
-
-```typescript
-// src/components/guess-input.tsx
-
-"use client";
-
-import { useGuess } from "~/lib/hooks/use-guess";
-
-// TODO: Import InputOTP components
-// import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
-
-type GuessInputProps = {
-  gameId: number;
-};
-
-// TODO: Create a GuessItemSlot component with consistent styling
-function GuessItemSlot({ index }: { index: number }) {
+// Updated the GuessItem component to reflect the styling of each guess
+export const GuessItem = ({ guess }: GuessItemProps) => {
   return (
-    <InputOTPSlot
-      index={index}
-      // TODO: Apply the same styling as in the GuessItemSlot from guess-item.tsx
-      // For example: "h-16 w-16 text-3xl font-medium uppercase"
-    />
-  );
-}
-
-export const GuessInput = ({ gameId }: GuessInputProps) => {
-  const { guess, setGuess } = useGuess();
-
-  return (
-    <InputOTP
-      maxLength={5}
-      value={guess}
-      onChange={(value) => setGuess(value)}
-      onComplete={async (value) => {
-        // TODO: Submit the guess using the API and handle errors
-      }}
-    >
+    <InputOTP readOnly maxLength={5} value={guess.guess}>
       <InputOTPGroup className="gap-2">
         {[0, 1, 2, 3, 4].map((index) => (
-          <GuessItemSlot key={index} index={index} />
+          <GuessItemSlot
+            key={index}
+            index={index}
+            result={guess.result[index] ?? ""}
+          />
         ))}
       </InputOTPGroup>
     </InputOTP>
@@ -196,20 +121,26 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
 };
 ```
 
-When you're ready, check your implementation against the provided solution.
-
 ---
 
-<details>
-<summary>👉 Click here to see the solution 👈</summary>
+## Exercise 3: Improve the Guess Input
+
+In this exercise, you'll enhance the appearance of the guess input field to match the game board's updated styling.
+
+### Changes:
+
+- Reused the `GuessItemSlot` styling from the game board for consistency.
+- Styled the guess input to ensure the size and appearance matches the game board.
 
 ```typescript
 // src/components/guess-input.tsx
 
 "use client";
 
-import { useGuess } from "~/lib/hooks/use-guess";
-import { api } from "~/server/api";
+import { REGEXP_ONLY_CHARS } from "input-otp";
+
+import { useCreateGuess } from "~/lib/hooks/use-create-guess"; // Hook to handle submitting guesses
+import { useGuess } from "~/lib/hooks/use-guess"; // Hook to track the current guess state
 
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./ui/input-otp";
 
@@ -217,32 +148,31 @@ type GuessInputProps = {
   gameId: number;
 };
 
-// Create a separate component for consistent styling
+// Reused the styling of GuessItemSlot from the game board for consistent appearance
 function GuessItemSlot({ index }: { index: number }) {
   return (
     <InputOTPSlot
       index={index}
-      // Match styling with guess items
       className="h-16 w-16 border text-3xl font-medium uppercase first:rounded-l-none last:rounded-r-none"
     />
   );
 }
 
+// Styled GuessInput component to align with the game board
 export const GuessInput = ({ gameId }: GuessInputProps) => {
   const { guess, setGuess } = useGuess();
+
+  const createGuess = useCreateGuess();
 
   return (
     <InputOTP
       maxLength={5}
+      pattern={REGEXP_ONLY_CHARS} // Ensures only valid characters are allowed
       value={guess}
-      onChange={(value) => setGuess(value)}
-      onComplete={async (value) => {
-        try {
-          // Submit the guess when input is complete
-          await api.guesses.create(value, gameId);
-          setGuess("");
-        } catch (error) {
-          console.error(error);
+      onChange={(value) => setGuess(value)} // Updates the guess state as user types
+      onKeyDown={async (e) => {
+        if (e.key === "Enter") {
+          await createGuess(guess, gameId); // Submits the guess when Enter is pressed
         }
       }}
     >
@@ -256,117 +186,49 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
 };
 ```
 
-</details>
-
 ---
 
-### Exercise 4: Create an Engaging Game Over Dialog
+## Exercise 4: Create an Engaging Game Over Dialog
 
-Now, you'll replace the simple game results display with a more engaging dialog, including animations.
+You’ll replace the simple game results display with a more engaging modal dialog, including confetti animations for a win.
 
-**Instructions:**
+### Changes:
 
-1. Create a new file `src/components/game-results-dialog.tsx`.
-2. Implement the `GameResultsDialog` component.
-3. Use `react-confetti` for a celebratory effect when the player wins.
-4. Display all guesses in the dialog.
-
-**Hints:**
-
-- Use the `Dialog` and `DialogContent` components for the modal dialog.
-- Conditionally render content based on the game status (`"won"` or `"lost"`).
-- Use the `Confetti` component from `react-confetti` for the win animation.
-
-Here's a starting point for your `GameResultsDialog` component:
+- Added `react-confetti` for celebratory effects when the player wins.
+- Created a modal dialog that displays the final game results (win/lose) along with all the guesses.
+- Used the `Dialog` component for a clean and engaging interface.
 
 ```typescript
 // src/components/game-results-dialog.tsx
 
 "use client";
 
-import { useCreateGame } from "~/lib/hooks/use-create-game";
+import { useCreateGame } from "~/lib/hooks/use-create-game"; // Hook to reset and create a new game
 import { type api } from "~/server/api";
 import { type games } from "~/server/db/schema";
 
-// TODO: Import necessary components
-// import Confetti from "react-confetti";
-// import { Dialog, DialogContent } from "./ui/dialog";
-// import { GuessItem } from "./guess-item";
-// import { Button } from "./ui/button";
+import Confetti from "react-confetti"; // Used for win celebration
+import { Dialog, DialogContent } from "./ui/dialog"; // Modal dialog components
+import { GuessItem } from "./guess-item"; // Reuse GuessItem component to display guesses
+import { Button } from "./ui/button"; // Reusable button component
 
 type GameResultsDialogProps = {
-  status: (typeof games.status.enumValues)[number];
-  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+  status: (typeof games.status.enumValues)[number]; // The current game status
+  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>; // List of guesses for the current game
 };
 
+// Modal dialog to display game results with confetti on win
 export const GameResultsDialog = ({
   status,
   guesses,
 }: GameResultsDialogProps) => {
-  const createGame = useCreateGame();
+  const createGame = useCreateGame(); // Function to create a new game when user clicks "Play again"
 
-  if (status === "in_progress") return null;
-
-  return (
-    <Dialog open={true}>
-      <DialogContent
-        // TODO: Style the dialog for a more engaging appearance
-        // For example, use "flex flex-col items-center gap-6 rounded-2xl p-12 md:max-w-fit"
-        withClose={false}
-      >
-        {status === "won" ? (
-          <>{/* TODO: Add win message and confetti effect */}</>
-        ) : (
-          <>{/* TODO: Add lose message */}</>
-        )}
-        {/* TODO: Display all guesses */}
-        {/* TODO: Add Play Again button */}
-      </DialogContent>
-    </Dialog>
-  );
-};
-```
-
-When you're ready, check your implementation against the provided solution.
-
----
-
-<details>
-<summary>👉 Click here to see the solution 👈</summary>
-
-```typescript
-// src/components/game-results-dialog.tsx
-
-"use client";
-
-import { useCreateGame } from "~/lib/hooks/use-create-game";
-import { type api } from "~/server/api";
-import { type games } from "~/server/db/schema";
-
-import Confetti from "react-confetti";
-import { Dialog, DialogContent } from "./ui/dialog";
-import { GuessItem } from "./guess-item";
-import { Button } from "./ui/button";
-
-type GameResultsDialogProps = {
-  status: (typeof games.status.enumValues)[number];
-  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
-};
-
-export const GameResultsDialog = ({
-  status,
-  guesses,
-}: GameResultsDialogProps) => {
-  const createGame = useCreateGame();
-
-  if (status === "in_progress") return null;
+  if (status === "in_progress") return null; // Don't show dialog if the game is still ongoing
 
   return (
     <Dialog open={true}>
-      <DialogContent
-        className="flex flex-col items-center gap-6 rounded-2xl p-12 md:max-w-fit"
-        withClose={false}
-      >
+      <DialogContent className="flex flex-col items-center gap-6 rounded-2xl p-12 md:max-w-fit">
         {status === "won" ? (
           <>
             <div className="flex flex-col items-center gap-6">
@@ -376,14 +238,15 @@ export const GameResultsDialog = ({
                   awesome!
                 </div>
               </div>
+              {/* Show the confetti animation when the player wins */}
               {guesses.map((guess) => (
                 <GuessItem key={guess.id} guess={guess} />
               ))}
             </div>
             <Confetti
               className="h-full w-full"
-              numberOfPieces={200}
-              gravity={0.05}
+              numberOfPieces={200} // Number of confetti pieces
+              gravity={0.05} // Slow falling confetti effect
             />
           </>
         ) : (
@@ -401,7 +264,7 @@ export const GameResultsDialog = ({
           variant="outline"
           className="h-14 w-full rounded-xl text-xl font-semibold"
           size="lg"
-          onClick={() => createGame()}
+          onClick={() => createGame()} // Allows the user to play again
         >
           Play again!
         </Button>
@@ -411,26 +274,16 @@ export const GameResultsDialog = ({
 };
 ```
 
-</details>
-
 ---
 
-### Exercise 5: Update the `GameBoard` Component
+## Exercise 5: Update the `GameBoard` Component
 
-You'll modify the `GameBoard` component to use the new `GameResultsDialog` for displaying game over messages.
+Now you'll modify the `GameBoard` component to use the new `GameResultsDialog` for displaying game over messages.
 
-**Instructions:**
+### Changes:
 
-1. Open `src/components/game-board.tsx`.
-2. Replace the old `GameResults` component with `GameResultsDialog`.
-3. Adjust the component structure if necessary.
-
-**Hints:**
-
-- Ensure you pass the required props (`status` and `guesses`) to `GameResultsDialog`.
-- Remove or comment out the old `GameResults` component to avoid confusion.
-
-Here's a starting point for your updated `GameBoard` component:
+- Replaced the old `GameResults` component with the new `GameResultsDialog`.
+- Passed the `status` and `guesses` props to the `GameResultsDialog`.
 
 ```typescript
 // src/components/game-board.tsx
@@ -438,17 +291,17 @@ Here's a starting point for your updated `GameBoard` component:
 import { type api } from "~/server/api";
 import { type games } from "~/server/db/schema";
 
-// TODO: Import GameResultsDialog instead of GameResults
-// import { GameResultsDialog } from "./game-results-dialog";
+import { GameResultsDialog } from "./game-results-dialog"; // Import the new GameResultsDialog component
 import { GuessInput } from "./guess-input";
 import { GuessList } from "./guess-list";
 
 type GameBoardProps = {
   gameId: number;
-  status: (typeof games.status.enumValues)[number];
-  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
+  status: (typeof games.status.enumValues)[number]; // Game status (in progress, won, lost)
+  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>; // All guesses for the current game
 };
 
+// Updated the GameBoard component to include GameResultsDialog for game-over feedback
 export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
   return (
     <div className="flex grow flex-col items-center gap-6">
@@ -458,132 +311,83 @@ export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
         {/* Only show GuessInput if the game is still in progress */}
         {status === "in_progress" && <GuessInput gameId={gameId} />}
       </div>
-      {/* TODO: Add the new GameResultsDialog component */}
-    </div>
-  );
-};
-```
-
-When you're ready, check your implementation against the provided solution.
-
----
-
-<details>
-<summary>👉 Click here to see the solution 👈</summary>
-
-```typescript
-// src/components/game-board.tsx
-
-import { type api } from "~/server/api";
-import { type games } from "~/server/db/schema";
-
-import { GameResultsDialog } from "./game-results-dialog";
-import { GuessInput } from "./guess-input";
-import { GuessList } from "./guess-list";
-
-type GameBoardProps = {
-  gameId: number;
-  status: (typeof games.status.enumValues)[number];
-  guesses: Awaited<ReturnType<typeof api.guesses.findByGameId>>;
-};
-
-export const GameBoard = ({ gameId, status, guesses }: GameBoardProps) => {
-  return (
-    <div className="flex grow flex-col items-center gap-6">
-      <div className="flex flex-col gap-2">
-        {/* Display the list of guesses */}
-        <GuessList guesses={guesses} />
-        {/* Only show GuessInput if the game is still in progress */}
-        {status === "in_progress" && <GuessInput gameId={gameId} />}
-      </div>
-      {/* Add the new GameResultsDialog component */}
+      {/* Include the new GameResultsDialog to show results and confetti for wins */}
       <GameResultsDialog status={status} guesses={guesses} />
     </div>
   );
 };
 ```
 
-</details>
-
 ---
 
-### Exercise 6: Refine the On-Screen Keyboard
+## Exercise 6: Refine the On-Screen Keyboard
 
 Finally, you'll improve the styling of the on-screen keyboard for a more polished look.
 
-**Instructions:**
+### Changes:
 
-1. Open `src/components/guess-keyboard.tsx`.
-2. Adjust the keyboard layout and button styling.
-3. Ensure the keyboard integrates well with the updated game board and input.
-
-**Hints:**
-
-- Modify the `buttonTheme` to adjust the appearance of the keys.
-- Update the `layout` and `display` props for better key arrangement.
-- Ensure the keys are larger and easier to interact with.
+- Updated the keyboard layout and button styling for better interaction.
+- Adjusted the size and theme of the keys to be more responsive.
 
 ```typescript
 // src/components/guess-keyboard.tsx
 
 "use client";
 
-import "react-simple-keyboard/build/css/index.css";
+import "react-simple-keyboard/build/css/index.css"; // Importing CSS for the virtual keyboard
 
 import Keyboard from "react-simple-keyboard";
 
-import { useGuess } from "~/lib/hooks/use-guess";
-import { api } from "~/server/api";
+import { useCreateGuess } from "~/lib/hooks/use-create-guess"; // Hook to handle creating guesses
+import { useGuess } from "~/lib/hooks/use-guess"; // Hook to track the user's current guess
 
 type GuessKeyboardProps = {
   gameId: number;
 };
 
+// Updated styling for a more user-friendly and polished keyboard
 export const GuessKeyboard = ({ gameId }: GuessKeyboardProps) => {
   const { guess, setGuess } = useGuess();
 
+  const createGuess = useCreateGuess();
+
   return (
     <Keyboard
-      layout={{
-        default: [
-          "Q W E R T Y U I O P",
-          "A S D F G H J K L",
-          "{enter} Z X C V B N M {bksp}",
-        ],
-      }}
-      display={{
-        "{enter}": "enter",
-        "{bksp}": "⌫",
-      }}
-      maxLength={5}
-      value={guess}
-      onChange={(value) => setGuess(value)}
-      onKeyPress={async (button) => {
-        if (button === "{enter}" && guess.length === 5) {
-          try {
-            // Submit the guess when Enter is pressed
-            await api.guesses.create(guess, gameId);
-            setGuess("");
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      }}
+      theme="hg-theme-default !bg-secondary/75" // Applied custom theme to the keyboard
       buttonTheme={[
         {
-          // Improve button styling for a more polished look
           class:
             "!bg-background !text-foreground !border-none !shadow-none hover:!bg-secondary/50 active:!bg-white/25 !h-16",
           buttons:
-            "Q W E R T Y U I O P A S D F G H J K L Z X C V B N M {bksp} {enter}",
+            "Q W E R T Y U I O P A S D F G H J K L Z X C V B N M {delete} {enter}",
         },
       ]}
+      layout={{
+        default: [
+          "Q W E R T Y U I O P {delete}", // Added a row for the delete key
+          "A S D F G H J K L {enter}", // Added a row for the enter key
+          "Z X C V B N M", // Arranged the bottom row for letters
+        ],
+      }}
+      onKeyPress={async (input) => {
+        if (input === "{delete}") {
+          setGuess(guess.slice(0, -1)); // Remove the last letter on delete press
+          return;
+        }
+
+        if (input === "{enter}") {
+          await createGuess(guess, gameId); // Submit the guess when enter is pressed
+          return;
+        }
+
+        if (guess.length === 5) return; // Prevent further input after 5 characters
+
+        setGuess(guess + input); // Add the pressed key to the guess
+      }}
     />
   );
 };
 ```
-
-</details>
 
 ---
 
