@@ -339,7 +339,7 @@ export const GuessInput = () => {
     >
       <InputOTPGroup>
         {/* Render 5 input slots */}
-        {[...Array(5)].map((_, index) => (
+        {[0, 1, 2, 3, 4].map((_, index) => (
           <InputOTPSlot
             key={index}
             index={index}
