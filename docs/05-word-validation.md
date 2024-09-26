@@ -63,9 +63,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable} dark`}>
-      <body className="h-screen">{children}</body>
-      {/* Add the Toaster component to display toast notifications */}
-      <Toaster closeButton={true} expand={true} visibleToasts={4} />
+      <body className="h-screen">
+        {children}
+        {/* Add the Toaster component to display toast notifications */}
+        <Toaster closeButton={true} expand={true} visibleToasts={4} />
+      </body>
     </html>
   );
 }
@@ -73,10 +75,7 @@ export default function RootLayout({
 
 **Explanation:**
 
-- **Import Statements:**
-  - Imported the `Toaster` component from `~/components/ui/sonner`.
 - **Adding the Toaster:**
-  - Placed the `<Toaster>` component inside the `<html>` tag but outside the `<body>` tag. This ensures it's available throughout your application.
   - Configured the `Toaster` with `closeButton`, `expand`, and `visibleToasts` props to customize its behavior.
 
 ---
@@ -247,7 +246,7 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
       }}
     >
       <InputOTPGroup>
-        {[...Array(5)].map((_, index) => (
+        {[0, 1, 2, 3, 4].map((_, index) => (
           <InputOTPSlot
             key={index}
             index={index}
@@ -482,8 +481,6 @@ Now that you've implemented word validation and enhanced user feedback, it's tim
 - The application should prevent invalid inputs and provide immediate feedback.
 - Valid guesses should be accepted and displayed with appropriate color coding.
 - Error messages should help guide the user towards valid inputs.
-
-If everything works as expected, congratulations! You've successfully enhanced your Wordle clone with word validation and improved user feedback.
 
 ---
 

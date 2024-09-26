@@ -437,6 +437,219 @@ export const useCreateGame = (withRedirect = true) => {
 
 </details>
 
+Here’s the full content for **Exercise 5**, including the **Explanation** section in the solution:
+
+---
+
+### Exercise 5: Updating the Guess Service
+
+In this exercise, you'll update the **guess service** to handle game state transitions when a player has either won or lost. This includes counting the number of guesses and updating the game's status based on the result.
+
+**Instructions:**
+
+1. **Update the Guess Service File:**
+
+   - Open the file at `src/server/services/guess.service.ts`.
+
+2. **Update the `create` Function:**
+
+   - Modify the `create` function to handle the following scenarios:
+     - The player has lost after six incorrect guesses.
+     - The player has won by guessing the correct word.
+   - Use the `gameService.update` function to update the game status when necessary.
+
+3. **Implement the `countByGameId` Function:**
+
+   - Create a new function that counts the number of guesses for a given game.
+   - This function will be used to determine if the player has used all their attempts.
+
+4. **Refactor the `checkGuess` Function:**
+
+   - Ensure that the `checkGuess` function is used within the `create` function to validate guesses.
+
+**Hints:**
+
+- Use `gameService.update(gameId, "lost")` to update the game status to "lost."
+- Use `gameService.update(gameId, "won")` to update the game status to "won" when the correct word is guessed.
+- The `countByGameId` function should utilize the `drizzle-orm` `count` function to tally the guesses.
+- Use `revalidatePath` to ensure the game's path is revalidated after updates.
+
+---
+
+Here’s a **starting point** for your updated `guessService`:
+
+```typescript
+import { asc, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+
+import { db } from "../db";
+import { games, guesses } from "../db/schema";
+import { gameService } from "./game.service";
+
+// TODO: Modify this function to count the guesses and update the game status
+const create = async (guess: string, gameId: number) => {
+  const result = await checkGuess(guess, gameId);
+
+  const [createdGuess] = await db
+    .insert(guesses)
+    .values({
+      gameId,
+      guess: guess.toUpperCase(),
+      result,
+    })
+    .returning();
+
+  if (!createdGuess) {
+    throw new Error("Failed to create guess");
+  }
+
+  // TODO: Implement guess count and game status updates
+
+  revalidatePath(`/game/${gameId}`);
+
+  return createdGuess;
+};
+
+// TODO: Implement this function to count the guesses for a specific game
+const countByGameId = async (gameId: number) => {
+  // Use drizzle-orm's count function to count guesses for the game
+};
+
+export const guessService = {
+  create,
+  findByGameId,
+};
+```
+
+**Try to complete the `create` and `countByGameId` functions before looking at the solution.**
+
+---
+
+<details>
+<summary>👉 Click here to see the solution 👈</summary>
+
+```typescript
+import { asc, count, eq } from "drizzle-orm"; // 'count' is newly imported to tally guesses
+import { revalidatePath } from "next/cache"; // 'revalidatePath' is imported to refresh the game path after changes
+
+import { db } from "../db";
+import { games, guesses } from "../db/schema";
+import { gameService } from "./game.service"; // 'gameService' is used to update the game status (win/loss)
+
+// Function to check if a guess is correct and return feedback for each letter
+const checkGuess = async (guess: string, gameId: number) => {
+  const game = await db.query.games.findFirst({
+    where: eq(games.id, gameId),
+  });
+
+  if (!game) {
+    throw new Error("Game not found");
+  }
+
+  const actualWord = game.word.toUpperCase();
+  const upperGuess = guess.toUpperCase();
+  const result = new Array(5).fill("X");
+  const charCount = new Map();
+
+  // This logic fills in the result array with "C" for correct letters
+  for (let i = 0; i < 5; i++) {
+    if (upperGuess[i] === actualWord[i]) {
+      result[i] = "C";
+      charCount.set(upperGuess[i], charCount.get(upperGuess[i]) - 1);
+    }
+  }
+
+  // This logic fills in the result array with "~" for correct letters in wrong positions
+  for (let i = 0; i < 5; i++) {
+    if (result[i] !== "C" && charCount.get(upperGuess[i]) > 0) {
+      result[i] = "~";
+      charCount.set(upperGuess[i], charCount.get(upperGuess[i]) - 1);
+    }
+  }
+
+  return result.join("");
+};
+
+// Updated 'create' function to handle win/loss conditions based on guesses
+const create = async (guess: string, gameId: number) => {
+  const result = await checkGuess(guess, gameId);
+
+  const [createdGuess] = await db
+    .insert(guesses)
+    .values({
+      gameId,
+      guess: guess.toUpperCase(),
+      result,
+    })
+    .returning();
+
+  if (!createdGuess) {
+    throw new Error("Failed to create guess");
+  }
+
+  const count = await countByGameId(gameId); // Count the number of guesses made for this game
+
+  // If the player has made 6 guesses and still has incorrect letters ("X"), update the game as lost
+  if (count === 6 && createdGuess.result.includes("X")) {
+    await gameService.update(gameId, "lost"); // Update game status to 'lost'
+  }
+
+  // If the player guessed the word correctly ("CCCCC"), update the game as won
+  if (createdGuess.result === "CCCCC") {
+    await gameService.update(gameId, "won"); // Update game status to 'won'
+  }
+
+  revalidatePath(`/game/${gameId}`); // Revalidate the game path to reflect the new state
+
+  return createdGuess;
+};
+
+// New function to count the number of guesses made for a particular game
+const countByGameId = async (gameId: number) => {
+  const [gameCount] = await db
+    .select({ count: count() }) // Count the total number of guesses for the game
+    .from(guesses)
+    .where(eq(guesses.gameId, gameId));
+
+  if (!gameCount) {
+    throw new Error("Error counting guesses");
+  }
+
+  return gameCount.count; // Return the number of guesses
+};
+
+// Function to find all guesses made for a specific game
+const findByGameId = async (gameId: number) => {
+  return db.query.guesses.findMany({
+    where: eq(guesses.gameId, gameId),
+    orderBy: [asc(guesses.createdAt)],
+  });
+};
+
+export const guessService = {
+  create,
+  findByGameId,
+};
+```
+
+---
+
+**Explanation:**
+
+- **Game Over Logic:**
+  - The game status is updated to `"lost"` if six guesses have been made and the latest guess contains an `"X"`, meaning the player didn't guess the correct word within the allowed attempts.
+  - The game status is updated to `"won"` if the guess result is `"CCCCC"`, indicating that the player guessed the word correctly.
+- **Counting Guesses:**
+
+  - The `countByGameId` function utilizes `drizzle-orm`'s `count` function to retrieve the number of guesses made for a specific game. This is used to determine if the player has used all six attempts.
+
+- **Revalidating the Game Path:**
+  - `revalidatePath` ensures that the game page is refreshed and up-to-date after each guess, reflecting the game's current status.
+
+</details>
+
+---
+
 ## Checking Your Progress
 
 Now that you've implemented the game over logic and new game creation, it's time to test your application.
