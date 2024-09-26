@@ -16,8 +16,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable} dark`}>
-      <body className="h-screen">{children}</body>
-      <Toaster closeButton={true} expand={true} visibleToasts={4} />
+      <body className="h-screen">
+        {children}
+        <Toaster closeButton={true} expand={true} visibleToasts={4} />
+      </body>
     </html>
   );
 }
