@@ -357,7 +357,7 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
       }}
     >
       <InputOTPGroup>
-        {[...Array(5)].map((_, index) => (
+        {[0, 1, 2, 3, 4].map((_, index) => (
           <InputOTPSlot
             key={index}
             index={index}
@@ -385,11 +385,11 @@ export const GuessInput = ({ gameId }: GuessInputProps) => {
 
 ## Checking Your Progress
 
+![Section 4 Checkpoint](img/3.png)
+
 Now that you've implemented the on-screen keyboard and updated the components, it's time to test your application.
 
 **Instructions:**
-
-![Section 4 Checkpoint](img/3.png)
 
 1. **Start the Development Server:**
 
